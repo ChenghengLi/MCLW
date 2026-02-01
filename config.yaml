@@ -1,0 +1,103 @@
+# LTW Watermark Configuration
+
+# =============================================
+# LOCAL MODEL SETTINGS
+# =============================================
+model:
+  # For text generation (watermarked/non-watermarked)
+  generator:
+    name: "gpt2"                    # Local HuggingFace model
+    # name: "gpt2-medium"           # Larger model option
+    # name: "meta-llama/Llama-2-7b" # Requires authentication
+    device: "auto"                  # "cuda", "cpu", or "auto"
+    max_length: 256
+    temperature: 0.7
+    top_p: 0.9
+    do_sample: true
+  
+  # For embeddings (watermark detection)
+  embedder:
+    name: "all-MiniLM-L6-v2"        # Sentence transformer
+    # name: "all-mpnet-base-v2"     # Higher quality, slower
+    cache_embeddings: true
+
+# =============================================
+# PERPLEXITY DETECTION (BASELINE)
+# =============================================
+perplexity:
+  model_name: "gpt2"
+  threshold: 30.0
+  burstiness_threshold: 0.3
+
+# =============================================
+# WATERMARK SETTINGS
+# =============================================
+watermark:
+  secret_key: "your-secret-key-change-me-2024"
+  rotation_strength: 0.3          # 0-1, how much to rotate in embedding space
+  watermark_strength: 2.0         # Logit bias strength (higher = stronger watermark)
+  detection_threshold: 0.1        # Differential score threshold
+  use_differential_scoring: true
+  unit: "sentence"                # "word" or "sentence"
+
+# =============================================
+# DATA PATHS
+# =============================================
+data:
+  watermarked_dir: "data/watermarked"
+  non_watermarked_dir: "data/non_watermarked"
+  human_dir: "data/human"
+  output_format: "jsonl"          # "jsonl" or "txt"
+
+# =============================================
+# GENERATION SETTINGS
+# =============================================
+generation:
+  prompts:
+    - "Explain the concept of machine learning in simple terms."
+    - "Describe the effects of climate change on ocean ecosystems."
+    - "Write about the future of renewable energy technology."
+    - "Discuss the ethical implications of artificial intelligence."
+    - "Explain how quantum computers differ from classical computers."
+  n_samples_per_prompt: 5
+  random_seed: 42
+
+# =============================================
+# EXPERIMENT SETTINGS
+# =============================================
+experiments:
+  random_seed: 42
+  
+  # Experiment 1: Basic Detection
+  exp1:
+    use_data_folder: true
+  
+  # Experiment 2: False Positive Rate
+  exp2:
+    n_samples: 200
+    thresholds: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
+  
+  # Experiment 3: Paraphrase Robustness
+  exp3:
+    n_samples: 50
+    paraphrase_methods:
+      - "synonym_replacement"
+      - "sentence_restructure"
+      - "back_translation"
+  
+  # Experiment 4: Perplexity Comparison
+  exp4:
+    n_samples: 100
+  
+  # Experiment 5: Anisotropy Analysis
+  exp5:
+    n_samples: 500
+    rotation_strengths: [0.1, 0.2, 0.3, 0.5, 0.7, 1.0]
+
+# =============================================
+# OUTPUT SETTINGS
+# =============================================
+output:
+  results_dir: "results/"
+  figures_dir: "results/figures/"
+  save_intermediates: true
