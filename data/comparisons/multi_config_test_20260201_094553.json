@@ -1,0 +1,90 @@
+[
+  {
+    "description": "Clockwork 4-state, Hard partition",
+    "chain_key": "clockwork",
+    "overlap": 0.0,
+    "num_states": 4,
+    "mean_score": 0.971090534979424,
+    "std_score": 0.023206487983385708,
+    "mean_ppl": 22.2441045391307,
+    "detection_rate": 1.0,
+    "expected_random": 0.25
+  },
+  {
+    "description": "Clockwork 4-state, 20% overlap",
+    "chain_key": "clockwork",
+    "overlap": 0.2,
+    "num_states": 4,
+    "mean_score": 0.5061213991769548,
+    "std_score": 0.023248183481534918,
+    "mean_ppl": 7.267262617862703,
+    "detection_rate": 0.6666666666666666,
+    "expected_random": 0.25
+  },
+  {
+    "description": "Clockwork 4-state, 40% overlap",
+    "chain_key": "clockwork",
+    "overlap": 0.4,
+    "num_states": 4,
+    "mean_score": 0.325,
+    "std_score": 0.035355339059327355,
+    "mean_ppl": 3.8246283625933155,
+    "detection_rate": 0.0,
+    "expected_random": 0.25
+  },
+  {
+    "description": "Clockwork 4-state, 60% overlap",
+    "chain_key": "clockwork",
+    "overlap": 0.6,
+    "num_states": 4,
+    "mean_score": 0.25416666666666665,
+    "std_score": 0.032808366141715874,
+    "mean_ppl": 4.966896818377692,
+    "detection_rate": 0.0,
+    "expected_random": 0.25
+  },
+  {
+    "description": "Binary 2-state, Hard partition",
+    "chain_key": "binary",
+    "overlap": 0.0,
+    "num_states": 2,
+    "mean_score": 1.0,
+    "std_score": 0.0,
+    "mean_ppl": 4.443648482040754,
+    "detection_rate": 1.0,
+    "expected_random": 0.5
+  },
+  {
+    "description": "Binary 2-state, 20% overlap",
+    "chain_key": "binary",
+    "overlap": 0.2,
+    "num_states": 2,
+    "mean_score": 0.7666666666666666,
+    "std_score": 0.1649915822768611,
+    "mean_ppl": 3.5245429934980717,
+    "detection_rate": 1.0,
+    "expected_random": 0.5
+  },
+  {
+    "description": "Soft cycle 4-state, Hard partition",
+    "chain_key": "soft_cycle",
+    "overlap": 0.0,
+    "num_states": 4,
+    "mean_score": 0.9875000000000002,
+    "std_score": 1.1102230246251565e-16,
+    "mean_ppl": 5.098552467018592,
+    "detection_rate": 1.0,
+    "expected_random": 0.5
+  },
+  {
+    "description": "Soft cycle 4-state, 30% overlap",
+    "chain_key": "soft_cycle",
+    "overlap": 0.3,
+    "num_states": 4,
+    "mean_score": 0.65,
+    "std_score": 0.027003086243366076,
+    "mean_ppl": 2.956088037926156,
+    "detection_rate": 1.0,
+    "expected_random": 0.5
+  }
+]

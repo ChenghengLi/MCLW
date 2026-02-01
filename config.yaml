@@ -1,103 +1,82 @@
-# LTW Watermark Configuration
+# =============================================
+# MCL Watermark Configuration
+# =============================================
+# This config file controls the Markov Chain-Lock (MCL) watermarking system.
 
 # =============================================
-# LOCAL MODEL SETTINGS
+# MODEL SETTINGS
 # =============================================
 model:
-  # For text generation (watermarked/non-watermarked)
+  # Language model for text generation
   generator:
-    name: "gpt2"                    # Local HuggingFace model
-    # name: "gpt2-medium"           # Larger model option
-    # name: "meta-llama/Llama-2-7b" # Requires authentication
-    device: "auto"                  # "cuda", "cpu", or "auto"
-    max_length: 256
-    temperature: 0.7
-    top_p: 0.9
-    do_sample: true
-  
-  # For embeddings (watermark detection)
-  embedder:
-    name: "all-MiniLM-L6-v2"        # Sentence transformer
-    # name: "all-mpnet-base-v2"     # Higher quality, slower
-    cache_embeddings: true
+    name: "meta-llama/Llama-3.2-3B-Instruct"
+    device: "cuda"              # "cuda" for GPU, "cpu" for CPU
+    max_length: 256             # Maximum tokens to generate per sample
+    temperature: 1.0            # 1.0 = greedy within state constraints
 
 # =============================================
-# PERPLEXITY DETECTION (BASELINE)
+# MCL WATERMARK SETTINGS
 # =============================================
-perplexity:
-  model_name: "gpt2"
-  threshold: 30.0
-  burstiness_threshold: 0.3
-
-# =============================================
-# WATERMARK SETTINGS
-# =============================================
-watermark:
+mcl:
+  # Secret key for watermark - CHANGE THIS for your deployment
+  # The key determines how tokens are assigned to states via SHA-256 hash
   secret_key: "your-secret-key-change-me-2024"
-  rotation_strength: 0.3          # 0-1, how much to rotate in embedding space
-  watermark_strength: 2.0         # Logit bias strength (higher = stronger watermark)
-  detection_threshold: 0.1        # Differential score threshold
-  use_differential_scoring: true
-  unit: "sentence"                # "word" or "sentence"
+  
+  # Number of Markov chain states (2-7 recommended)
+  # More states = stronger detection but fewer tokens available per state
+  # - 2 states: 50% vocab per state, random baseline 50%
+  # - 4 states: 25% vocab per state, random baseline 25%
+  # - 6 states: 16.7% vocab per state, random baseline 16.7%
+  num_states: 4
+  
+  # Transition topology: how states connect
+  # - "clockwork": strict cycle 0->1->2->3->0 (strongest detection)
+  # - "binary": alternating 0->1->0->1
+  # - "soft_cycle": allows skipping one state (better quality)
+  chain_key: "clockwork"
+  
+  # Overlap ratio for soft partitions (0.0 - 1.0)
+  # Higher overlap = more tokens available = better quality but weaker detection
+  # - 0.00: hard partition, each token in exactly 1 state
+  # - 0.10: ~33% of vocab per state
+  # - 0.15: ~36% of vocab per state
+  overlap_ratio: 0.10
+  
+  # Detection threshold (0.0 - 1.0)
+  # Score above this = classified as watermarked
+  # For clockwork with S states, random baseline is 1/S (0.25 for S=4)
+  # Recommended: 0.5 for strong detection
+  detection_threshold: 0.5
 
 # =============================================
-# DATA PATHS
-# =============================================
-data:
-  watermarked_dir: "data/watermarked"
-  non_watermarked_dir: "data/non_watermarked"
-  human_dir: "data/human"
-  output_format: "jsonl"          # "jsonl" or "txt"
-
-# =============================================
-# GENERATION SETTINGS
+# DATASET GENERATION
 # =============================================
 generation:
+  # Sample prompts for generating watermarked text
   prompts:
     - "Explain the concept of machine learning in simple terms."
     - "Describe the effects of climate change on ocean ecosystems."
     - "Write about the future of renewable energy technology."
     - "Discuss the ethical implications of artificial intelligence."
     - "Explain how quantum computers differ from classical computers."
+  
+  # Number of samples to generate per prompt
   n_samples_per_prompt: 5
+  
+  # Random seed for reproducibility
   random_seed: 42
 
 # =============================================
-# EXPERIMENT SETTINGS
+# DATA PATHS
 # =============================================
-experiments:
-  random_seed: 42
-  
-  # Experiment 1: Basic Detection
-  exp1:
-    use_data_folder: true
-  
-  # Experiment 2: False Positive Rate
-  exp2:
-    n_samples: 200
-    thresholds: [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
-  
-  # Experiment 3: Paraphrase Robustness
-  exp3:
-    n_samples: 50
-    paraphrase_methods:
-      - "synonym_replacement"
-      - "sentence_restructure"
-      - "back_translation"
-  
-  # Experiment 4: Perplexity Comparison
-  exp4:
-    n_samples: 100
-  
-  # Experiment 5: Anisotropy Analysis
-  exp5:
-    n_samples: 500
-    rotation_strengths: [0.1, 0.2, 0.3, 0.5, 0.7, 1.0]
+data:
+  output_dir: "data/"           # Where to save generated datasets
+  human_dir: "data/human"       # Human-written text for comparison
+  output_format: "jsonl"        # Output format: "jsonl" or "txt"
 
 # =============================================
 # OUTPUT SETTINGS
 # =============================================
 output:
   results_dir: "results/"
-  figures_dir: "results/figures/"
   save_intermediates: true

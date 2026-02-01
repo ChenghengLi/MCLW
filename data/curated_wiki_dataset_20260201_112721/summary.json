@@ -1,0 +1,305 @@
+{
+  "timestamp": "20260201_112721",
+  "model": "meta-llama/Llama-3.2-3B-Instruct",
+  "secret_key": "curated_wiki_dataset_2024",
+  "seed": 42,
+  "concepts_count": 173,
+  "configs": [
+    {
+      "name": "states2_overlap0pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states2_overlap5pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states2_overlap10pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states2_overlap15pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states4_overlap0pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states4_overlap5pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states4_overlap10pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states4_overlap15pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states5_overlap0pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states5_overlap5pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states5_overlap10pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states5_overlap15pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states7_overlap0pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states7_overlap5pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states7_overlap10pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states7_overlap15pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states9_overlap0pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states9_overlap5pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states9_overlap10pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states9_overlap15pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states11_overlap0pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states11_overlap5pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states11_overlap10pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states11_overlap15pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states15_overlap0pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states15_overlap5pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states15_overlap10pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states15_overlap15pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    }
+  ],
+  "stats": [
+    {
+      "config": "states2_overlap0pct",
+      "num_states": 2,
+      "overlap": 0.0,
+      "avg_score": 1.0,
+      "avg_ppl": 1.2863447307511704,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap5pct",
+      "num_states": 2,
+      "overlap": 0.05,
+      "avg_score": 1.0,
+      "avg_ppl": 1.2863447307511704,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap10pct",
+      "num_states": 2,
+      "overlap": 0.1,
+      "avg_score": 1.0,
+      "avg_ppl": 1.2863447307511704,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap15pct",
+      "num_states": 2,
+      "overlap": 0.15,
+      "avg_score": 1.0,
+      "avg_ppl": 1.2863447307511704,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states4_overlap0pct",
+      "num_states": 4,
+      "overlap": 0.0,
+      "avg_score": 0.9887218231639237,
+      "avg_ppl": 4.891848497650781,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap5pct",
+      "num_states": 4,
+      "overlap": 0.05,
+      "avg_score": 0.8423948141181473,
+      "avg_ppl": 4.477629731952223,
+      "detection_rate": 0.9942196531791907,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap10pct",
+      "num_states": 4,
+      "overlap": 0.1,
+      "avg_score": 0.6958583640899768,
+      "avg_ppl": 3.9988814157012853,
+      "detection_rate": 0.9884393063583815,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap15pct",
+      "num_states": 4,
+      "overlap": 0.15,
+      "avg_score": 0.6261301343214705,
+      "avg_ppl": 3.842905087485959,
+      "detection_rate": 0.9595375722543352,
+      "baseline": 0.5
+    },
+    {
+      "config": "states5_overlap0pct",
+      "num_states": 5,
+      "overlap": 0.0,
+      "avg_score": 0.9914629486793384,
+      "avg_ppl": 4.98156515990635,
+      "detection_rate": 1.0,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap5pct",
+      "num_states": 5,
+      "overlap": 0.05,
+      "avg_score": 0.7259710189067804,
+      "avg_ppl": 4.74114583675787,
+      "detection_rate": 0.9653179190751445,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap10pct",
+      "num_states": 5,
+      "overlap": 0.1,
+      "avg_score": 0.6390887982326012,
+      "avg_ppl": 4.855708744298254,
+      "detection_rate": 0.953757225433526,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap15pct",
+      "num_states": 5,
+      "overlap": 0.15,
+      "avg_score": 0.5418462788516569,
+      "avg_ppl": 4.218162611246838,
+      "detection_rate": 0.7052023121387283,
+      "baseline": 0.4
+    },
+    {
+      "config": "states7_overlap0pct",
+      "num_states": 7,
+      "overlap": 0.0,
+      "avg_score": 0.9908262575968348,
+      "avg_ppl": 4.195729477206971,
+      "detection_rate": 1.0,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap5pct",
+      "num_states": 7,
+      "overlap": 0.05,
+      "avg_score": 0.6429610176757444,
+      "avg_ppl": 4.761579244321938,
+      "detection_rate": 0.9190751445086706,
+      "baseline": 0.2857142857142857
+    }
+  ]
+}

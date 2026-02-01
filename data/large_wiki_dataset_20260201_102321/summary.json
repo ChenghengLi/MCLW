@@ -1,0 +1,370 @@
+{
+  "timestamp": "20260201_102321",
+  "model": "meta-llama/Llama-3.2-3B-Instruct",
+  "secret_key": "large_wiki_dataset_2024",
+  "concepts_count": 30,
+  "configs": [
+    {
+      "name": "states2_overlap0pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states2_overlap5pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states2_overlap10pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states2_overlap15pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states3_overlap0pct",
+      "num_states": 3,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states3_overlap5pct",
+      "num_states": 3,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states3_overlap10pct",
+      "num_states": 3,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states3_overlap15pct",
+      "num_states": 3,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states4_overlap0pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states4_overlap5pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states4_overlap10pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states4_overlap15pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states5_overlap0pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states5_overlap5pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states5_overlap10pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states5_overlap15pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states6_overlap0pct",
+      "num_states": 6,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states6_overlap5pct",
+      "num_states": 6,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states6_overlap10pct",
+      "num_states": 6,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states6_overlap15pct",
+      "num_states": 6,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states7_overlap0pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states7_overlap5pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states7_overlap10pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states7_overlap15pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    }
+  ],
+  "stats": [
+    {
+      "config": "states2_overlap0pct",
+      "num_states": 2,
+      "overlap": 0.0,
+      "avg_score": 1.0,
+      "avg_ppl": 1.4974566918013146,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap5pct",
+      "num_states": 2,
+      "overlap": 0.05,
+      "avg_score": 1.0,
+      "avg_ppl": 1.4974566918013146,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap10pct",
+      "num_states": 2,
+      "overlap": 0.1,
+      "avg_score": 1.0,
+      "avg_ppl": 1.4974566918013146,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap15pct",
+      "num_states": 2,
+      "overlap": 0.15,
+      "avg_score": 1.0,
+      "avg_ppl": 1.4974566918013146,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states3_overlap0pct",
+      "num_states": 3,
+      "overlap": 0.0,
+      "avg_score": 0.9993299663299664,
+      "avg_ppl": 3.9826394971198473,
+      "detection_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states3_overlap5pct",
+      "num_states": 3,
+      "overlap": 0.05,
+      "avg_score": 0.9152768699550367,
+      "avg_ppl": 3.5712249621870193,
+      "detection_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states3_overlap10pct",
+      "num_states": 3,
+      "overlap": 0.1,
+      "avg_score": 0.8528922558922559,
+      "avg_ppl": 3.109767386856232,
+      "detection_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states3_overlap15pct",
+      "num_states": 3,
+      "overlap": 0.15,
+      "avg_score": 0.8232693602693602,
+      "avg_ppl": 2.9479551886096345,
+      "detection_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states4_overlap0pct",
+      "num_states": 4,
+      "overlap": 0.0,
+      "avg_score": 0.988316498316498,
+      "avg_ppl": 5.668291627682483,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap5pct",
+      "num_states": 4,
+      "overlap": 0.05,
+      "avg_score": 0.8432131117873692,
+      "avg_ppl": 4.60806556002755,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap10pct",
+      "num_states": 4,
+      "overlap": 0.1,
+      "avg_score": 0.7413333333333333,
+      "avg_ppl": 4.223794417923177,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap15pct",
+      "num_states": 4,
+      "overlap": 0.15,
+      "avg_score": 0.6948227856799283,
+      "avg_ppl": 4.206017943727455,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    },
+    {
+      "config": "states5_overlap0pct",
+      "num_states": 5,
+      "overlap": 0.0,
+      "avg_score": 0.9879696969696966,
+      "avg_ppl": 6.496609724409534,
+      "detection_rate": 1.0,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap5pct",
+      "num_states": 5,
+      "overlap": 0.05,
+      "avg_score": 0.7976195286195285,
+      "avg_ppl": 6.367528423054261,
+      "detection_rate": 1.0,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap10pct",
+      "num_states": 5,
+      "overlap": 0.1,
+      "avg_score": 0.6626990311276024,
+      "avg_ppl": 6.253431451798359,
+      "detection_rate": 1.0,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap15pct",
+      "num_states": 5,
+      "overlap": 0.15,
+      "avg_score": 0.5859704528275957,
+      "avg_ppl": 5.627123774285078,
+      "detection_rate": 0.8333333333333334,
+      "baseline": 0.4
+    },
+    {
+      "config": "states6_overlap0pct",
+      "num_states": 6,
+      "overlap": 0.0,
+      "avg_score": 0.9905852293070339,
+      "avg_ppl": 6.008083521988113,
+      "detection_rate": 1.0,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states6_overlap5pct",
+      "num_states": 6,
+      "overlap": 0.05,
+      "avg_score": 0.7548806213954727,
+      "avg_ppl": 7.20820747133469,
+      "detection_rate": 0.9666666666666667,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states6_overlap10pct",
+      "num_states": 6,
+      "overlap": 0.1,
+      "avg_score": 0.5391919191919192,
+      "avg_ppl": 6.367966975603682,
+      "detection_rate": 0.6333333333333333,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states6_overlap15pct",
+      "num_states": 6,
+      "overlap": 0.15,
+      "avg_score": 0.46855405877766126,
+      "avg_ppl": 5.349403666527436,
+      "detection_rate": 0.26666666666666666,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states7_overlap0pct",
+      "num_states": 7,
+      "overlap": 0.0,
+      "avg_score": 0.98628199520983,
+      "avg_ppl": 8.850004529090286,
+      "detection_rate": 1.0,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap5pct",
+      "num_states": 7,
+      "overlap": 0.05,
+      "avg_score": 0.7404729077718767,
+      "avg_ppl": 6.75167088261924,
+      "detection_rate": 0.9666666666666667,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap10pct",
+      "num_states": 7,
+      "overlap": 0.1,
+      "avg_score": 0.45842637256922975,
+      "avg_ppl": 6.968289146318266,
+      "detection_rate": 0.23333333333333334,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap15pct",
+      "num_states": 7,
+      "overlap": 0.15,
+      "avg_score": 0.39552389139623173,
+      "avg_ppl": 6.411671563787451,
+      "detection_rate": 0.2,
+      "baseline": 0.2857142857142857
+    }
+  ]
+}

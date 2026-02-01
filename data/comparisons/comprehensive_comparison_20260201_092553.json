@@ -1,0 +1,217 @@
+{
+  "human": [
+    {
+      "perplexity": 10.642364144611967,
+      "chain_score": 0.15517241379310345,
+      "is_watermarked": false
+    },
+    {
+      "perplexity": 7.973638240788439,
+      "chain_score": 0.3275862068965517,
+      "is_watermarked": false
+    },
+    {
+      "perplexity": 6.12847073585352,
+      "chain_score": 0.109375,
+      "is_watermarked": false
+    },
+    {
+      "perplexity": 13.964084996730142,
+      "chain_score": 0.18181818181818182,
+      "is_watermarked": false
+    },
+    {
+      "perplexity": 11.709788763621358,
+      "chain_score": 0.2807017543859649,
+      "is_watermarked": false
+    }
+  ],
+  "non_watermarked": [
+    {
+      "text": " Machine learning is a subset of artificial intelligence that involves training algorithms to make p...",
+      "perplexity": 2.110630434920584,
+      "chain_score": 0.25,
+      "is_watermarked": false
+    },
+    {
+      "text": " \nRenewable energy sources, such as solar, wind, and hydroelectric power, offer several benefits ove...",
+      "perplexity": 1.8815454540494108,
+      "chain_score": 0.32,
+      "is_watermarked": false
+    },
+    {
+      "text": " Photosynthesis is the process by which plants, algae, and some bacteria convert light energy from t...",
+      "perplexity": 1.6428735084272594,
+      "chain_score": 0.22,
+      "is_watermarked": false
+    },
+    {
+      "text": " I want to be able to understand the physical and technical aspects of how the internet works.\nTo an...",
+      "perplexity": 2.4400663518464345,
+      "chain_score": 0.22,
+      "is_watermarked": false
+    },
+    {
+      "text": " Effective communication, emotional intelligence, and a willingness to learn and adapt are essential...",
+      "perplexity": 2.480607753413233,
+      "chain_score": 0.17,
+      "is_watermarked": false
+    }
+  ],
+  "mcl_hard": [
+    {
+      "text": " So, that everyone can easily grasp and understand how it works\n## What Exactly Is Machine?\nIn the a...",
+      "perplexity": 11.541068701424356,
+      "chain_score": 0.99,
+      "is_watermarked": true,
+      "state_seq": [
+        1,
+        2,
+        3,
+        0,
+        1,
+        2,
+        3,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "text": " Renewable Energy Sources\nA) Cost Savings, Reduced Environmental Pollution, Energy Efficiency\nB) Cro...",
+      "perplexity": 2.1589583380915744,
+      "chain_score": 0.99,
+      "is_watermarked": true,
+      "state_seq": [
+        2,
+        3,
+        0,
+        1,
+        2,
+        3,
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "text": " The main components involved\nare sunlight energy source, water and a plant cell.\nPhotosynthetically...",
+      "perplexity": 5.279424727576698,
+      "chain_score": 0.99,
+      "is_watermarked": true,
+      "state_seq": [
+        1,
+        2,
+        3,
+        0,
+        1,
+        2,
+        3,
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "text": " Here we'll explore how it all comes...\nThe world of internet has come a long time. The internet has...",
+      "perplexity": 2.0507349522398175,
+      "chain_score": 0.99,
+      "is_watermarked": true,
+      "state_seq": [
+        2,
+        3,
+        0,
+        1,
+        2,
+        3,
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "text": " (Essay)\n\nModern organizations face complex challenges, such agility demands, rapid innovation requi...",
+      "perplexity": 10.829707916753073,
+      "chain_score": 0.99,
+      "is_watermarked": true,
+      "state_seq": [
+        2,
+        3,
+        0,
+        1,
+        2,
+        3,
+        0,
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "mcl_soft_30": [
+    {
+      "text": " Machine learners (MLers), as we know, rely on data and algorithms. The goal of machine learning is ...",
+      "perplexity": 2.8252946806658517,
+      "chain_score": 0.46,
+      "is_watermarked": false
+    },
+    {
+      "text": " Renewable Energy Sources\nA) Cost savings, Reduced carbon emissions, Increased energy reliability, I...",
+      "perplexity": 2.072999478801446,
+      "chain_score": 0.6,
+      "is_watermarked": true
+    },
+    {
+      "text": " The role of chloroplast, chloroplast DNA, chloroplast proteins, chloroplast membrane, thyl\u0430\u043aoids (t...",
+      "perplexity": 2.573934831885482,
+      "chain_score": 0.5,
+      "is_watermarked": false
+    },
+    {
+      "text": " The internet works as follows: data is sent to and retrieved by servers. The data then gets routed ...",
+      "perplexity": 5.292135887473724,
+      "chain_score": 0.37,
+      "is_watermarked": false
+    },
+    {
+      "text": " (Part 6)\nIn Part VI, we will explore how a leader can foster a collaborative culture, encourage inn...",
+      "perplexity": 8.629380598774038,
+      "chain_score": 0.43,
+      "is_watermarked": false
+    }
+  ],
+  "mcl_soft_50": [
+    {
+      "text": " Machine\nlearners are trained on a dataset and then use the data to learn patterns and relationships...",
+      "perplexity": 3.585358684487837,
+      "chain_score": 0.23,
+      "is_watermarked": false
+    },
+    {
+      "text": " Renewable Energy Sources\nRenewing energy sources are a vital component towards a sustainable energy...",
+      "perplexity": 5.3489551625595535,
+      "chain_score": 0.29,
+      "is_watermarked": false
+    },
+    {
+      "text": " Photosynthetically Active Pigments (MAPS)\nPhotosynthesis is carried out in specialized organs of pl...",
+      "perplexity": 6.320507075949634,
+      "chain_score": 0.3163265306122449,
+      "is_watermarked": false
+    },
+    {
+      "text": " The internet works by connecting computers and devices through a network of interconnected computer...",
+      "perplexity": 5.516869732505889,
+      "chain_score": 0.39215686274509803,
+      "is_watermarked": false
+    },
+    {
+      "text": " (1) A person with a strong sense of self-disclosure (2)\nA person with a sense of self-aware-ness an...",
+      "perplexity": 2.323343244796968,
+      "chain_score": 0.39,
+      "is_watermarked": false
+    }
+  ]
+}

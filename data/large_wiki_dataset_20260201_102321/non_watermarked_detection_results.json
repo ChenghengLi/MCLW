@@ -1,0 +1,276 @@
+{
+  "per_config_results": [
+    {
+      "config": "states2_overlap0pct",
+      "num_states": 2,
+      "overlap": 0.0,
+      "avg_score": 1.0,
+      "max_score": 1.0,
+      "min_score": 1.0,
+      "std_score": 0.0,
+      "false_positive_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap5pct",
+      "num_states": 2,
+      "overlap": 0.05,
+      "avg_score": 1.0,
+      "max_score": 1.0,
+      "min_score": 1.0,
+      "std_score": 0.0,
+      "false_positive_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap10pct",
+      "num_states": 2,
+      "overlap": 0.1,
+      "avg_score": 1.0,
+      "max_score": 1.0,
+      "min_score": 1.0,
+      "std_score": 0.0,
+      "false_positive_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap15pct",
+      "num_states": 2,
+      "overlap": 0.15,
+      "avg_score": 1.0,
+      "max_score": 1.0,
+      "min_score": 1.0,
+      "std_score": 0.0,
+      "false_positive_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states3_overlap0pct",
+      "num_states": 3,
+      "overlap": 0.0,
+      "avg_score": 0.6889999999999997,
+      "max_score": 0.78,
+      "min_score": 0.6,
+      "std_score": 0.03797806384392617,
+      "false_positive_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states3_overlap5pct",
+      "num_states": 3,
+      "overlap": 0.05,
+      "avg_score": 0.6889999999999997,
+      "max_score": 0.78,
+      "min_score": 0.6,
+      "std_score": 0.03797806384392617,
+      "false_positive_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states3_overlap10pct",
+      "num_states": 3,
+      "overlap": 0.1,
+      "avg_score": 0.6889999999999997,
+      "max_score": 0.78,
+      "min_score": 0.6,
+      "std_score": 0.03797806384392617,
+      "false_positive_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states3_overlap15pct",
+      "num_states": 3,
+      "overlap": 0.15,
+      "avg_score": 0.6889999999999997,
+      "max_score": 0.78,
+      "min_score": 0.6,
+      "std_score": 0.03797806384392617,
+      "false_positive_rate": 1.0,
+      "baseline": 0.6666666666666666
+    },
+    {
+      "config": "states4_overlap0pct",
+      "num_states": 4,
+      "overlap": 0.0,
+      "avg_score": 0.5103333333333334,
+      "max_score": 0.61,
+      "min_score": 0.42,
+      "std_score": 0.045275698657104,
+      "false_positive_rate": 0.4666666666666667,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap5pct",
+      "num_states": 4,
+      "overlap": 0.05,
+      "avg_score": 0.5103333333333334,
+      "max_score": 0.61,
+      "min_score": 0.42,
+      "std_score": 0.045275698657104,
+      "false_positive_rate": 0.4666666666666667,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap10pct",
+      "num_states": 4,
+      "overlap": 0.1,
+      "avg_score": 0.5103333333333334,
+      "max_score": 0.61,
+      "min_score": 0.42,
+      "std_score": 0.045275698657104,
+      "false_positive_rate": 0.4666666666666667,
+      "baseline": 0.5
+    },
+    {
+      "config": "states4_overlap15pct",
+      "num_states": 4,
+      "overlap": 0.15,
+      "avg_score": 0.5103333333333334,
+      "max_score": 0.61,
+      "min_score": 0.42,
+      "std_score": 0.045275698657104,
+      "false_positive_rate": 0.4666666666666667,
+      "baseline": 0.5
+    },
+    {
+      "config": "states5_overlap0pct",
+      "num_states": 5,
+      "overlap": 0.0,
+      "avg_score": 0.3936666666666666,
+      "max_score": 0.57,
+      "min_score": 0.25,
+      "std_score": 0.0646262760458589,
+      "false_positive_rate": 0.06666666666666667,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap5pct",
+      "num_states": 5,
+      "overlap": 0.05,
+      "avg_score": 0.3936666666666666,
+      "max_score": 0.57,
+      "min_score": 0.25,
+      "std_score": 0.0646262760458589,
+      "false_positive_rate": 0.06666666666666667,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap10pct",
+      "num_states": 5,
+      "overlap": 0.1,
+      "avg_score": 0.3936666666666666,
+      "max_score": 0.57,
+      "min_score": 0.25,
+      "std_score": 0.0646262760458589,
+      "false_positive_rate": 0.06666666666666667,
+      "baseline": 0.4
+    },
+    {
+      "config": "states5_overlap15pct",
+      "num_states": 5,
+      "overlap": 0.15,
+      "avg_score": 0.3936666666666666,
+      "max_score": 0.57,
+      "min_score": 0.25,
+      "std_score": 0.0646262760458589,
+      "false_positive_rate": 0.06666666666666667,
+      "baseline": 0.4
+    },
+    {
+      "config": "states6_overlap0pct",
+      "num_states": 6,
+      "overlap": 0.0,
+      "avg_score": 0.351,
+      "max_score": 0.44,
+      "min_score": 0.23,
+      "std_score": 0.05287406421551748,
+      "false_positive_rate": 0.0,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states6_overlap5pct",
+      "num_states": 6,
+      "overlap": 0.05,
+      "avg_score": 0.351,
+      "max_score": 0.44,
+      "min_score": 0.23,
+      "std_score": 0.05287406421551748,
+      "false_positive_rate": 0.0,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states6_overlap10pct",
+      "num_states": 6,
+      "overlap": 0.1,
+      "avg_score": 0.351,
+      "max_score": 0.44,
+      "min_score": 0.23,
+      "std_score": 0.05287406421551748,
+      "false_positive_rate": 0.0,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states6_overlap15pct",
+      "num_states": 6,
+      "overlap": 0.15,
+      "avg_score": 0.351,
+      "max_score": 0.44,
+      "min_score": 0.23,
+      "std_score": 0.05287406421551748,
+      "false_positive_rate": 0.0,
+      "baseline": 0.3333333333333333
+    },
+    {
+      "config": "states7_overlap0pct",
+      "num_states": 7,
+      "overlap": 0.0,
+      "avg_score": 0.26966666666666667,
+      "max_score": 0.36,
+      "min_score": 0.18,
+      "std_score": 0.0403718824045757,
+      "false_positive_rate": 0.0,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap5pct",
+      "num_states": 7,
+      "overlap": 0.05,
+      "avg_score": 0.26966666666666667,
+      "max_score": 0.36,
+      "min_score": 0.18,
+      "std_score": 0.0403718824045757,
+      "false_positive_rate": 0.0,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap10pct",
+      "num_states": 7,
+      "overlap": 0.1,
+      "avg_score": 0.26966666666666667,
+      "max_score": 0.36,
+      "min_score": 0.18,
+      "std_score": 0.0403718824045757,
+      "false_positive_rate": 0.0,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap15pct",
+      "num_states": 7,
+      "overlap": 0.15,
+      "avg_score": 0.26966666666666667,
+      "max_score": 0.36,
+      "min_score": 0.18,
+      "std_score": 0.0403718824045757,
+      "false_positive_rate": 0.0,
+      "baseline": 0.2857142857142857
+    }
+  ],
+  "aggregated": {
+    "avg_max_score": 1.0,
+    "max_max_score": 1.0,
+    "min_max_score": 1.0,
+    "std_max_score": 0.0,
+    "fpr_any_config": 1.0,
+    "num_samples": 30
+  }
+}
