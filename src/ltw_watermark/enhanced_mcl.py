@@ -67,12 +67,14 @@ def generate_transition_matrix(
             matrix[i][1 - (i % 2)] = 1.0
             
     elif chain_key == "soft_cycle":
-        # Allow next state OR skip one
+        # Soft Cycle Matrix (Definition 3.5 from paper):
+        # T^soft_ij = 0.67 if j ≡ i+1 (mod S), 0.33 if j ≡ i+2 (mod S), 0 otherwise
+        # Properties: stochastic, aperiodic, p_random = 2/S
         for i in range(num_states):
             next1 = (i + 1) % num_states
             next2 = (i + 2) % num_states
-            matrix[i][next1] = 1.0
-            matrix[i][next2] = 0.5  # Lower weight for skip
+            matrix[i][next1] = 0.67  # Immediate successor
+            matrix[i][next2] = 0.33  # Skip one state
             
     else:
         # Generate deterministic transitions from key
