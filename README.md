@@ -230,7 +230,7 @@ uv run python scripts/compare_wm_vs_non_wm.py
 
 ## 📄 Paper
 
-See [`docs/main.tex`](docs/main.tex) for the full paper:
+See [`docs/Report.pdf`](docs/Report.pdf) for the full paper:
 
 > **Markov Chain Lock Watermarking: Provably Secure Authentication for LLM Outputs**
 
