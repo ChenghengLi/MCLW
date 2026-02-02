@@ -1,271 +1,245 @@
 # Markov Chain-Lock (MCL) Watermarking
 
-A research implementation of **Markov Chain-Lock Watermarking** for embedding verifiable fingerprints in AI-generated text. This method provides provable detection guarantees with exponentially small false positive rates.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+
+A cryptographically secure framework for embedding verifiable fingerprints in LLM-generated text with **provable detection guarantees**.
 
 ---
 
-## Overview
+## 🎯 How MCL Watermarking Works
 
-**MCL Watermarking** embeds a cryptographic fingerprint by forcing the language model to generate tokens that follow a secret **Markov chain state pattern**. Unlike passive detection methods (perplexity-based), this is an *active* watermarking approach where the signal is deliberately embedded during generation.
+MCL watermarking embeds a hidden "fingerprint" by forcing the language model to generate tokens that follow a secret **Markov chain state pattern**.
 
-### Key Concept: The Fingerprint
+### Step 1: Vocabulary Partitioning
 
-A **fingerprint** is the hidden sequence of Markov chain states that tokens traverse:
+Every token in the vocabulary is assigned to a state (0 to S-1) using SHA-256:
 
 ```
-Tokens:     t₁  →  t₂  →  t₃  →  t₄  →  t₅  → ...
-              ↓      ↓      ↓      ↓      ↓
-States:      0  →   1  →   2  →   3  →   0  → ...  (clockwork cycle)
+state = SHA256(secret_key + token_id) mod S
 ```
 
-Each token is secretly assigned to a state via `state = SHA256(secret_key || token_id) mod S`. The watermark forces consecutive tokens to follow the transition pattern (e.g., 0→1→2→3→0→...).
-
-### Comparison with Other Methods
-
-| Method | Type | Detection | False Positive Rate | Robustness |
-|--------|------|-----------|---------------------|------------|
-| **Perplexity** | Passive | Model-based | High on formal text | Weak |
-| **Green-Red Lists** | Active | Statistical | Low | Weak to paraphrase |
-| **MCL (This Project)** | Active | Hash-based | **Exponentially small** | **Strong** |
-
----
-
-## How MCL Watermarking Works
-
-### 1. Vocabulary Partitioning
-
-The vocabulary is partitioned into `S` disjoint sets using a cryptographic hash:
-
-```python
-def get_token_state(token_id: int, secret_key: str, num_states: int) -> int:
-    """Assign each token to a state (0 to S-1) using SHA-256."""
-    data = f"{secret_key}-{token_id}".encode()
-    hash_val = int(hashlib.sha256(data).hexdigest(), 16)
-    return hash_val % num_states
-```
-
-For a 128,000-token vocabulary with S=4 states:
+For S=4 states with a 128K vocabulary:
 - State 0: ~32,000 tokens
-- State 1: ~32,000 tokens  
+- State 1: ~32,000 tokens
 - State 2: ~32,000 tokens
 - State 3: ~32,000 tokens
 
-### 2. Constrained Generation (Embedding)
+### Step 2: Constrained Generation (Embedding)
 
-During text generation, we constrain the model to only select tokens from the **required next state**:
-
-```
-Algorithm: MCL Embedding
-
-1. Get current state from previous token: s_current = σ(last_token)
-2. Determine required next state: s_next = (s_current + 1) mod S
-3. Mask all tokens NOT in state s_next to -∞ logits
-4. Sample/argmax from remaining valid tokens
-5. Repeat
-```
-
-This produces text where every consecutive token pair follows the state transition pattern.
-
-### 3. Detection (Verifying the Fingerprint)
-
-Detection is simple and **does not require the language model**:
+During text generation, only tokens from valid **successor states** are allowed:
 
 ```
-Algorithm: MCL Detection
+Soft Cycle (k=2): State s → next state must be (s+1) mod S or (s+2) mod S
+
+Example with S=4:
+  Token 1 → State 0 → Allow states {1, 2}
+  Token 2 → State 1 → Allow states {2, 3}
+  Token 3 → State 2 → Allow states {3, 0}
+  ...
+```
+
+All other tokens are masked to `-∞` logits before sampling.
+
+### Step 3: Detection (No Model Needed!)
+
+Detection is **model-free** and runs in O(n) time:
 
 1. Tokenize the text
 2. Map each token to its state using the secret key
-3. Count how many transitions follow the expected pattern
-4. Score = valid_transitions / total_transitions
-5. If score > threshold: watermarked
-```
+3. Count valid transitions (consecutive tokens following the chain)
+4. `Score = valid_transitions / total_transitions`
+5. If `Score > threshold`: **Watermarked**
 
-**Example**:
-- Watermarked text: Score ≈ 1.00 (100% valid transitions)
-- Random text: Score ≈ 0.25 (for S=4, by chance)
-
----
-
-## Mathematical Guarantees
-
-### Theorem 1: Exponential Detection Power
-
-For random (non-watermarked) text of length `n` tokens with `S` states:
-
-```
-P(false positive) ≤ exp(-2(n-1)(τ - 1/S)²)
-```
-
-| Text Length | S=4, τ=0.5 | False Positive Rate |
-|:-----------:|:----------:|:-------------------:|
-| 50 tokens | | 1.8 × 10⁻³ |
-| 100 tokens | | 3.2 × 10⁻⁶ |
-| 200 tokens | | 1.0 × 10⁻¹¹ |
-| 500 tokens | | 1.0 × 10⁻²⁷ |
-
-### Theorem 2: Robustness to Modifications
-
-If an adversary modifies fraction `δ` of tokens:
-
-```
-Expected score = (1-δ)² + δ(2-δ)/S
-```
-
-With S=4:
-- 10% modifications → Expected score ≈ 0.86 (still detectable)
-- 20% modifications → Expected score ≈ 0.70 (still detectable)
-- 30% modifications → Expected score ≈ 0.54 (marginally detectable)
+| Text Type | Expected Score (S=7, Soft Cycle) |
+|-----------|----------------------------------|
+| Watermarked | ~0.99 (all transitions valid) |
+| Random | ~0.29 (2/7 by chance) |
 
 ---
 
-## Transition Topologies
-
-We support multiple Markov chain transition patterns:
-
-### Clockwork (Default)
-Strict cycle: 0 → 1 → 2 → 3 → 0 → ...
-```
-Transition Matrix:
-    0  1  2  3
-0 [ 0  1  0  0 ]
-1 [ 0  0  1  0 ]
-2 [ 0  0  0  1 ]
-3 [ 1  0  0  0 ]
-```
-- Random baseline: 25%
-- Strongest detection, but most restrictive
-
-### Soft Cycle
-Each state can transition to next OR skip one:
-- Random baseline: 50%
-- Better text quality, weaker detection
-
-### Binary Alternation
-Two states only: 0 → 1 → 0 → 1 → ...
-- Random baseline: 50%
-- 50% of vocabulary available per token
-
----
-
-## Soft Partitions (Overlap)
-
-To improve text quality, tokens can belong to **multiple states** with configurable overlap:
-
-| Overlap ρ | Tokens per State | Quality | Detection |
-|:---------:|:----------------:|:-------:|:---------:|
-| 0% | 25% of vocab | Lower | Strongest |
-| 5% | 29% of vocab | OK | Strong |
-| 10% | 33% of vocab | Good | Good |
-| 15% | 36% of vocab | Better | Moderate |
-
----
-
-## Installation
+## 🚀 Quick Start
 
 ```bash
 # Clone and install
-cd LTW
-uv sync
+git clone https://github.com/ChenghengLi/MCLW.git
+cd MCLW
+uv sync  # or: pip install -e .
 
-# Or with pip
-pip install -e .
+# Set your HuggingFace token (for Llama access)
+export HF_TOKEN="your-huggingface-token"
+
+# Run the main experiment
+uv run python scripts/generate_curated_dataset.py
 ```
 
-## Project Structure
+---
+
+## 📁 Project Structure
 
 ```
-LTW/
-├── src/ltw_watermark/
-│   ├── mcl_watermark.py      # Basic MCL implementation
-│   ├── enhanced_mcl.py       # Soft partitions & custom transitions
-│   └── analysis.py           # Visualization utilities
-├── scripts/
-│   ├── generate_curated_dataset.py      # Generate watermarked datasets
-│   ├── generate_large_wikipedia_dataset.py
-│   └── load_data.py          # Data loading utilities
-├── data/                     # Generated datasets
-├── config.yaml               # Configuration
-└── pyproject.toml            # Dependencies
+MCLW/
+├── src/mcl_watermark/           # Core library
+│   ├── __init__.py              # Package exports
+│   ├── mcl_watermark.py         # Basic MCL watermarking (clockwork)
+│   └── enhanced_mcl.py          # Soft cycle, overlaps, custom transitions
+│
+├── scripts/                     # Executable scripts
+│   ├── generate_curated_dataset.py        # Main experiment (28 configs)
+│   ├── generate_large_wikipedia_dataset.py # Large-scale generation
+│   ├── compare_wm_vs_non_wm.py            # Comparison analysis
+│   ├── evaluate_curated_non_watermarked.py # Baseline evaluation
+│   ├── robustness_attack.py               # Adversarial attack tests
+│   └── load_data.py                       # Data loading utilities
+│
+├── experiments/                 # Additional experiments
+│   └── robustness_test.py       # Word replacement robustness
+│
+├── data/                        # Generated datasets (auto-created)
+├── docs/                        # Paper (main.tex)
+├── config.yaml                  # Configuration
+└── LICENSE                      # MIT License
 ```
 
-## Usage
+---
+
+## ⚙️ Configuration Guide
+
+Edit `config.yaml` to customize the watermarking system:
+
+```yaml
+# =============================================
+# MODEL SETTINGS
+# =============================================
+model:
+  generator:
+    name: "meta-llama/Llama-3.2-3B-Instruct"  # HuggingFace model
+    device: "cuda"                             # "cuda" or "cpu"
+    max_length: 256                            # Max tokens per generation
+
+# =============================================
+# WATERMARK SETTINGS
+# =============================================
+mcl:
+  secret_key: "your-secret-key"   # CHANGE THIS! Determines state assignment
+  num_states: 7                   # Number of states (5-11 recommended)
+  chain_key: "soft_cycle"         # Transition topology (see below)
+  overlap_ratio: 0.0              # Soft partition overlap (0.0 = hard)
+  detection_threshold: 0.5        # Score threshold for detection
+```
+
+### Transition Topologies (`chain_key`)
+
+| Topology | Valid Successors | Random Baseline | Use Case |
+|----------|------------------|-----------------|----------|
+| `clockwork` | s → (s+1) mod S | 1/S | Maximum security |
+| `soft_cycle` | s → {(s+1), (s+2)} mod S | 2/S | **Recommended** |
+
+### State Count (`num_states`)
+
+| States (S) | Vocab per State | Detection Power | Quality |
+|:----------:|:---------------:|:---------------:|:-------:|
+| 2 | 50% | ❌ None (all valid for soft cycle) | Best |
+| 4 | 25% | ⚠️ Weak (33% FPR for soft cycle) | Good |
+| **7** | 14.3% | ✅ **Perfect** | **Optimal** |
+| 11 | 9.1% | ✅ Perfect | Lower |
+
+### Overlap Ratio (`overlap_ratio`)
+
+| Overlap (ρ) | Vocab per State | Detection | Quality |
+|:-----------:|:---------------:|:---------:|:-------:|
+| **0%** | 14.3% | ✅ 100% | Standard |
+| 5% | ~19% | ⚠️ 92% | Better |
+| 10% | ~24% | ❌ 35% | Good |
+
+**Recommendation**: Use `num_states: 7`, `chain_key: soft_cycle`, `overlap_ratio: 0.0`
+
+---
+
+## 💻 Python API
 
 ### Generate Watermarked Text
 
 ```python
-from ltw_watermark import EnhancedMCLGenerator
+from mcl_watermark import EnhancedMCLGenerator
 
 generator = EnhancedMCLGenerator(
     model_name="meta-llama/Llama-3.2-3B-Instruct",
-    secret_key="your-secret-key",
-    num_states=4,
-    chain_key="clockwork",
-    overlap_ratio=0.10  # 10% soft overlap
+    secret_key="my-secret-key-2024",
+    num_states=7,
+    chain_key="soft_cycle",
+    overlap_ratio=0.0
 )
 
 text, metadata = generator.generate("Explain quantum computing")
-print(text)
-print(f"Tokens generated: {metadata['tokens_generated']}")
+print(f"Score: {metadata['chain_score']:.3f}")  # ~0.99
 ```
 
 ### Detect Watermark
 
 ```python
-from ltw_watermark import EnhancedMCLDetector
+from mcl_watermark import EnhancedMCLDetector
 
 detector = EnhancedMCLDetector(
-    secret_key="your-secret-key",  # Must match!
-    num_states=4,
-    chain_key="clockwork",
+    secret_key="my-secret-key-2024",  # Must match!
+    num_states=7,
+    chain_key="soft_cycle",
     detection_threshold=0.5
 )
 
 result = detector.detect(text)
-print(f"Watermarked: {result.is_watermarked}")
-print(f"Score: {result.chain_score:.2%}")  # ~100% for watermarked
-print(f"Random baseline: {result.expected_random:.2%}")  # ~25%
+print(f"Watermarked: {result.is_watermarked}")  # True
+print(f"Score: {result.chain_score:.2%}")        # ~99%
 ```
 
-### Generate Dataset with Multiple Configurations
+---
+
+## 🔧 How to Run
+
+### Generate Watermarked Dataset
 
 ```bash
-# Generate watermarked samples across different state/overlap combinations
 uv run python scripts/generate_curated_dataset.py
 ```
 
-This generates files like:
-- `states4_overlap0pct.jsonl`
-- `states4_overlap10pct.jsonl`
-- `states5_overlap5pct.jsonl`
-- etc.
+### Run Robustness Tests
 
----
+```bash
+uv run python experiments/robustness_test.py
+```
 
-## Configuration
+### Compare Watermarked vs Non-Watermarked
 
-Edit `config.yaml`:
-
-```yaml
-model:
-  generator:
-    name: "meta-llama/Llama-3.2-3B-Instruct"
-    device: "cuda"
-    
-watermark:
-  secret_key: "your-secret-key-change-me"
-  detection_threshold: 0.5
+```bash
+uv run python scripts/compare_wm_vs_non_wm.py
 ```
 
 ---
 
-## References
+## 📊 Key Results
 
-1. Kirchenbauer et al. (2023) - "A Watermark for Large Language Models" (ICML)
-2. SemStamp (NAACL 2024) - "A Semantic Watermark with Paraphrastic Robustness"
-3. Aaronson (2022) - Cryptographic watermarking concepts
+| States | Overlap | Detection | FPR | PPL |
+|:------:|:-------:|:---------:|:---:|:---:|
+| **7** | **0%** | **100%** | **0%** | **4.20** |
+| 9 | 0% | 100% | 0% | 5.37 |
+| 11 | 0% | 100% | 0% | 4.61 |
+
+**Robustness**: Detection remains >96% even with 30% word replacement.
 
 ---
 
-## License
+## 📄 Paper
 
-MIT License
+See [`docs/main.tex`](docs/main.tex) for the full paper:
+
+> **Markov Chain Lock Watermarking: Provably Secure Authentication for LLM Outputs**
+
+```bash
+cd docs && pdflatex main.tex && bibtex main && pdflatex main.tex && pdflatex main.tex
+```
+
+---
+
+## 📜 License
+
+[MIT License](LICENSE) - Chengheng Li & Kyuhee Kim, 2026
