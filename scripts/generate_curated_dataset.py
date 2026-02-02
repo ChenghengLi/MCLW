@@ -79,17 +79,19 @@ WIKIPEDIA_CONCEPTS = [
     "Extraterrestrial_life", "Ghost", "Vampire", "Zombie"
 ]
 
-# MCL configurations: states 2, 4, 5, 7, 9, 11, 15 × overlaps 0%, 5%, 10%, 15%
-MCL_CONFIGS = []
-for num_states in [2, 4, 5, 7, 9, 11, 15]:
-    for overlap_pct in [0, 5, 10, 15]:
-        overlap = overlap_pct / 100.0
-        MCL_CONFIGS.append({
-            "name": f"states{num_states}_overlap{overlap_pct}pct",
-            "num_states": num_states,
-            "chain_key": "soft_cycle",
-            "overlap": overlap,
-        })
+def build_mcl_configs(topology: str = "soft_cycle"):
+    """Build MCL configurations for all state/overlap combinations."""
+    configs = []
+    for num_states in [2, 4, 5, 7, 9, 11, 15]:
+        for overlap_pct in [0, 5, 10, 15]:
+            overlap = overlap_pct / 100.0
+            configs.append({
+                "name": f"states{num_states}_overlap{overlap_pct}pct",
+                "num_states": num_states,
+                "chain_key": topology,
+                "overlap": overlap,
+            })
+    return configs
 
 
 def generate_prompt(concept: str) -> str:
@@ -102,6 +104,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--max-tokens", type=int, default=150, help="Max tokens per generation")
     parser.add_argument("--model", default="meta-llama/Llama-3.2-3B-Instruct")
+    parser.add_argument("--topology", default="soft_cycle", choices=["clockwork", "binary", "soft_cycle"],
+                        help="Transition topology: clockwork, binary, or soft_cycle")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     parser.add_argument("--skip-non-watermarked", action="store_true", help="Skip non-watermarked generation")
     parser.add_argument("--resume-from-config", type=str, default=None, help="Resume from specific config name")
@@ -116,13 +120,15 @@ def main():
     
     device = "cuda" if torch.cuda.is_available() else "cpu"
     secret_key = "curated_wiki_dataset_2024"
-    
+
     concepts = WIKIPEDIA_CONCEPTS
-    
+    MCL_CONFIGS = build_mcl_configs(args.topology)
+
     print("=" * 80)
     print("CURATED WIKIPEDIA MCL DATASET GENERATOR")
     print("=" * 80)
     print(f"Concepts: {len(concepts)}")
+    print(f"Topology: {args.topology}")
     print(f"Configurations: {len(MCL_CONFIGS)} + non-watermarked")
     print(f"Total generations: {len(concepts) * (len(MCL_CONFIGS) + 1)}")
     print(f"States: 2, 4, 5, 7, 9, 11, 15")
