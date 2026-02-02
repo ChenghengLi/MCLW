@@ -1,0 +1,26 @@
+{
+  "timestamp": "20260202_064331",
+  "model": "mistralai/Mistral-7B-v0.3",
+  "secret_key": "curated_wiki_dataset_2024",
+  "seed": 42,
+  "concepts_count": 173,
+  "configs": [
+    {
+      "name": "states7_overlap15pct",
+      "num_states": 7,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    }
+  ],
+  "stats": [
+    {
+      "config": "states7_overlap15pct",
+      "num_states": 7,
+      "overlap": 0.15,
+      "avg_score": 0.3142036157617269,
+      "avg_ppl": 2.378499056214142,
+      "detection_rate": 0.08092485549132948,
+      "baseline": 0.14285714285714285
+    }
+  ]
+}

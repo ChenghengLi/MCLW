@@ -39,6 +39,24 @@
       "avg_ppl": 1.709610532560381,
       "detection_rate": 1.0,
       "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap5pct",
+      "num_states": 7,
+      "overlap": 0.05,
+      "avg_score": 0.6071035508918667,
+      "avg_ppl": 2.0435689644872044,
+      "detection_rate": 0.6994219653179191,
+      "baseline": 0.2857142857142857
+    },
+    {
+      "config": "states7_overlap10pct",
+      "num_states": 7,
+      "overlap": 0.1,
+      "avg_score": 0.4991037339790918,
+      "avg_ppl": 2.272280127574016,
+      "detection_rate": 0.49710982658959535,
+      "baseline": 0.2857142857142857
     }
   ]
 }
