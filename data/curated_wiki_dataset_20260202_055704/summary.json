@@ -1,0 +1,197 @@
+{
+  "timestamp": "20260202_055704",
+  "model": "mistralai/Mistral-7B-v0.3",
+  "secret_key": "curated_wiki_dataset_2024",
+  "seed": 42,
+  "concepts_count": 173,
+  "configs": [
+    {
+      "name": "states2_overlap0pct",
+      "num_states": 2,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states2_overlap5pct",
+      "num_states": 2,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states2_overlap10pct",
+      "num_states": 2,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states2_overlap15pct",
+      "num_states": 2,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    },
+    {
+      "name": "states4_overlap0pct",
+      "num_states": 4,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states4_overlap5pct",
+      "num_states": 4,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states4_overlap10pct",
+      "num_states": 4,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states4_overlap15pct",
+      "num_states": 4,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    },
+    {
+      "name": "states5_overlap0pct",
+      "num_states": 5,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states5_overlap5pct",
+      "num_states": 5,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states5_overlap10pct",
+      "num_states": 5,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states5_overlap15pct",
+      "num_states": 5,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    },
+    {
+      "name": "states7_overlap0pct",
+      "num_states": 7,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states7_overlap5pct",
+      "num_states": 7,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states7_overlap10pct",
+      "num_states": 7,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states7_overlap15pct",
+      "num_states": 7,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    },
+    {
+      "name": "states9_overlap0pct",
+      "num_states": 9,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states9_overlap5pct",
+      "num_states": 9,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states9_overlap10pct",
+      "num_states": 9,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states9_overlap15pct",
+      "num_states": 9,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    },
+    {
+      "name": "states11_overlap0pct",
+      "num_states": 11,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states11_overlap5pct",
+      "num_states": 11,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states11_overlap10pct",
+      "num_states": 11,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states11_overlap15pct",
+      "num_states": 11,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    },
+    {
+      "name": "states15_overlap0pct",
+      "num_states": 15,
+      "chain_key": "clockwork",
+      "overlap": 0.0
+    },
+    {
+      "name": "states15_overlap5pct",
+      "num_states": 15,
+      "chain_key": "clockwork",
+      "overlap": 0.05
+    },
+    {
+      "name": "states15_overlap10pct",
+      "num_states": 15,
+      "chain_key": "clockwork",
+      "overlap": 0.1
+    },
+    {
+      "name": "states15_overlap15pct",
+      "num_states": 15,
+      "chain_key": "clockwork",
+      "overlap": 0.15
+    }
+  ],
+  "stats": [
+    {
+      "config": "states2_overlap0pct",
+      "num_states": 2,
+      "overlap": 0.0,
+      "avg_score": 0.9920093169208544,
+      "avg_ppl": 2.0545249425831735,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    },
+    {
+      "config": "states2_overlap5pct",
+      "num_states": 2,
+      "overlap": 0.05,
+      "avg_score": 0.876446874688236,
+      "avg_ppl": 1.9800225066629922,
+      "detection_rate": 0.9942196531791907,
+      "baseline": 0.5
+    }
+  ]
+}
