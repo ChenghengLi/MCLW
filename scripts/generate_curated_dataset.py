@@ -79,11 +79,15 @@ WIKIPEDIA_CONCEPTS = [
     "Extraterrestrial_life", "Ghost", "Vampire", "Zombie"
 ]
 
-def build_mcl_configs(topology: str = "soft_cycle"):
-    """Build MCL configurations for all state/overlap combinations."""
+def build_mcl_configs(topology: str = "soft_cycle", states=None, overlaps=None):
+    """Build MCL configurations for given state/overlap combinations."""
+    if states is None:
+        states = [2, 4, 5, 7, 9, 11, 15]
+    if overlaps is None:
+        overlaps = [0, 5, 10, 15]
     configs = []
-    for num_states in [2, 4, 5, 7, 9, 11, 15]:
-        for overlap_pct in [0, 5, 10, 15]:
+    for num_states in states:
+        for overlap_pct in overlaps:
             overlap = overlap_pct / 100.0
             configs.append({
                 "name": f"states{num_states}_overlap{overlap_pct}pct",
@@ -106,6 +110,10 @@ def main():
     parser.add_argument("--model", default="meta-llama/Llama-3.2-3B-Instruct")
     parser.add_argument("--topology", default="soft_cycle", choices=["clockwork", "binary", "soft_cycle"],
                         help="Transition topology: clockwork, binary, or soft_cycle")
+    parser.add_argument("--states", type=int, nargs="+", default=[2, 4, 5, 7, 9, 11, 15],
+                        help="Which state counts to run (e.g. --states 2 4 5)")
+    parser.add_argument("--overlaps", type=int, nargs="+", default=[0, 5, 10, 15],
+                        help="Which overlap percentages to run (e.g. --overlaps 0 5 10 15)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
     parser.add_argument("--skip-non-watermarked", action="store_true", help="Skip non-watermarked generation")
     parser.add_argument("--resume-from-config", type=str, default=None, help="Resume from specific config name")
@@ -122,7 +130,7 @@ def main():
     secret_key = "curated_wiki_dataset_2024"
 
     concepts = WIKIPEDIA_CONCEPTS
-    MCL_CONFIGS = build_mcl_configs(args.topology)
+    MCL_CONFIGS = build_mcl_configs(args.topology, args.states, args.overlaps)
 
     print("=" * 80)
     print("CURATED WIKIPEDIA MCL DATASET GENERATOR")
