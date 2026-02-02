@@ -1,0 +1,53 @@
+{
+  "timestamp": "20260202_063033",
+  "model": "mistralai/Mistral-7B-v0.3",
+  "secret_key": "curated_wiki_dataset_2024",
+  "seed": 42,
+  "concepts_count": 173,
+  "configs": [
+    {
+      "name": "states11_overlap0pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states11_overlap5pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states11_overlap10pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states11_overlap15pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    }
+  ],
+  "stats": [
+    {
+      "config": "states11_overlap0pct",
+      "num_states": 11,
+      "overlap": 0.0,
+      "avg_score": 0.9900084141138049,
+      "avg_ppl": 2.330698806287968,
+      "detection_rate": 1.0,
+      "baseline": 0.18181818181818182
+    },
+    {
+      "config": "states11_overlap5pct",
+      "num_states": 11,
+      "overlap": 0.05,
+      "avg_score": 0.43086136219627325,
+      "avg_ppl": 2.0953951752717264,
+      "detection_rate": 0.28901734104046245,
+      "baseline": 0.18181818181818182
+    }
+  ]
+}
