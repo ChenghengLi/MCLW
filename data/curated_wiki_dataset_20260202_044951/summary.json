@@ -1,0 +1,224 @@
+{
+  "timestamp": "20260202_044951",
+  "model": "gpt2-xl",
+  "secret_key": "curated_wiki_dataset_2024",
+  "seed": 42,
+  "concepts_count": 173,
+  "configs": [
+    {
+      "name": "states2_overlap0pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states2_overlap5pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states2_overlap10pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states2_overlap15pct",
+      "num_states": 2,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states4_overlap0pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states4_overlap5pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states4_overlap10pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states4_overlap15pct",
+      "num_states": 4,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states5_overlap0pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states5_overlap5pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states5_overlap10pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states5_overlap15pct",
+      "num_states": 5,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states7_overlap0pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states7_overlap5pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states7_overlap10pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states7_overlap15pct",
+      "num_states": 7,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states9_overlap0pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states9_overlap5pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states9_overlap10pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states9_overlap15pct",
+      "num_states": 9,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states11_overlap0pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states11_overlap5pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states11_overlap10pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states11_overlap15pct",
+      "num_states": 11,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    },
+    {
+      "name": "states15_overlap0pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.0
+    },
+    {
+      "name": "states15_overlap5pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.05
+    },
+    {
+      "name": "states15_overlap10pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.1
+    },
+    {
+      "name": "states15_overlap15pct",
+      "num_states": 15,
+      "chain_key": "soft_cycle",
+      "overlap": 0.15
+    }
+  ],
+  "stats": [
+    {
+      "config": "states2_overlap0pct",
+      "num_states": 2,
+      "overlap": 0.0,
+      "avg_score": 1.0,
+      "avg_ppl": 1.5211599943377991,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap5pct",
+      "num_states": 2,
+      "overlap": 0.05,
+      "avg_score": 1.0,
+      "avg_ppl": 1.5211599943377991,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap10pct",
+      "num_states": 2,
+      "overlap": 0.1,
+      "avg_score": 1.0,
+      "avg_ppl": 1.5211599943377991,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states2_overlap15pct",
+      "num_states": 2,
+      "overlap": 0.15,
+      "avg_score": 1.0,
+      "avg_ppl": 1.5211599943377991,
+      "detection_rate": 1.0,
+      "baseline": 1.0
+    },
+    {
+      "config": "states4_overlap0pct",
+      "num_states": 4,
+      "overlap": 0.0,
+      "avg_score": 0.999960943602562,
+      "avg_ppl": 2.1427414928390753,
+      "detection_rate": 1.0,
+      "baseline": 0.5
+    }
+  ]
+}
