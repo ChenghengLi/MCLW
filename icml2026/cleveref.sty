@@ -1,0 +1,21 @@
+%%
+%% cleveref.sty -- minimal shim for draft-only compilation.
+%% Maps \cref and \Cref to \ref (loses type-prefix, but produces
+%% a valid PDF when the real cleveref package is unavailable).
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{cleveref}[2025/04/20 v0.1 minimal cleveref shim]
+
+\DeclareOption*{\relax}
+\ProcessOptions\relax
+
+\providecommand{\cref}[1]{\ref{#1}}
+\providecommand{\Cref}[1]{\ref{#1}}
+\providecommand{\crefrange}[2]{\ref{#1}--\ref{#2}}
+\providecommand{\Crefrange}[2]{\ref{#1}--\ref{#2}}
+\providecommand{\namecref}[1]{\ref{#1}}
+\providecommand{\nameCref}[1]{\ref{#1}}
+\providecommand{\crefname}[3]{}
+\providecommand{\Crefname}[3]{}
+
+\endinput

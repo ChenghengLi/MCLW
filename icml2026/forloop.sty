@@ -1,0 +1,27 @@
+%%
+%% forloop.sty -- minimal drop-in replacement
+%% Implements \forloop[step]{counter}{start}{condition}{body}
+%% Matches the public API of Matthew Richardson's forloop v3.0.
+%%
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{forloop}[2025/04/20 v0.1 minimal forloop]
+\RequirePackage{ifthen}
+
+\newcommand{\forloop}[5][1]{%
+  \setcounter{#2}{#3}%
+  \ifthenelse{#4}{%
+    #5%
+    \addtocounter{#2}{#1}%
+    \forloopiter[#1]{#2}{#4}{#5}%
+  }{}%
+}
+
+\newcommand{\forloopiter}[4][1]{%
+  \ifthenelse{#3}{%
+    #4%
+    \addtocounter{#2}{#1}%
+    \forloopiter[#1]{#2}{#3}{#4}%
+  }{}%
+}
+
+\endinput

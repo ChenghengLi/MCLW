@@ -1,0 +1,117 @@
+% introduction.tex -- included from paper.tex via \input{introduction}
+\section{Introduction}
+\label{sec:intro}
+
+Regulatory regimes are now committing to machine-readable marking of
+AI-generated content. EU AI Act Article~50~\citep{euaiact2024}, with
+enforcement beginning August 2026, mandates that providers of
+generative AI systems embed detectable signals in their outputs;
+parallel requirements appear in the OECD Hiroshima
+Process~\citep{oecdhiroshima2024} and in the EU's draft Code of
+Practice on Transparency of AI-Generated
+Content~\citep{eucodepractice2025}. The question these regimes leave
+unspecified is \emph{what counts as compliance}: at what false
+positive rate, for what text length, at what quality cost.
+
+\paragraph{The tradeoff that no one is naming.}
+Active watermarking schemes sit on a multidimensional frontier among
+detection power, robustness to modification, text-quality cost, and
+generation-time complexity. Current deployments choose a point on this
+frontier privately. A regulator who writes ``outputs shall be marked''
+has no mechanism to specify \emph{where} on the frontier to sit, and
+an auditor has no basis on which to evaluate a deployer's choice. The
+consequence is that Article~50 is straightforward to comply with
+\emph{nominally} (mark something, anything) and essentially
+unauditable \emph{substantively}.
+
+Existing watermarking approaches do not fix this. Passive
+detection~\citep{mitchell2023detectgpt,tian2023gptzero} reads
+statistical traces in the text and suffers high false positive rates
+on technical prose, with no controllable frontier at all.
+Green--red-list watermarking~\citep{kirchenbauer2023watermark} biases
+logits during generation but requires temperature sampling and
+degrades under paraphrase~\citep{krishna2023paraphrasing}. Schemes
+establishing the undetectability
+frontier~\citep{christ2024undetectable} are informative bounds but
+not directly deployable. None expose a calibration map from
+regulatory parameters to deployed configuration.
+
+\paragraph{Markov Chain Lock watermarking.}
+We present \emph{Markov Chain Lock} (MCL) watermarking: a scheme
+that partitions the vocabulary into $S$ states via
+$\sigma_k(t) = H(k \,\|\, t) \bmod S$ (SHA-256) and constrains
+generation to follow a clockwork transition $s \to (s+1) \bmod S$.
+Watermarking is \emph{entropy-gated}: the constraint applies only at
+positions where the model is confident, leaving high-entropy positions
+unconstrained so that the generator's expressive budget is spent on
+positions where fluency is decided. The scheme has three properties
+that suit it to operationalising Article~50:
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Model-free detection.} Verification maps each token to
+    a state via the shared key and counts valid transitions in $O(n)$
+    hash operations. A third-party auditor needs neither the original
+    model nor a proxy LM.
+  \item \textbf{Exponential FPR.} A watermarked sequence has score
+    $1$ by construction; random sequences have score $1/S$ with
+    Hoeffding bound $\exp(-2(n-1)(\tau - 1/S)^2)$ on the FPR.
+  \item \textbf{Greedy decoding compatibility.} The constraint is a
+    logit mask, not a temperature bias, so generation remains
+    deterministic.
+\end{itemize}
+
+\paragraph{Calibration: the regulatory knob.}
+The core analytical result is a closed-form mapping from deployment
+regime to configuration. Under the null, the detection $z$-score is
+$z = (\rho/2)\sqrt{(S-1)(n-1)}$ where $\rho$ is the watermark
+fraction. Inverting for the minimum $S$ at which a target FPR $\alpha$
+is met gives
+\begin{equation}
+  S^\star(n, \rho, \alpha)
+    = \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
+  \label{eq:calibration-intro}
+\end{equation}
+A regulator choosing a target FPR $\alpha$ and a text-length floor
+$n_{\min}$ reads off a unique minimum configuration; a deployer can
+only adjust $\rho$ upward, trading quality for margin, but cannot
+undercut detection. This is, we argue, the regulatory knob Article~50
+has been missing.
+
+\paragraph{Contributions.}
+\begin{enumerate}[nosep, leftmargin=*]
+  \item An end-to-end active watermarking scheme (MCL) with
+    SHA-256 state partitioning, clockwork transitions, entropy-gated
+    embedding (\S\ref{sec:method}), and model-free $O(n)$ detection.
+  \item A calibration formula (\cref{eq:calibration-intro}) derived
+    from a generalized detection bound $z = (\rho/2)\sqrt{(S-1)(n-1)}$
+    (Thm.~\ref{thm:detection}), mapping regulatory parameters to
+    deployed configurations.
+  \item A universal robustness threshold
+    $\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$
+    (Thm.~\ref{thm:robustness}) at which detection crosses the
+    midpoint, independent of $S$, $\rho$, and $n$ -- a
+    scheme-independent floor regulators can reference directly.
+  \item A Neyman--Pearson optimal entropy-weighted detector
+    (Thm.~\ref{thm:hdd}) that strictly dominates the model-free
+    detector when the entropy profile is observable, and a
+    self-healing theorem (Thm.~\ref{thm:healing}) showing each
+    adversarial modification contributes $1/S$ in expectation to the
+    valid-transition count.
+  \item An experimental program (\S\ref{sec:experiments}) with one
+    critical test: whether low-entropy tokens survive paraphrasing at
+    higher rates than high-entropy ones.
+    % FLAG: lee2023sweet / lu2024ewd citations are unverified.
+    If yes, entropy gating is also a robustness win and the
+    SWEET~\citep{lee2023sweet}~/~EWD~\citep{lu2024ewd} heuristic
+    (watermark the high-entropy tokens) is inverted; if no, we revise
+    the robustness claim accordingly.
+\end{enumerate}
+
+\paragraph{Governance framing.}
+The contribution is as much about \emph{operationalising} Article~50
+as it is about watermarking. The calibration formula turns an opaque
+deployer choice into a two-number policy specification
+$(\alpha, n_{\min})$ that an auditor can check. The model-free
+$O(n)$ detector makes that audit feasible without model access. And
+the universal $\delta^\star$ gives regulators a scheme-independent
+robustness benchmark. \S\ref{sec:discussion} lays out a minimum viable
+Article~50 specification in concrete numbers.

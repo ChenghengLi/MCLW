@@ -1,0 +1,28 @@
+% abstract.tex -- included from paper.tex via \input{abstract}
+\begin{abstract}
+  EU AI Act Article~50 requires machine-readable marking of
+  AI-generated content but leaves two decisive parameters -- false
+  positive rate and text-quality cost -- to be chosen opaquely by
+  deployers rather than specified by regulators. We present
+  \emph{Markov Chain Lock} (MCL) watermarking, an active watermarking
+  scheme that partitions the vocabulary into $S$ states via SHA-256
+  hashing and constrains generation to follow a clockwork transition
+  $s \to (s+1) \bmod S$ at selected (low-entropy) positions. Detection
+  is model-free, runs in $O(n)$ hash operations, and admits
+  Hoeffding-style exponential false positive bounds -- making
+  third-party audit feasible without LLM access. The central result is
+  a calibration formula
+  $S^\star = \lceil 4 z_\alpha^2 / (\rho^2 (n-1)) + 1 \rceil$ that
+  maps a target FPR $\alpha$, text length $n$, and watermark fraction
+  $\rho$ to a minimum state count, turning Article~50 compliance from
+  an opaque deployer choice into an auditable policy-to-configuration
+  map. We additionally prove a universal robustness threshold
+  $\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$ independent of
+  $(S, \rho, n)$, derive a Neyman--Pearson optimal entropy-weighted
+  detector, and formalize a $1/S$ self-healing surplus under
+  adversarial modification. A critical experiment tests whether
+  low-entropy tokens survive paraphrasing at higher rates than
+  high-entropy ones -- inverting the SWEET/EWD heuristic -- and
+  decides whether the entropy gate is purely a quality improvement or
+  also a robustness one.
+\end{abstract}
