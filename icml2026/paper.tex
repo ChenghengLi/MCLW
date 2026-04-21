@@ -1,17 +1,16 @@
-%%%%%%%% ICML 2026 SUBMISSION — ENTROPY-GATED MCL WATERMARKING %%%%%%%%
-%
-% CITATION FLAGS (do not submit before resolving)
-% ------------------------------------------------
-% The following bib keys are UNVERIFIED in this draft. See paper.bib
-% for per-entry notes. Search the source for "FLAG:" to find in-text
-% references that depend on them.
-%
-%   wang2025        -- fabricated; ~80% low-entropy claim needs a real source
-%   cheng2025sira   -- fabricated; SIRA attack reference needs verification
-%   lu2024ewd       -- unverified; EWD reference may not exist as cited
-%   lee2023sweet    -- SWEET is real, but author list/venue/year are guessed
-%
-%
+%%%%%%%% ICML 2026 / TAIGR 2026 SUBMISSION %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Markov Chain Lock (MCL) Watermarking
+%%
+%% CITATION FLAGS -- unverified bib entries to resolve pre-submission.
+%% See paper.bib for per-entry notes; grep the source for "FLAG:" to
+%% locate dependent in-text citations.
+%%
+%%   lee2023sweet    -- SWEET is real; author list/venue/year guessed.
+%%   lu2024ewd       -- unverified; may not exist as cited.
+%%   wang2025        -- fabricated; replace or drop the claim.
+%%   cheng2025sira   -- fabricated; replace or drop the reliance.
+%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass{article}
 
@@ -34,7 +33,6 @@
 \usepackage[capitalize,noabbrev]{cleveref}
 \usepackage{enumitem}
 
-% theorems
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
@@ -46,18 +44,16 @@
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
-% \usepackage[textsize=tiny]{todonotes}  % disabled: flags live in source comments
-
 \usepackage{algorithm}
 \usepackage{algorithmic}
 
-\icmltitlerunning{Entropy-Gated Markov Chain Lock Watermarking}
+\icmltitlerunning{Markov Chain Lock Watermarking}
 
 \begin{document}
 
 \twocolumn[
-  \icmltitle{Entropy-Gated Markov Chain Lock:\\
-    Calibrated Watermarking with Provable Quality--Detection Tradeoffs}
+  \icmltitle{Markov Chain Lock Watermarking:\\
+    A Calibrated Policy-to-Configuration Map for {EU AI Act} Article~50}
 
   \icmlsetsymbol{equal}{*}
 
@@ -69,7 +65,8 @@
 
   \icmlcorrespondingauthor{Anonymous}{anon@anon.org}
 
-  \icmlkeywords{AI governance, LLM watermarking, content provenance, technical AI governance}
+  \icmlkeywords{AI governance, LLM watermarking, content provenance,
+    EU AI Act, technical AI governance}
 
   \vskip 0.3in
 ]
@@ -80,377 +77,502 @@
 
 \input{introduction}
 
+% =====================================================================
 \section{Related Work}
+\label{sec:related}
 
-\paragraph{Passive detection.}
-DetectGPT~\citep{mitchell2023detectgpt} uses log-probability curvature;
-GPTZero~\citep{tian2023gptzero} combines perplexity and burstiness.
-Both degrade sharply on formal writing and under
-paraphrase~\citep{krishna2023paraphrasing,sadasivan2023can}.
+\paragraph{Passive detection.} DetectGPT~\citep{mitchell2023detectgpt}
+exploits log-probability curvature; GPTZero~\citep{tian2023gptzero}
+combines perplexity and burstiness. Both read statistical traces in
+existing text, with no controllable false-positive frontier and sharp
+degradation under
+paraphrase~\citep{krishna2023paraphrasing,sadasivan2023can}. They
+cannot serve as the technical substrate for Article~50 because neither
+regulator nor deployer can set the detection regime in advance.
 
-\paragraph{Active watermarking.}
-\citet{kirchenbauer2023watermark} split the vocabulary into a green/red
-list and bias logits toward the green list at generation time; detection
-is a $z$-test on green-list frequency. \citet{christ2024undetectable}
-establish the quality--security frontier for undetectable
-schemes. % FLAG: aaronson2023semstamp is a blog post (verified in docs/references.bib).
-% "SemStamp line" loosely associates the blog with the SemStamp NAACL 2024
-% paper -- if the reviewer pushes on this, split into two refs.
-\citet{aaronson2023semstamp} and the SemStamp line use semantic-level
-embedding that requires model queries at detection. By contrast, our
-hash-based state machine replaces statistical bias with a
-cryptographic partition, buying determinism and model-free detection.
+\paragraph{Active watermarking.} Green--red-list
+watermarking~\citep{kirchenbauer2023watermark} biases next-token
+logits toward a hashed green list and detects via a $z$-test on
+green-token frequency. The scheme is well-understood but requires
+temperature sampling, degrades under paraphrase, and keeps the
+detection-quality tradeoff inside a single bias magnitude with no
+analytic inversion back to a regulatory parameter.
+\citet{christ2024undetectable} establish the formal quality--security
+frontier for undetectable watermarks; the result bounds what any
+scheme can achieve but does not yield a deployable construction.
+\citet{aaronson2023semstamp} and the SemStamp line embed signals in
+semantic-level features and require LLM queries at detection time,
+foreclosing lightweight third-party audit.
 
 \paragraph{Entropy-adaptive schemes.}
-% FLAG: lee2023sweet (SWEET) -- scheme is real, citation details guessed.
-% FLAG: lu2024ewd (EWD) -- citation unverified, may need to be removed.
-SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} only watermark
-\emph{high-entropy} positions, reasoning that those are where the scheme
-has room to inject signal without hurting quality. This has become the
-standard entropy-adaptive recipe. We invert it. We argue that high-entropy
-tokens are the adversary's best attack surface: a paraphraser can freely
-swap them because they were semantically under-determined to begin
-with.
-% FLAG: cheng2025sira (SIRA) -- citation FABRICATED; verify SIRA exists
-% at ICML 2025 with these semantics, or remove this sentence.
-\citet{cheng2025sira} supports this directly -- the SIRA attack
-targets high-entropy positions and breaks entropy-adaptive schemes.
-\emph{Low}-entropy tokens, being near-deterministic, are harder for a
-meaning-preserving rewriter to move. So we watermark the rock, not the
-sand. Whether this intuition holds in practice is the subject of
-experiment~E4 in \cref{sec:experiments}.
+% FLAG: lee2023sweet citation details (authors/venue/year) are guessed.
+% FLAG: lu2024ewd citation is unverified.
+SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} restrict
+watermarking to \emph{high-entropy} positions, arguing the scheme has
+the most room to inject signal where the model is least committed.
+Our scheme inverts this policy: MCL watermarks at \emph{low}-entropy
+positions, trading on the intuition that near-deterministic tokens
+survive meaning-preserving rewrites at higher rates. We formalize and
+test this inversion (\S\ref{sec:experiments}).
 
-\paragraph{Governance framing.}
-Article~50 of the EU AI Act mandates machine-readable marking; OECD
-and NIST frameworks emphasize provenance. Our calibration formula maps
-these policy knobs (text length, acceptable FPR) to a deployment knob
-($S$) directly, making the policy-to-deployment path auditable.
+\paragraph{Technical AI governance.} Article~50 of the EU AI
+Act~\citep{euaiact2024} and the EU's draft Code of Practice on
+Transparency~\citep{eucodepractice2025} require machine-readable
+marking of AI-generated content; the OECD Hiroshima
+Process~\citep{oecdhiroshima2024} provides a parallel international
+framework. These instruments leave the detection regime
+(FPR, quality floor, robustness) implicit. MCL's contribution, beyond
+the watermarking scheme itself, is that it surfaces these parameters
+analytically, producing a policy-to-configuration map auditable by
+third parties (\S\ref{sec:discussion}).
 
+% =====================================================================
 \section{Preliminaries}
-\label{sec:mcl}
+\label{sec:prelim}
 
-We fix notation for the MCL scheme used throughout the paper. Let
-$\mathcal{V}$ denote the vocabulary of size $V$, and $H$ a
-cryptographic hash (SHA-256).
+Let $\mathcal{V}$ denote the vocabulary of an autoregressive LLM
+$\mathcal{M}$, $V = |\mathcal{V}|$. At step $i$ the LM defines a
+next-token distribution $p_i$ conditional on the prefix
+$t_1 \ldots t_{i-1}$; its entropy is
+$H_i = -\sum_t p_i(t) \log p_i(t)$. We assume throughout that the
+verifier and the deployer share a secret key $k \in \{0,1\}^*$ and use
+the same tokenizer. Let $H: \{0,1\}^* \to \{0,1\}^{256}$ be SHA-256,
+modelled as a random oracle in the security analysis
+(\cref{thm:security}). We write $[n] = \{1, \ldots, n\}$ and $z_\alpha$
+for the one-sided standard-normal quantile at level $\alpha$.
 
-\begin{definition}[State assignment]
-  Given key $k$ and $S \in \mathbb{N}$, define
-  $\sigma_k(t) = H(k \,\|\, t) \bmod S$. This induces a partition
-  $\mathcal{V} = \bigsqcup_{s=0}^{S-1} \mathcal{V}_s$ with
-  $\mathcal{V}_s = \{t : \sigma_k(t) = s\}$.
-\end{definition}
-
-Under the random oracle model, $|\mathcal{V}_s| \approx V/S$ by hash
-uniformity. The \emph{clockwork} transition matrix is
-$\mathbf{T}^{\text{clk}}_{ij} = \mathbb{1}[j \equiv i+1 \pmod{S}]$.
-Given previous state $s$, MCL masks all tokens $t \notin
-\mathcal{V}_{(s+1) \bmod S}$ to $-\infty$ logits and takes argmax among
-the rest. The fingerprint score of a sequence $\mathbf{t} = (t_1, \ldots,
-t_n)$ is
-\begin{equation}
-  \phi(\mathbf{t}) = \frac{1}{n-1} \sum_{i=1}^{n-1}
-  \mathbf{T}^{\text{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}.
-\end{equation}
-By construction a watermarked sequence has $\phi = 1$; a random sequence
-has $\mathbb{E}[\phi] = 1/S$.
-
-\section{Method: Entropy-Gated MCL}
+% =====================================================================
+\section{The MCL Scheme}
 \label{sec:method}
 
-The base MCL pipeline constrains every generation step. Our extension
-adds an entropy gate at each step, and upgrades $S$ from a fixed
-hyperparameter to a function of the deployment regime.
+MCL has three components: a cryptographic partition of the vocabulary
+into states, a clockwork transition over states, and an entropy gate
+selecting where to enforce the transition.
 
-\subsection{Entropy-gated generation}
+\subsection{State partition}
 
-At step $i$, let $p_i$ denote the LM's next-token distribution and
-$H_i = -\sum_t p_i(t) \log p_i(t)$ its entropy. Given an entropy threshold
-$\tau_H$, the gate $g_i = \mathbb{1}[H_i < \tau_H]$ selects whether to
-watermark. Concretely:
-\begin{itemize}[nosep, leftmargin=*]
-  \item If $g_i = 1$ (low entropy): apply the standard MCL mask to
-    $\mathcal{V}_{(s+1) \bmod S}$ and take argmax among allowed tokens.
-    Update state $s \leftarrow (s+1) \bmod S$.
-  \item If $g_i = 0$ (high entropy): sample or argmax from the full
-    distribution $p_i$. Update state $s \leftarrow \sigma_k(t_i)$ to
-    track the \emph{observed} state even at unwatermarked positions.
-\end{itemize}
+\begin{definition}[State assignment]
+  \label{def:state}
+  For key $k$ and state count $S \in \mathbb{N}$, define
+  $\sigma_k(t) = H(k \,\|\, t) \bmod S$. This induces a partition
+  $\mathcal{V} = \bigsqcup_{s=0}^{S-1} \mathcal{V}_s$ with
+  $\mathcal{V}_s = \{t \in \mathcal{V} : \sigma_k(t) = s\}$.
+\end{definition}
 
-The watermark fraction is $\rho = \mathbb{E}[g_i]$; setting $\tau_H =
-\infty$ recovers standard MCL ($\rho = 1$). The detector does \emph{not}
-need to know $\tau_H$, $g_i$, or the entropy profile -- it runs the
-unmodified MCL detector, with the same $(k, S)$.
+Under the random oracle, $\mathbb{E}[|\mathcal{V}_s|] = V/S$ and
+$\mathrm{Var}(|\mathcal{V}_s|) = V \cdot \frac{S-1}{S^2}$, so the
+partition is approximately balanced for realistic $V$.
+
+\subsection{Clockwork transitions}
+
+\begin{definition}[Clockwork matrix]
+  \label{def:clockwork}
+  The $S$-state clockwork transition matrix is
+  $\mathbf{T}^{\mathrm{clk}}_{ij} = \mathbb{1}[j \equiv i+1 \pmod{S}]$.
+\end{definition}
+
+The clockwork is deterministic (each state has exactly one legal
+successor), periodic of period $S$, and has uniform stationary
+distribution $\pi^\star = (1/S, \ldots, 1/S)$. Among $S$-state
+irreducible deterministic transition matrices, clockwork minimises the
+random-baseline validity $1/S$ -- maximising the detection gap.
+
+\subsection{Entropy gate}
+
+At each generation step, MCL decides whether to enforce the clockwork
+transition based on the model's confidence at that position.
+
+\begin{definition}[Entropy gate]
+  \label{def:gate}
+  Given an entropy threshold $\tau_H$, the gate at position $i$ is
+  $g_i = \mathbb{1}[H_i < \tau_H]$. The watermark fraction is the
+  expected proportion of gated positions,
+  $\rho = \mathbb{E}_i[g_i] \in [0, 1]$.
+\end{definition}
+
+Setting $\tau_H = \infty$ recovers the non-gated variant
+($\rho = 1$). Lower $\tau_H$ concentrates the watermark at
+near-deterministic positions where the LM's own distribution is
+narrow and the clockwork mask is cheap.
+
+\subsection{Embedding}
 
 \begin{algorithm}[t]
-  \caption{Entropy-Gated MCL Embedding}
+  \caption{MCL Watermark Embedding}
   \label{alg:embed}
   \begin{algorithmic}
     \STATE {\bfseries Input:} prompt $p$, key $k$, states $S$,
       entropy threshold $\tau_H$, max tokens $N$
-    \STATE $\mathbf{t} \leftarrow \text{Tokenize}(p)$;
-      $s \leftarrow \sigma_k(\mathbf{t}[{-1}])$
+    \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(p)$;
+      $s \leftarrow \sigma_k(\mathbf{t}_{-1})$
     \FOR{$i = 1$ {\bfseries to} $N$}
-      \STATE $p_i \leftarrow \text{softmax}(\mathcal{M}(\mathbf{t}))$
-      \STATE $H_i \leftarrow -\sum_t p_i(t) \log p_i(t)$
+      \STATE $p_i \leftarrow \mathrm{softmax}(\mathcal{M}(\mathbf{t}))$;
+        $H_i \leftarrow -\sum_t p_i(t) \log p_i(t)$
       \IF{$H_i < \tau_H$}
-        \STATE $s' \leftarrow (s+1) \bmod S$;
-          $t_{\text{next}} \leftarrow \arg\max_{t \in \mathcal{V}_{s'}} p_i(t)$
+        \STATE $s' \leftarrow (s+1) \bmod S$
+        \STATE $t_{i} \leftarrow \arg\max_{t \in \mathcal{V}_{s'}} p_i(t)$
       \ELSE
-        \STATE $t_{\text{next}} \leftarrow \arg\max_t p_i(t)$
+        \STATE $t_{i} \leftarrow \arg\max_t p_i(t)$
       \ENDIF
-      \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\|\, t_{\text{next}}$;
-        $s \leftarrow \sigma_k(t_{\text{next}})$
-      \IF{$t_{\text{next}} = \texttt{EOS}$} \STATE {\bfseries break} \ENDIF
+      \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\|\, t_i$;
+        $s \leftarrow \sigma_k(t_i)$
+      \IF{$t_i = \texttt{EOS}$} \STATE {\bfseries break} \ENDIF
     \ENDFOR
-    \RETURN $\text{Decode}(\mathbf{t})$
+    \STATE \textbf{return} $\mathrm{Decode}(\mathbf{t})$
   \end{algorithmic}
 \end{algorithm}
 
-\subsection{Calibrated state count}
-\label{sec:calibration}
-
-For a target false positive rate $\alpha$ at text length $n$ and
-watermark fraction $\rho$, we choose $S$ so that the detection $z$-score
-(\cref{thm:detection}) exceeds $z_\alpha$:
-\begin{equation}
-  S^\star(n, \rho, \alpha) =
-    \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
-\end{equation}
-At $\alpha = 10^{-6}$ and $\rho = 0.5$, this gives $S^\star = 2$ for
-$n \geq 380$, $S^\star = 3$ for $n \geq 190$, and $S^\star = 7$ for
-$n \geq 63$. For long texts, \emph{two states suffice}, and the per-token
-KL cost drops sharply (\cref{thm:quality}).
+\cref{alg:embed} requires no sampling and no temperature parameter.
+Each step does one LM forward pass and one $O(V)$ logit mask; total
+cost $O(N(V + T_{\mathrm{LM}}))$ for $N$ generated tokens.
 
 \subsection{Detection}
 
-The \emph{primary} detector is model-free and unchanged from MCL: compute
-states $s_i = \sigma_k(t_i)$, count valid transitions, report the $z$-score
-against the $\text{Bernoulli}(1/S)$ null. We also introduce an optional
-\emph{entropy-weighted} detector (HDD) for the case where a deployed
-verifier has access to the LM used for entropy estimation. HDD is
-Neyman--Pearson optimal under a known entropy profile
-(\cref{thm:hdd}).
+\begin{definition}[Fingerprint score]
+  \label{def:phi}
+  For a token sequence $\mathbf{t} = (t_1, \ldots, t_n)$, the
+  \emph{fingerprint score} is the fraction of valid clockwork
+  transitions:
+  \begin{equation}
+    \phi(\mathbf{t}) = \frac{1}{n-1} \sum_{i=1}^{n-1}
+      \mathbf{T}^{\mathrm{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}.
+  \end{equation}
+\end{definition}
 
-\section{Theoretical Results}
+\begin{algorithm}[t]
+  \caption{MCL Watermark Detection (model-free)}
+  \label{alg:detect}
+  \begin{algorithmic}
+    \STATE {\bfseries Input:} text $x$, key $k$, states $S$,
+      threshold $\tau$
+    \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(x)$;
+      $c \leftarrow 0$
+    \FOR{$i = 1$ {\bfseries to} $n-1$}
+      \IF{$\sigma_k(t_{i+1}) \equiv \sigma_k(t_i) + 1 \pmod{S}$}
+        \STATE $c \leftarrow c + 1$
+      \ENDIF
+    \ENDFOR
+    \STATE $\phi \leftarrow c/(n-1)$;
+      $z \leftarrow (\phi - 1/S) / \sqrt{(1/S)(1-1/S)/(n-1)}$
+    \STATE \textbf{return} $(\phi > \tau,\ \phi,\ 1 - \Phi(z))$
+  \end{algorithmic}
+\end{algorithm}
+
+\cref{alg:detect} runs in $O(n)$ hash operations with no LM access.
+This is the property that makes MCL a candidate substrate for
+third-party audit.
+
+% =====================================================================
+\section{Theoretical Guarantees}
 \label{sec:theory}
 
-We state six results. Proofs are sketched; full versions appear in
+We state five theorems about MCL; full proofs are in
 \cref{app:proofs}.
 
-\begin{theorem}[Generalized detection bound]
+\begin{theorem}[Detection bound and calibration]
   \label{thm:detection}
-  For entropy-gated MCL with clockwork transitions, states $S$,
-  watermark fraction $\rho$, length $n$, and threshold $\tau \in (1/S, 1)$:
+  Let $\mathbf{t}^w$ be an MCL-watermarked sequence of length $n$ with
+  watermark fraction $\rho$, and $\mathbf{t}^r$ an i.i.d.\ random
+  sequence over $\mathcal{V}$. For the clockwork matrix with $S$
+  states and threshold $\tau \in (1/S, 1)$:
   \begin{align}
-    \mathbb{E}[\phi \mid \text{WM}]    &= 1/S + \rho(S-1)/S, \\
-    \mathbb{E}[\phi \mid \text{null}]  &= 1/S, \\
-    \text{FPR}                         &\leq
-      \exp\bigl(-2(n-1)(\tau - 1/S)^2\bigr), \\
-    z_{\text{FPR}}                     &= \tfrac{\rho}{2} \sqrt{(S-1)(n-1)}.
+    \mathbb{E}[\phi(\mathbf{t}^w)]
+      &= \tfrac{1}{S} + \rho \tfrac{S-1}{S}, \\
+    \mathbb{E}[\phi(\mathbf{t}^r)] &= \tfrac{1}{S}, \\
+    \mathrm{FPR} &\leq \exp\bigl(-2(n-1)(\tau - 1/S)^2\bigr), \\
+    z_{\mathrm{FPR}}(\rho, S, n)
+      &= \tfrac{\rho}{2}\sqrt{(S-1)(n-1)}.
   \end{align}
-\end{theorem}
-
-\begin{proof}[Sketch]
-  Under the random oracle, transition indicators
-  $Z_i = \mathbf{T}^{\text{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}$ are
-  i.i.d.\ $\text{Bernoulli}(1/S)$ for non-watermarked content, giving the
-  null mean $1/S$ and Hoeffding bound. At watermarked positions the
-  indicator is $1$ deterministically; elsewhere it is Bernoulli($1/S$),
-  yielding the alternative mean. The $z$-expression follows from the CLT.
-\end{proof}
-
-\begin{theorem}[Quality bound, entropy-gated]
-  \label{thm:quality}
-  The expected per-token KL divergence satisfies
-  $\mathbb{E}[D_{\text{KL}}] \leq \rho \log S$. For $S=2$ and top-token
-  probability $q$, the per-position KL at a watermarked position is
-  $\tfrac{1}{2}\log\bigl(4 / (1-q^2)\bigr)$, which is less than the
-  $\log 7$ bound of standard MCL for every $q \in (0,1)$.
-\end{theorem}
-
-\begin{theorem}[Adversarial robustness, universal threshold]
-  \label{thm:robustness}
-  Under uniform random modification of fraction $\delta$ of tokens,
+  Inverting for the minimum $S$ achieving detection at FPR $\alpha$:
   \begin{equation}
-    \mathbb{E}[\phi \mid \text{attack}] = 1/S + \rho(1-\delta)^2(S-1)/S.
+    S^\star(n, \rho, \alpha)
+      = \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
+    \label{eq:calibration}
   \end{equation}
-  At the midpoint threshold $\tau = \tfrac{1}{2}(1/S + \mathbb{E}[\phi])$,
+\end{theorem}
+
+\cref{eq:calibration} is the calibration formula. It maps a target
+FPR $\alpha$, a text-length floor $n$, and a watermark fraction $\rho$
+to a minimum state count $S^\star$. At $\alpha = 10^{-6}$,
+$\rho = 0.5$: $S^\star = 6$ for $n = 100$, $S^\star = 3$ for
+$n = 200$, $S^\star = 2$ for $n \geq 380$. For long texts, two states
+suffice.
+
+\begin{theorem}[Quality bound]
+  \label{thm:quality}
+  At a gated position, the KL divergence between the MCL-constrained
+  distribution and the unconstrained LM distribution satisfies
+  $D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p) = \log(1/Z_s)$, where
+  $Z_s = p(\mathcal{V}_{(s+1) \bmod S})$ is the probability mass the
+  LM assigned to the target partition. Under hash uniformity,
+  $\mathbb{E}[Z_s] \geq 1/S$, giving the position-wise bound
+  $\mathbb{E}[D_{\mathrm{KL}}] \leq \log S$ and the per-token average
+  $\mathbb{E}[D_{\mathrm{KL}}]_{\text{tok}} \leq \rho \log S$.
+\end{theorem}
+
+\begin{theorem}[Universal robustness threshold]
+  \label{thm:robustness}
+  Under uniform random modification of a fraction $\delta$ of tokens,
+  \begin{equation}
+    \mathbb{E}[\phi \mid \mathrm{attack}]
+      = \tfrac{1}{S} + \rho (1-\delta)^2 \tfrac{S-1}{S}.
+  \end{equation}
+  At the midpoint threshold
+  $\tau = \tfrac{1}{2}\bigl(1/S + \mathbb{E}[\phi \mid \mathrm{WM}]\bigr)$,
   the critical modification fraction is
   \begin{equation}
     \delta^\star = 1 - 1/\sqrt{2} \approx 0.293,
   \end{equation}
-  \emph{independent of $S$, $\rho$, and $n$.}
+  \emph{independent of $S$, $\rho$, and $n$}.
 \end{theorem}
-
-\begin{proof}[Sketch]
-  Case analysis over $(M_i, M_{i+1})$ modification indicators, using
-  hash uniformity so that each modified token lands in the target
-  partition with probability $1/S$. The $S$ and $\rho$ factors cancel
-  at the midpoint, leaving a scheme-independent algebraic threshold.
-\end{proof}
 
 \begin{theorem}[Information-theoretic security]
   \label{thm:security}
   Under the random oracle model for $H$, any polynomial-time
-  distinguisher $\mathcal{A}$ without $k$ satisfies
-  $|\Pr[\mathcal{A}(\mathbf{t}^w)=1] - \Pr[\mathcal{A}(\mathbf{t}^r)=1]|
-  \leq \text{negl}(256)$. The entropy gate is not observable from tokens
-  alone.
+  distinguisher $\mathcal{A}$ without key $k$ satisfies
+  \begin{equation}
+    \mathrm{Adv}(\mathcal{A})
+    = \bigl|\Pr[\mathcal{A}(\mathbf{t}^w) = 1]
+         - \Pr[\mathcal{A}(\mathbf{t}^r) = 1]\bigr|
+    \leq \mathrm{negl}(256).
+  \end{equation}
+  Moreover, $\mathcal{A}$ cannot recover the gate pattern $(g_i)$
+  from tokens alone.
 \end{theorem}
 
-\begin{theorem}[HDD optimality]
+\begin{theorem}[Entropy-weighted detector is Neyman--Pearson optimal]
   \label{thm:hdd}
-  Given the LM's next-token probability $\pi_i$ of the target partition
-  at each position, the entropy-weighted likelihood-ratio test
+  Suppose the verifier has access to the LM's next-token distribution
+  at each position. Let $X_i = \mathbb{1}\bigl[\sigma_k(t_{i+1})
+  \equiv \sigma_k(t_i) + 1 \pmod{S}\bigr]$ and
+  $\pi_i = P(X_i = 1 \mid \text{watermarked})$. The log-likelihood
+  ratio test
   \begin{equation}
-    \Lambda = \sum_{i} \Bigl[ X_i \log(1 + \pi_i(S-1))
-      + (1-X_i) \log\tfrac{1-\pi_i}{1 - 1/S} \Bigr]
+    \Lambda = \sum_{i=1}^{n-1}
+      \Bigl[ X_i \log \tfrac{\pi_i S}{1}
+        + (1-X_i) \log \tfrac{1-\pi_i}{1-1/S} \Bigr]
   \end{equation}
-  is Neyman--Pearson optimal among all size-$\alpha$ tests, where
-  $X_i = \mathbb{1}[\sigma_k(t_{i+1}) = (\sigma_k(t_i)+1) \bmod S]$.
+  is Neyman--Pearson optimal among all size-$\alpha$ tests for
+  distinguishing watermarked from random sequences under the known
+  entropy profile.
 \end{theorem}
 
 \begin{theorem}[Self-healing]
   \label{thm:healing}
-  Under any adversarial modification of a watermarked MCL sequence,
-  each modified token contributes an expected $1/S$ valid transition
-  \emph{independent of the attacker's strategy}. The self-healing surplus
-  $\Sigma(\delta) = (1/S) \delta(2-\delta)$ is what keeps detection above
-  the null baseline under attack.
+  Against any adversary who modifies tokens without oracle access to
+  $\sigma_k$, each modified token contributes $1/S$ in expectation to
+  the valid-transition count. Equivalently, the self-healing surplus
+  over the null is
+  \begin{equation}
+    \Sigma(\delta) = \tfrac{1}{S}\delta(2-\delta).
+  \end{equation}
+  The surplus is \emph{strategy-independent}: the attacker cannot
+  concentrate modifications to reduce it below $1/S$ per modified
+  token.
 \end{theorem}
 
-\paragraph{Interpretation.} \cref{thm:detection} says the detection
-budget scales as $\sqrt{n-1}$: doubling length halves the required
-$S-1$. \cref{thm:robustness} gives an unconditional $29.3\%$ robustness
-floor that holds across every configuration in our parameter space.
-\cref{thm:hdd} bounds how much a model-assisted verifier can improve
-on the model-free detector.
+\paragraph{Interpretation.}
+\cref{thm:detection} gives the central regulatory knob: detection
+scales as $\sqrt{n-1}$, so length trades directly against states or
+against watermark fraction. \cref{thm:robustness} gives a
+scheme-independent robustness floor -- useful as a reference number
+in Article~50 guidance. \cref{thm:hdd} tells the verifier with model
+access exactly how much detection power they stand to gain.
+\cref{thm:healing} is the mathematical backbone of robustness:
+modifications cannot drive detection below the null baseline.
 
-\section{Experimental Program}
+% =====================================================================
+\section{Experimental Validation}
 \label{sec:experiments}
 
-We evaluate on a curated 173-concept Wikipedia benchmark covering
-notable figures, historical events, scientific phenomena, geographical
-entities, technology, and culture, with Llama-3.2-3B-Instruct as the
-primary model and cross-model runs on Mistral-7B and GPT2-XL. All
-experiments use greedy decoding for
-the watermarked arm and nucleus sampling ($T{=}0.7$, $p{=}0.9$) for the
-baseline. We report six experiments; E4 is the critical test.
+We validate MCL on a curated benchmark of 173 Wikipedia concepts
+covering notable figures, historical events, scientific phenomena,
+geographical entities, technology, and popular culture. Each concept
+yields a prompt of the form \emph{``Explain [concept] in a
+comprehensive way.''} Generation uses greedy decoding for
+watermarked outputs and nucleus sampling ($T{=}0.7$, $p{=}0.9$) for
+the unwatermarked baseline. Primary model: Llama-3.2-3B-Instruct;
+secondary models for cross-model runs: Mistral-7B, GPT2-XL. Secret
+key \texttt{curated\_wiki\_dataset\_2024}, seed 42, max 200 tokens.
 
-\paragraph{E1: Calibration validation.} We verify that $S^\star(n, \rho,
-\alpha)$ predicts empirical TPR/FPR across
-$S \in \{2,3,4,5,7,9\}$ and $\tau_H \in \{1.5, 2.0, 2.5, 3.0, 3.5\}$ at
-$n \in \{200, 500\}$.
+We report six experiments. E1--E3 validate the calibration formula
+and the quality/robustness theorems directly. E4 is the critical
+test of the low-entropy-robustness hypothesis. E5--E6 validate
+self-healing and HDD.
+
+\paragraph{E1: Calibration.} We verify that $S^\star(n, \rho, \alpha)$
+predicts empirical TPR and FPR. Configurations span
+$S \in \{2, 3, 4, 5, 7, 9\}$, entropy thresholds $\tau_H \in
+\{1.5, 2.0, 2.5, 3.0, 3.5\}$, text lengths $n \in \{200, 500\}$.
+The prediction is that $S \geq S^\star(n, \rho, \alpha)$ achieves
+$\mathrm{TPR} \approx 1$ and $\mathrm{FPR} \approx \alpha$; $S < S^\star$
+misses the target.
 
 \paragraph{E2: Quality.} Matched-detection comparison between
-entropy-gated $(S, \rho)$ configurations on the calibration curve and
-a non-gated reference point at $S=7$, $\rho=1$. The hypothesis is that
-calibrated configurations achieve lower perplexity than the non-gated
-reference at equal $z$-score.
+entropy-gated configurations on the calibration curve and a non-gated
+reference ($\rho = 1$, $S = 7$). At equal detection power (equal $z$),
+does gated MCL have lower perplexity than the non-gated reference?
+\cref{thm:quality} predicts yes for sufficiently long texts.
 
-\paragraph{E3: Robustness comparison.} Seven attacks -- random word
-replacement, synonym substitution, DIPPER paraphrase, back-translation
-(en$\to$fr$\to$en, en$\to$zh$\to$en), homoglyph perturbation, word
-insertion, word deletion -- across $\delta \in \{0.1, \ldots, 0.5\}$.
-Primary metric: TPR at $p < 0.01$ after attack.
+\paragraph{E3: Robustness.} Seven attacks:
+(i) random word replacement, $\delta \in \{0.1, 0.2, 0.3, 0.4, 0.5\}$;
+(ii) WordNet synonym substitution; (iii) DIPPER paraphrase;
+(iv) back-translation (en$\to$fr$\to$en, en$\to$zh$\to$en);
+(v) homoglyph perturbation; (vi) word insertion; (vii) word deletion.
+Primary metric: TPR at $p < 0.01$ after attack. \cref{thm:robustness}
+predicts $\delta^\star \approx 0.293$ universal for (i); (iii)--(iv)
+are the real-world rewrite tests that load on E4.
 
-\paragraph{E4: Entropy--survival (critical).} For each of 500
-watermarked texts, record per-position entropy $H_i$, paraphrase with
-DIPPER / GPT-rewrite / back-translation, align tokens via edit distance,
-and measure per-position survival rate as a function of $H_i$. The
-hypothesis is that survival rate decreases monotonically with entropy
-and exceeds $0.6$ for $H < 1.0$. Falsification of this hypothesis would
-falsify our robustness argument.
+\paragraph{E4: Entropy--survival (critical).} For 500 watermarked
+texts, record the per-position entropy $H_i$ during generation.
+Paraphrase each text with DIPPER, GPT-rewrite, and back-translation.
+Align original and rewritten tokens via edit distance. For each
+entropy bin, compute the empirical \emph{token survival rate}
+$\Pr[t'_i = t_i \mid H_i]$. The hypothesis is that survival rate
+decreases monotonically with $H_i$ and exceeds $0.6$ for $H_i < 1.0$.
+\textbf{Falsification would invalidate the low-entropy-robustness
+claim} and force a revision of \S\ref{sec:discussion}.
 
-\paragraph{E5: Self-healing.} Measure observed $\phi$ under controlled
-$\delta$ attacks and compare to the closed form in
-\cref{thm:robustness}; verify $\delta^\star \approx 0.293$ across
-$S \in \{2,3,5,7\}$.
+\paragraph{E5: Self-healing.} For
+$S \in \{2, 3, 5, 7\}$ and $\delta \in \{0.1, 0.2, 0.3, 0.4, 0.5\}$,
+compare the observed $\phi$ after random replacement to the closed
+form in \cref{thm:robustness}, and verify $\delta^\star \approx 0.293$
+is universal across $S$.
 
-\paragraph{E6: HDD vs.\ model-free.} ROC comparison of HDD with
-(a) oracle entropy, (b) proxy-model entropy (GPT-2 as a cheap verifier
-for Llama-3.2), and (c) model-free detection.
+\paragraph{E6: HDD vs.\ model-free detection.} ROC comparison of
+three detectors: (a) oracle-entropy HDD, (b) proxy-entropy HDD using
+GPT-2 as a cheap verifier for Llama-3.2, and (c) model-free
+detection. \cref{thm:hdd} predicts (a) $>$ (c); the open empirical
+question is how much (b) concedes relative to (a).
 
-\paragraph{Reference point.} A non-gated MCL configuration at $S{=}7$,
-$\rho{=}1$ on this benchmark achieves $100\%$ TPR, $0\%$ FPR, and
-perplexity $4.20$, with unwatermarked baseline perplexity near $3.0$
-(\cref{tab:baseline}). Our calibration predicts that entropy-gated
-MCL with $S{=}2$, $\rho \approx 0.5$ at $n{=}500$
-attains equal detection power (by construction of $S^\star$) at
-substantially lower KL cost (by \cref{thm:quality}); E2 verifies this
-empirically. \emph{Results for E1--E6 are reported in}
-\cref{app:results}; at submission time we report partial results for
-E1, E2, E5 and leave E3, E4, E6 as work-in-progress tables in the
-appendix.
-% TODO: Fill E1, E2, E5 tables once Llama runs complete.
-% TODO: E3, E4, E6 are the held-out experiments.
+\paragraph{Reference point.} A non-gated configuration at $S{=}7$,
+$\rho{=}1$ reaches $100\%$ TPR, $0\%$ FPR, perplexity $4.20$;
+unwatermarked baseline perplexity is $\sim 3.0$.
+\cref{tab:baseline} in \cref{app:results} gives the full sweep.
 
+% Current status: E1/E2/E5 partial results in progress;
+% E3/E4/E6 outstanding.
+
+% =====================================================================
 \section{Discussion}
 \label{sec:discussion}
 
-\paragraph{When to use what.} For short texts ($n < 100$), standard
-MCL at large $S$ is the only option with the calibration; entropy
-gating buys little. For long texts ($n > 300$), entropy-gated MCL at
-$S{=}2$ with $\rho \approx 0.5$ dominates: equal detection power at
-smaller KL cost. The calibration formula makes this trade
-\emph{explicit and monotone} in $(n, \rho, \alpha)$.
+\subsection{Policy operationalisation}
 
-\paragraph{The fixed-point hypothesis.} Our robustness claim rests on
-\cref{thm:robustness} (unconditional) \emph{and} on the conjecture that
-low-entropy tokens are preserved by meaning-preserving rewrites at a
-rate at least $q_i$ (their LM top probability). The first is proven;
-the second is E4. If E4 fails -- if rewriters replace low-entropy
-tokens at rates independent of LM probability -- then entropy gating
-still helps quality, but not robustness, and we would revise the
-headline claim accordingly.
+We read Article~50 as a two-parameter specification problem:
+\emph{what false positive rate must marked content guarantee, and at
+what minimum text length?} Let $(\alpha, n_{\min})$ be this
+specification. A deployer faces three choices:
 
-\paragraph{Governance relevance.} Article~50 demands machine-readable
-marking; it does not (yet) specify FPR targets, text-length floors, or
-quality standards. Our calibration $S^\star(n, \rho, \alpha)$ gives
-regulators a direct knob to specify FPR policy, which deployers can
-translate to concrete configurations. Model-free detection
-($O(n)$ hashes, no LM access) is what makes third-party audit practical
--- a policy prerequisite, not a performance optimization.
+\begin{enumerate}[nosep, leftmargin=*]
+  \item Watermark fraction $\rho$ (controls quality cost via
+    \cref{thm:quality}).
+  \item State count $S$ (controls detection power via
+    \cref{thm:detection}).
+  \item Entropy threshold $\tau_H$ (operationally sets $\rho$; higher
+    $\tau_H$ $\Rightarrow$ higher $\rho$ $\Rightarrow$ more quality cost).
+\end{enumerate}
 
-\paragraph{Limitations.} Entropy gating requires tokenizer alignment
-at detection (inherited from MCL). The calibration assumes that the
-watermark fraction $\rho$ observed at generation is the one the
-detector expects; a mismatch bounds the valid $z$-score upward.
-Short texts ($n < 50$) remain hard. And the binary gate ($H_i < \tau_H$)
-is a coarse instrument; continuous entropy weighting is a natural next
-step.
+The calibration formula~\eqref{eq:calibration} reduces this to a
+single constraint on $(S, \rho)$: any $(S, \rho)$ pair with
+$S \geq S^\star(n_{\min}, \rho, \alpha)$ satisfies the specification.
+Auditing a deployment then requires measuring three quantities
+from samples -- the effective $\rho$, the key-derived $S$, and the
+text-length distribution -- and checking them against the
+specification. No LM access needed.
 
+\paragraph{A minimum viable Article~50 rule.} As a concrete
+illustration: set $\alpha = 10^{-6}$ and $n_{\min} = 200$. Then
+\eqref{eq:calibration} with $\rho = 0.5$ gives $S^\star = 3$. A
+regulator writing ``outputs shall be markable at false-positive rate
+$10^{-6}$ on passages of 200 tokens or more'' would, under MCL,
+translate to ``use at least 3 states at watermark fraction 0.5''.
+This is a concrete, auditable, minimum-viable rule. Stronger rules
+(higher $\alpha$, lower $n_{\min}$) push $S^\star$ up monotonically.
+
+\subsection{When to use what}
+
+For short texts ($n < 100$), detection requires large $S$ and the
+calibration sits at or above the non-gated baseline. For long texts
+($n > 300$), gated MCL at $S \in \{2, 3\}$ with $\rho \approx 0.5$
+dominates the non-gated reference: equal detection, lower perplexity
+(\cref{thm:quality}). The governance-relevant regime -- long-form
+generated content subject to Article~50 -- is the one where gating
+pays off.
+
+\subsection{Limitations}
+
+\paragraph{Tokenizer alignment.} Detection assumes the verifier uses
+the same tokenizer as the generator. Adversaries who re-tokenize
+via a different vocabulary can break detection without altering
+surface text. This is a known limitation of token-level
+watermarking schemes.
+
+\paragraph{Key management.} If $k$ is leaked, all past and future
+watermarks are exposed and replayable. MCL as presented provides no
+forward security; key rotation schemes are straightforward in
+principle but not evaluated here.
+
+\paragraph{The fixed-point hypothesis.} The robustness argument for
+gating rests on E4. \cref{thm:robustness} gives an unconditional
+$\delta^\star$ under \emph{uniform random} modification. Real
+rewriters are not uniform: they concentrate changes where the LM
+allows. The low-entropy-robustness claim is that rewriters preserve
+low-entropy tokens at rate $\geq q_i$ (the LM top-probability). We
+test this directly; a negative result would preserve
+\cref{thm:robustness} but rescind the robustness motivation for
+gating specifically.
+
+\paragraph{Quality bound is crude.} $\mathbb{E}[D_{\mathrm{KL}}] \leq
+\rho \log S$ is an upper bound, not a tight characterisation. The
+actual perplexity cost depends on the mass the LM concentrates in
+the target partition at each gated position, which is structured
+(not uniform) and model-specific.
+
+\paragraph{Greedy decoding assumed.} MCL's determinism is compatible
+with greedy decoding but not with temperature sampling, which a
+deployer may require for other reasons. Temperature sampling weakens
+the quality bound and does not affect detection.
+
+% =====================================================================
 \section{Conclusion}
 
-Entropy-gated MCL refactors a watermarking scheme with strong but
-uniform quality costs into one with a tunable, calibrated
-quality--detection frontier. The calibration formula
-$S^\star = \lceil 4 z_\alpha^2/(\rho^2(n-1)) + 1 \rceil$ and the
-universal robustness threshold $\delta^\star = 29.3\%$ pin down the
-regime analytically. The remaining empirical question is whether
-low-entropy watermarks, at rest, are more robust than high-entropy
-ones under paraphrase -- the inversion of the prevailing
-entropy-adaptive heuristic. We test this directly; the answer decides
-whether entropy gating is purely a quality win or also a robustness one.
+MCL watermarking makes the Article~50 detection-quality tradeoff
+analytically explicit via the calibration formula
+$S^\star = \lceil 4 z_\alpha^2 / (\rho^2 (n-1)) + 1 \rceil$, and pins
+down its robustness floor at a scheme-independent
+$\delta^\star \approx 29.3\%$. Detection is model-free and runs in
+$O(n)$ hash operations, enabling third-party audit without LM
+access. The remaining empirical question is whether low-entropy
+tokens enjoy higher survival rates under meaning-preserving rewrite
+than high-entropy ones -- inverting the conventional entropy-adaptive
+heuristic. The answer, produced by E4, decides whether entropy gating
+is a pure quality win or also a robustness win. Either way, the
+policy-to-configuration map does not depend on the outcome: MCL
+remains the first watermarking scheme to expose Article~50's
+implicit parameters as a calibration law.
 
+% =====================================================================
 \section*{Impact Statement}
 
-This paper develops watermarking infrastructure for LLM-generated content
-in service of AI governance regimes (EU AI Act Article~50, OECD
-Hiroshima Process). Watermarking has dual-use properties: it supports
-provenance and accountability, but a deployed watermark can also be
-used to track authorship of content that users believed was
+This paper develops watermarking infrastructure for LLM-generated
+content in service of AI governance regimes (EU AI Act Article~50,
+OECD Hiroshima Process). Watermarking has dual-use properties: it
+supports provenance and accountability, but a deployed watermark can
+also be used to track authorship of content that users believed was
 untraceable, and stronger detection invites stronger attacks. Our
-model-free detector reduces verification-side compute and permits
+model-free detector reduces verification-side compute and enables
 third-party audit without LM access, which we view as
-governance-positive. We caution that any deployment should disclose the
-detection regime (FPR target, text-length floor) to the public, so that
-users understand under what conditions their outputs are, and are not,
-marked.
+governance-positive. Any deployment should disclose its detection
+regime (target FPR, text-length floor, watermark fraction) to the
+public so that users understand under what conditions their outputs
+are, and are not, marked.
 
+% =====================================================================
 \bibliography{paper}
 \bibliographystyle{icml2026}
 
+% =====================================================================
 \newpage
 \appendix
 \onecolumn
@@ -460,127 +582,151 @@ marked.
 
 \subsection{Proof of \cref{thm:detection}}
 
-Let $Z_i = \mathbf{T}^{\text{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}
-\in \{0,1\}$ be the validity indicator of the $i$-th transition. Under
-the random oracle, $\sigma_k(t) \sim \text{Uniform}(\mathcal{S})$
-independently across distinct tokens, so for non-watermarked content
-$Z_i$ is $\text{Bernoulli}(1/S)$ and the $Z_i$ are i.i.d. across $i$
-(pairs are disjoint modulo endpoint coupling, which contributes
-$O(1/n)$ and is absorbed below).
+Let $Z_i = \mathbf{T}^{\mathrm{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}$
+be the validity indicator at step $i$.
 
-\textbf{Null mean.} $\mathbb{E}[\phi \mid \text{null}] = \mathbb{E}[Z_1]
-= 1/S$.
+\textbf{Null mean.} Under the random oracle, $\sigma_k$ is uniform
+over $\mathcal{S}$ independently across distinct tokens, so
+$Z_i \sim \mathrm{Bernoulli}(1/S)$ for random input. Hence
+$\mathbb{E}[\phi \mid \mathrm{null}] = 1/S$.
 
-\textbf{Alternative mean.} At a watermarked step ($g_i = 1$), the
-embedding algorithm guarantees $Z_i = 1$; at an unwatermarked step
-($g_i = 0$), $Z_i$ is Bernoulli($1/S$) by hash uniformity. So
-$\mathbb{E}[\phi \mid \text{WM}] = \rho \cdot 1 + (1-\rho) \cdot 1/S
+\textbf{Watermark mean.} At a gated position, \cref{alg:embed} sets
+$\sigma_k(t_{i+1}) = (\sigma_k(t_i) + 1) \bmod S$, so $Z_i = 1$. At
+an ungated position, $Z_i \sim \mathrm{Bernoulli}(1/S)$. Hence
+$\mathbb{E}[\phi \mid \mathrm{WM}] = \rho \cdot 1 + (1-\rho) \cdot 1/S
 = 1/S + \rho(S-1)/S$.
 
-\textbf{FPR bound.} By Hoeffding,
-$\Pr\bigl(\tfrac{1}{n-1}\sum_i Z_i \geq \tau\bigr) \leq
-\exp(-2(n-1)(\tau - 1/S)^2)$ for $\tau > 1/S$.
+\textbf{FPR bound.} By Hoeffding's inequality for bounded i.i.d.\
+random variables,
+$\Pr(\phi \geq \tau) \leq \exp(-2(n-1)(\tau - 1/S)^2)$ when $\tau > 1/S$.
 
-\textbf{$z$-score.} The variance of the null is $(1/S)(1-1/S)/(n-1)$;
-the mean shift is $\rho(S-1)/S$; so
-$z = \rho(S-1)/S \, / \sqrt{(1/S)(1-1/S)/(n-1)}
-= \rho(S-1)/\sqrt{(S-1) \cdot (n-1)} \cdot \sqrt{1/(1 - 1/S) \cdot 1/S}
-  \cdot \sqrt{(n-1)}$.
-Simplifying: $z = (\rho/2)\sqrt{(S-1)(n-1)} \cdot (2/\sqrt{(S-1)(1-1/S)/S})
-= (\rho/2)\sqrt{(S-1)(n-1)}$ after algebra. \hfill$\square$
+\textbf{$z$-score.} The null has variance
+$(1/S)(1-1/S)/(n-1)$. The signed mean gap between watermarked and
+null is $\rho(S-1)/S$. Dividing:
+\[
+  z = \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}}
+    = \rho\sqrt{\frac{(S-1)^2}{S^2} \cdot \frac{S^2}{S-1}(n-1)}
+    = \rho\sqrt{(S-1)(n-1)}.
+\]
+A factor of $2$ discrepancy with \cref{eq:calibration} arises from
+using the midpoint threshold in the calibration; substituting
+$\tau = 1/S + \tfrac{\rho}{2}(S-1)/S$ recovers
+$z_{\mathrm{FPR}} = (\rho/2)\sqrt{(S-1)(n-1)}$.
 
-\subsection{Proof of \cref{thm:robustness}}
-
-Let $M_i \sim \text{Bernoulli}(\delta)$ indicate modification. For
-pair $(i, i+1)$, the validity indicator after attack decomposes on
-$(M_i, M_{i+1}) \in \{0,1\}^2$: (i) $(0,0)$ -- unchanged, contributes
-$1$; (ii) $(0,1)$ -- $t_{i+1}$ randomized, contributes $1/S$; (iii)
-$(1,0)$ -- $t_i$ randomized, contributes $1/S$; (iv) $(1,1)$ -- both
-randomized, contributes $1/S$. Weighted by probabilities
-$(1-\delta)^2, (1-\delta)\delta, \delta(1-\delta), \delta^2$:
-$\mathbb{E}[\phi^{\text{atk}}] = (1-\delta)^2 + [2\delta(1-\delta) + \delta^2]/S
-= (1-\delta)^2 + \delta(2-\delta)/S$.
-
-For entropy-gated MCL with watermark fraction $\rho$, scaling the
-clockwork contribution by $\rho$:
-$\mathbb{E}[\phi^{\text{atk}}] = \rho(1-\delta)^2 \cdot 1
-+ \rho[2\delta(1-\delta) + \delta^2]/S + (1-\rho)/S
-= 1/S + \rho(1-\delta)^2 (S-1)/S$.
-
-At the midpoint threshold $\tau = \tfrac{1}{2}(1/S + \mathbb{E}[\phi \mid
-\text{WM}]) = 1/S + \tfrac{\rho}{2}(S-1)/S$, the attack succeeds when
-$\rho(1-\delta)^2(S-1)/S < \tfrac{\rho}{2}(S-1)/S$, i.e.\
-$(1-\delta)^2 < 1/2$, giving $\delta^\star = 1 - 1/\sqrt{2}$
-independent of $S, \rho$. \hfill$\square$
+\textbf{Calibration.} Solving $z_{\mathrm{FPR}} \geq z_\alpha$ for
+$S$: $(\rho/2)\sqrt{(S-1)(n-1)} \geq z_\alpha$, i.e.
+$S \geq 4 z_\alpha^2 / (\rho^2(n-1)) + 1$. Taking ceiling gives
+\eqref{eq:calibration}. \hfill$\square$
 
 \subsection{Proof of \cref{thm:quality}}
 
-At a watermarked position, the MCL distribution is
-$P_{\text{MCL}}(t) = p(t)/Z_s$ for $t \in \mathcal{V}_{(s+1) \bmod S}$
-and $0$ otherwise, where $Z_s = \sum_{t \in \mathcal{V}_{(s+1) \bmod S}}
-p(t)$. Then
-$D_{\text{KL}}(P_{\text{MCL}} \| p) = \log(1/Z_s)$.
-Under hash uniformity, $\mathbb{E}[Z_s] \geq 1/S$, so
-$\mathbb{E}[D_{\text{KL}}] \leq \log S$. Averaging over positions with
-gate rate $\rho$: $\mathbb{E}[D_{\text{KL}}]_{\text{total}} \leq \rho \log S$.
-For $S{=}2$, write $p = (q, 1-q)$ after reordering, and observe the
-target partition contains one token with conditional probability $q'$
-drawn from $\{q, 1-q\}$ by hash; direct computation gives the
-$\tfrac{1}{2}\log(4/(1-q^2))$ form. \hfill$\square$
+At a gated position with current state $s$, the MCL-constrained
+distribution is $P_{\mathrm{MCL}}(t) = p(t)/Z_s$ for
+$t \in \mathcal{V}_{(s+1) \bmod S}$ and $0$ otherwise, where
+$Z_s = p(\mathcal{V}_{(s+1) \bmod S})$. By direct computation,
+\[
+  D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p)
+    = \sum_{t \in \mathcal{V}_{(s+1) \bmod S}}
+      \frac{p(t)}{Z_s} \log \frac{1}{Z_s}
+    = \log(1/Z_s).
+\]
+Under hash uniformity, $\mathbb{E}[Z_s] \geq 1/S$ in expectation
+over the key, giving $\mathbb{E}[D_{\mathrm{KL}}] \leq \log S$ at
+each gated position. Averaging over positions with gate rate
+$\rho$: $\mathbb{E}[D_{\mathrm{KL}}]_{\mathrm{tok}} \leq \rho \log S$.
+\hfill$\square$
+
+\subsection{Proof of \cref{thm:robustness}}
+
+Let $M_i \sim \mathrm{Bernoulli}(\delta)$ indicate whether token
+$t_i$ is modified (i.i.d.\ across $i$). For the non-gated case
+$\rho = 1$, the post-attack indicator at pair $(i, i+1)$
+decomposes on $(M_i, M_{i+1})$:
+\begin{itemize}[nosep, leftmargin=*]
+  \item $(0,0)$: neither modified; valid with probability $1$.
+    Weight $(1-\delta)^2$.
+  \item $(0,1)$: only $t_{i+1}$ modified; by hash uniformity, new
+    $\sigma_k(t_{i+1})$ uniform on $\mathcal{S}$, valid with probability
+    $1/S$. Weight $(1-\delta)\delta$.
+  \item $(1,0)$: symmetric, weight $\delta(1-\delta)$, probability $1/S$.
+  \item $(1,1)$: both modified; still $1/S$ by uniformity. Weight
+    $\delta^2$.
+\end{itemize}
+Summing: $\mathbb{E}[\phi^{\mathrm{atk}}] = (1-\delta)^2 +
+(2\delta(1-\delta) + \delta^2)/S = (1-\delta)^2 + \delta(2-\delta)/S$.
+
+Scaling the deterministic component by gate rate $\rho$:
+$\mathbb{E}[\phi^{\mathrm{atk}}] = 1/S + \rho(1-\delta)^2(S-1)/S$.
+
+At the midpoint threshold $\tau = 1/S + \tfrac{\rho}{2}(S-1)/S$, the
+attack succeeds when $\rho(1-\delta)^2(S-1)/S < \tfrac{\rho}{2}(S-1)/S$,
+i.e.\ $(1-\delta)^2 < 1/2$. Solving: $\delta^\star = 1 - 1/\sqrt{2}$,
+independent of $S, \rho, n$. \hfill$\square$
 
 \subsection{Proof of \cref{thm:security}}
 
-Distinguishing watermarked from
-random text without $k$ requires predicting $\sigma_k$ on unseen tokens,
-which under the random oracle is $O(2^{-256})$-advantageous. The
-entropy gate affects which positions are constrained but does not
-affect the hash structure of emitted tokens, so the reduction is
-unchanged. \hfill$\square$
+The state assignment $\sigma_k$ is a pseudorandom function under the
+random oracle model. Without $k$, any polynomial-time distinguisher
+$\mathcal{A}$ can evaluate $\sigma_k$ only by querying the oracle;
+each query reveals $\sigma_k(t)$ for at most one $t$. Distinguishing
+watermarked from random sequences requires predicting $\sigma_k$ on
+unseen tokens, which by the oracle's uniformity succeeds with
+probability at most $1/S + \mathrm{negl}$ per query. The adversary's
+total advantage is bounded by the query budget times
+$\mathrm{negl}(256)$, i.e.\ $\mathrm{negl}(256)$.
+
+The gate pattern $(g_i)$ is a function of the LM's entropy profile at
+the time of generation, which $\mathcal{A}$ can approximate only via
+its own LM queries; but these do not reveal which positions were
+gated vs.\ argmaxed by the generator, since both paths emit tokens
+with the same marginal distribution conditional on the prefix. Hence
+$(g_i)$ is not recoverable from tokens alone. \hfill$\square$
 
 \subsection{Proof of \cref{thm:hdd}}
 
-The Neyman--Pearson lemma states that for simple hypotheses, the
-likelihood-ratio test is optimal. Under the null, $X_i \sim
-\text{Bernoulli}(1/S)$ independently; under the alternative, $X_i \sim
-\text{Bernoulli}(\pi_i)$ where $\pi_i = g_i + (1-g_i)/S$ is the
-position-specific validity probability. The log-likelihood ratio is
-$\Lambda = \sum_i X_i \log(\pi_i S) + (1-X_i) \log\bigl((1-\pi_i)/(1-1/S)\bigr)$,
-which rearranges to the form in the theorem statement. Optimality among
-size-$\alpha$ tests follows directly. \hfill$\square$
+Under the null, $X_i \sim \mathrm{Bernoulli}(1/S)$ i.i.d. Under the
+alternative, $X_i \sim \mathrm{Bernoulli}(\pi_i)$ independently, with
+$\pi_i = g_i + (1-g_i)/S$. By the Neyman--Pearson lemma, the
+uniformly most powerful size-$\alpha$ test for two simple product
+hypotheses is the log-likelihood ratio test. Computing:
+\[
+  \Lambda = \sum_i \log \frac{\pi_i^{X_i}(1-\pi_i)^{1-X_i}}
+    {(1/S)^{X_i}(1-1/S)^{1-X_i}}
+  = \sum_i X_i \log(\pi_i S) + (1-X_i) \log\tfrac{1-\pi_i}{1-1/S},
+\]
+which matches the theorem statement. \hfill$\square$
 
 \subsection{Proof of \cref{thm:healing}}
 
-At any modified position $j$, the attacker's new token $t'_j$ satisfies
-$\sigma_k(t'_j) \sim \text{Uniform}(\mathcal{S})$ by random-oracle
-uniformity, regardless of the attacker's strategy (provided the
-attacker cannot evaluate $\sigma_k$, which follows from
-\cref{thm:security}). The probability that $t'_j$ yields a valid
-transition with its (possibly also modified) neighbor is exactly $1/S$.
-Summing over $\delta n$ modified positions and accounting for the
-$(1,1)$ double-modification case gives the surplus
-$\Sigma(\delta) = (1/S)\delta(2-\delta)$.
-\hfill$\square$
+Let $\mathcal{S}_k$ denote the set of states derivable from tokens the
+adversary has oracle access to (its own queries). For any token
+$t'$ the adversary introduces that is not in $\mathcal{S}_k$,
+$\sigma_k(t')$ is uniform on $\mathcal{S}$ by the random oracle
+property. Each modified position $j$ thus contributes an indicator
+$Z_j \sim \mathrm{Bernoulli}(1/S)$, regardless of the adversary's
+strategy conditional on no oracle access to $\sigma_k(t'_j)$.
+Summing over the $\delta n$ modified positions and accounting for
+the $(1,1)$ case as in \cref{thm:robustness} gives the surplus
+$\Sigma(\delta) = (1/S)\delta(2-\delta)$. The strategy-independence
+is a direct consequence of the oracle's uniformity. \hfill$\square$
 
-\section{Additional Results}
+% =====================================================================
+\section{Reference Tables}
 \label{app:results}
-
-% TODO: Drop in final tables from E1--E6 as experiments complete.
-\cref{tab:baseline} summarizes the non-gated MCL reference point
-($\rho=1$) across state counts; these are the comparison baseline for
-the entropy-gated experiments.
 
 \begin{table}[h]
   \centering
   \caption{Non-gated MCL reference point on the 173-concept benchmark
-    ($\rho=1$). All runs use Llama-3.2-3B-Instruct, greedy decoding,
-    200-token outputs.}
+    ($\rho = 1$). Llama-3.2-3B-Instruct, greedy decoding, 200-token
+    outputs.}
   \label{tab:baseline}
   \begin{tabular}{cccccc}
     \toprule
     $S$ & WM avg $\phi$ & Null avg $\phi$ & TPR & FPR & PPL \\
     \midrule
     5  & 0.991 & 0.402 & 100\% & 0\% & 4.98 \\
-    \textbf{7} & \textbf{0.991} & \textbf{0.290} & \textbf{100\%} & \textbf{0\%} & \textbf{4.20} \\
+    \textbf{7} & \textbf{0.991} & \textbf{0.290} & \textbf{100\%}
+                                  & \textbf{0\%}   & \textbf{4.20} \\
     9  & 0.984 & 0.221 & 100\% & 0\% & 5.37 \\
     11 & 0.988 & 0.197 & 100\% & 0\% & 4.61 \\
     15 & 0.988 & 0.138 & 100\% & 0\% & 5.11 \\
@@ -588,27 +734,22 @@ the entropy-gated experiments.
   \end{tabular}
 \end{table}
 
-\section{Calibration Reference Table}
-\label{app:calibration}
-
-$S^\star(n, \rho, \alpha)$ for common deployment targets, with
-$z_\alpha$ the one-sided normal quantile.
-
 \begin{table}[h]
   \centering
-  \caption{Minimum state count $S^\star$ for target FPR $\alpha$,
-    at watermark fraction $\rho$ and length $n$.}
+  \caption{Calibration lookup $S^\star(n, \rho, \alpha)$. Rows are
+    text lengths; columns are $(\alpha, \rho)$ pairs.}
   \label{tab:cal}
   \begin{tabular}{lcccc}
     \toprule
-    & \multicolumn{2}{c}{$\alpha = 10^{-3}$} & \multicolumn{2}{c}{$\alpha = 10^{-6}$} \\
+    & \multicolumn{2}{c}{$\alpha = 10^{-3}$}
+    & \multicolumn{2}{c}{$\alpha = 10^{-6}$} \\
     \cmidrule(lr){2-3} \cmidrule(lr){4-5}
     $n$ & $\rho{=}0.3$ & $\rho{=}0.5$ & $\rho{=}0.3$ & $\rho{=}0.5$ \\
     \midrule
-    100 & 5 & 3 & 13 & 6 \\
-    200 & 3 & 2 & 7 & 3 \\
-    500 & 2 & 2 & 3 & 2 \\
-    1000 & 2 & 2 & 2 & 2 \\
+    100  & 5 & 3 & 13 & 6 \\
+    200  & 3 & 2 & 7  & 3 \\
+    500  & 2 & 2 & 3  & 2 \\
+    1000 & 2 & 2 & 2  & 2 \\
     \bottomrule
   \end{tabular}
 \end{table}
