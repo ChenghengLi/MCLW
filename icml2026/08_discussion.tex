@@ -1,0 +1,80 @@
+% 08_discussion.tex
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Policy operationalisation}
+
+We read Article~50 as a two-parameter specification problem:
+\emph{what false positive rate must marked content guarantee, and at
+what minimum text length?} Let $(\alpha, n_{\min})$ be this
+specification. A deployer faces three choices:
+
+\begin{enumerate}[nosep, leftmargin=*]
+  \item Watermark fraction $\rho$ (controls quality cost via
+    \cref{thm:quality}).
+  \item State count $S$ (controls detection power via
+    \cref{thm:detection}).
+  \item Entropy threshold $\tau_H$ (operationally sets $\rho$; higher
+    $\tau_H$ $\Rightarrow$ higher $\rho$ $\Rightarrow$ more quality cost).
+\end{enumerate}
+
+The calibration formula~\eqref{eq:calibration} reduces this to a
+single constraint on $(S, \rho)$: any $(S, \rho)$ pair with
+$S \geq S^\star(n_{\min}, \rho, \alpha)$ satisfies the specification.
+Auditing a deployment then requires measuring three quantities
+from samples -- the effective $\rho$, the key-derived $S$, and the
+text-length distribution -- and checking them against the
+specification. No LM access needed.
+
+\paragraph{A minimum viable Article~50 rule.} As a concrete
+illustration: set $\alpha = 10^{-6}$ and $n_{\min} = 200$. Then
+\eqref{eq:calibration} with $\rho = 0.5$ gives $S^\star = 3$. A
+regulator writing ``outputs shall be markable at false-positive rate
+$10^{-6}$ on passages of 200 tokens or more'' would, under MCL,
+translate to ``use at least 3 states at watermark fraction 0.5''.
+This is a concrete, auditable, minimum-viable rule. Stronger rules
+(higher $\alpha$, lower $n_{\min}$) push $S^\star$ up monotonically.
+
+\subsection{When to use what}
+
+For short texts ($n < 100$), detection requires large $S$ and the
+calibration sits at or above the non-gated baseline. For long texts
+($n > 300$), gated MCL at $S \in \{2, 3\}$ with $\rho \approx 0.5$
+dominates the non-gated reference: equal detection, lower perplexity
+(\cref{thm:quality}). The governance-relevant regime -- long-form
+generated content subject to Article~50 -- is the one where gating
+pays off.
+
+\subsection{Limitations}
+
+\paragraph{Tokenizer alignment.} Detection assumes the verifier uses
+the same tokenizer as the generator. Adversaries who re-tokenize
+via a different vocabulary can break detection without altering
+surface text. This is a known limitation of token-level
+watermarking schemes.
+
+\paragraph{Key management.} If $k$ is leaked, all past and future
+watermarks are exposed and replayable. MCL as presented provides no
+forward security; key rotation schemes are straightforward in
+principle but not evaluated here.
+
+\paragraph{The fixed-point hypothesis.} The robustness argument for
+gating rests on E4. \cref{thm:robustness} gives an unconditional
+$\delta^\star$ under \emph{uniform random} modification. Real
+rewriters are not uniform: they concentrate changes where the LM
+allows. The low-entropy-robustness claim is that rewriters preserve
+low-entropy tokens at rate $\geq q_i$ (the LM top-probability). We
+test this directly; a negative result would preserve
+\cref{thm:robustness} but rescind the robustness motivation for
+gating specifically.
+
+\paragraph{Quality bound is crude.} $\mathbb{E}[D_{\mathrm{KL}}] \leq
+\rho \log S$ is an upper bound, not a tight characterisation. The
+actual perplexity cost depends on the mass the LM concentrates in
+the target partition at each gated position, which is structured
+(not uniform) and model-specific.
+
+\paragraph{Greedy decoding assumed.} MCL's determinism is compatible
+with greedy decoding but not with temperature sampling, which a
+deployer may require for other reasons. Temperature sampling weakens
+the quality bound and does not affect detection.

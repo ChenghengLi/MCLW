@@ -1,0 +1,17 @@
+% 09_conclusion.tex
+\section{Conclusion}
+
+MCL watermarking makes the Article~50 detection-quality tradeoff
+analytically explicit via the calibration formula
+$S^\star = \lceil 4 z_\alpha^2 / (\rho^2 (n-1)) + 1 \rceil$, and pins
+down its robustness floor at a scheme-independent
+$\delta^\star \approx 29.3\%$. Detection is model-free and runs in
+$O(n)$ hash operations, enabling third-party audit without LM
+access. The remaining empirical question is whether low-entropy
+tokens enjoy higher survival rates under meaning-preserving rewrite
+than high-entropy ones -- inverting the conventional entropy-adaptive
+heuristic. The answer, produced by E4, decides whether entropy gating
+is a pure quality win or also a robustness win. Either way, the
+policy-to-configuration map does not depend on the outcome: MCL
+remains the first watermarking scheme to expose Article~50's
+implicit parameters as a calibration law.

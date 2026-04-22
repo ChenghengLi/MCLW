@@ -1,0 +1,71 @@
+% 07_experiments.tex
+\section{Experimental Validation}
+\label{sec:experiments}
+
+We validate MCL on a curated benchmark of 173 Wikipedia concepts
+covering notable figures, historical events, scientific phenomena,
+geographical entities, technology, and popular culture. Each concept
+yields a prompt of the form \emph{``Explain [concept] in a
+comprehensive way.''} Generation uses greedy decoding for
+watermarked outputs and nucleus sampling ($T{=}0.7$, $p{=}0.9$) for
+the unwatermarked baseline. Primary model: Llama-3.2-3B-Instruct;
+secondary models for cross-model runs: Mistral-7B, GPT2-XL. Secret
+key \texttt{curated\_wiki\_dataset\_2024}, seed 42, max 200 tokens.
+
+We report six experiments. E1--E3 validate the calibration formula
+and the quality/robustness theorems directly. E4 is the critical
+test of the low-entropy-robustness hypothesis. E5--E6 validate
+self-healing and HDD.
+
+\paragraph{E1: Calibration.} We verify that $S^\star(n, \rho, \alpha)$
+predicts empirical TPR and FPR. Configurations span
+$S \in \{2, 3, 4, 5, 7, 9\}$, entropy thresholds $\tau_H \in
+\{1.5, 2.0, 2.5, 3.0, 3.5\}$, text lengths $n \in \{200, 500\}$.
+The prediction is that $S \geq S^\star(n, \rho, \alpha)$ achieves
+$\mathrm{TPR} \approx 1$ and $\mathrm{FPR} \approx \alpha$; $S < S^\star$
+misses the target.
+
+\paragraph{E2: Quality.} Matched-detection comparison between
+entropy-gated configurations on the calibration curve and a non-gated
+reference ($\rho = 1$, $S = 7$). At equal detection power (equal $z$),
+does gated MCL have lower perplexity than the non-gated reference?
+\cref{thm:quality} predicts yes for sufficiently long texts.
+
+\paragraph{E3: Robustness.} Seven attacks:
+(i) random word replacement, $\delta \in \{0.1, 0.2, 0.3, 0.4, 0.5\}$;
+(ii) WordNet synonym substitution; (iii) DIPPER paraphrase;
+(iv) back-translation (en$\to$fr$\to$en, en$\to$zh$\to$en);
+(v) homoglyph perturbation; (vi) word insertion; (vii) word deletion.
+Primary metric: TPR at $p < 0.01$ after attack. \cref{thm:robustness}
+predicts $\delta^\star \approx 0.293$ universal for (i); (iii)--(iv)
+are the real-world rewrite tests that load on E4.
+
+\paragraph{E4: Entropy--survival (critical).} For 500 watermarked
+texts, record the per-position entropy $H_i$ during generation.
+Paraphrase each text with DIPPER, GPT-rewrite, and back-translation.
+Align original and rewritten tokens via edit distance. For each
+entropy bin, compute the empirical \emph{token survival rate}
+$\Pr[t'_i = t_i \mid H_i]$. The hypothesis is that survival rate
+decreases monotonically with $H_i$ and exceeds $0.6$ for $H_i < 1.0$.
+\textbf{Falsification would invalidate the low-entropy-robustness
+claim} and force a revision of \S\ref{sec:discussion}.
+
+\paragraph{E5: Self-healing.} For
+$S \in \{2, 3, 5, 7\}$ and $\delta \in \{0.1, 0.2, 0.3, 0.4, 0.5\}$,
+compare the observed $\phi$ after random replacement to the closed
+form in \cref{thm:robustness}, and verify $\delta^\star \approx 0.293$
+is universal across $S$.
+
+\paragraph{E6: HDD vs.\ model-free detection.} ROC comparison of
+three detectors: (a) oracle-entropy HDD, (b) proxy-entropy HDD using
+GPT-2 as a cheap verifier for Llama-3.2, and (c) model-free
+detection. \cref{thm:hdd} predicts (a) $>$ (c); the open empirical
+question is how much (b) concedes relative to (a).
+
+\paragraph{Reference point.} A non-gated configuration at $S{=}7$,
+$\rho{=}1$ reaches $100\%$ TPR, $0\%$ FPR, perplexity $4.20$;
+unwatermarked baseline perplexity is $\sim 3.0$.
+\cref{tab:baseline} in \cref{app:results} gives the full sweep.
+
+% Current status: E1/E2/E5 partial results in progress;
+% E3/E4/E6 outstanding.

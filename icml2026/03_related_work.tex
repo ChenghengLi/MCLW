@@ -1,0 +1,48 @@
+% 03_related_work.tex
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Passive detection.} DetectGPT~\citep{mitchell2023detectgpt}
+exploits log-probability curvature; GPTZero~\citep{tian2023gptzero}
+combines perplexity and burstiness. Both read statistical traces in
+existing text, with no controllable false-positive frontier and sharp
+degradation under
+paraphrase~\citep{krishna2023paraphrasing,sadasivan2023can}. They
+cannot serve as the technical substrate for Article~50 because neither
+regulator nor deployer can set the detection regime in advance.
+
+\paragraph{Active watermarking.} Green--red-list
+watermarking~\citep{kirchenbauer2023watermark} biases next-token
+logits toward a hashed green list and detects via a $z$-test on
+green-token frequency. The scheme is well-understood but requires
+temperature sampling, degrades under paraphrase, and keeps the
+detection-quality tradeoff inside a single bias magnitude with no
+analytic inversion back to a regulatory parameter.
+\citet{christ2024undetectable} establish the formal quality--security
+frontier for undetectable watermarks; the result bounds what any
+scheme can achieve but does not yield a deployable construction.
+\citet{aaronson2023semstamp} and the SemStamp line embed signals in
+semantic-level features and require LLM queries at detection time,
+foreclosing lightweight third-party audit.
+
+\paragraph{Entropy-adaptive schemes.}
+% FLAG: lee2023sweet citation details (authors/venue/year) are guessed.
+% FLAG: lu2024ewd citation is unverified.
+SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} restrict
+watermarking to \emph{high-entropy} positions, arguing the scheme has
+the most room to inject signal where the model is least committed.
+Our scheme inverts this policy: MCL watermarks at \emph{low}-entropy
+positions, trading on the intuition that near-deterministic tokens
+survive meaning-preserving rewrites at higher rates. We formalize and
+test this inversion (\S\ref{sec:experiments}).
+
+\paragraph{Technical AI governance.} Article~50 of the EU AI
+Act~\citep{euaiact2024} and the EU's draft Code of Practice on
+Transparency~\citep{eucodepractice2025} require machine-readable
+marking of AI-generated content; the OECD Hiroshima
+Process~\citep{oecdhiroshima2024} provides a parallel international
+framework. These instruments leave the detection regime
+(FPR, quality floor, robustness) implicit. MCL's contribution, beyond
+the watermarking scheme itself, is that it surfaces these parameters
+analytically, producing a policy-to-configuration map auditable by
+third parties (\S\ref{sec:discussion}).

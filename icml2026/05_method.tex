@@ -1,0 +1,120 @@
+% 05_method.tex
+\section{The MCL Scheme}
+\label{sec:method}
+
+MCL has three components: a cryptographic partition of the vocabulary
+into states, a clockwork transition over states, and an entropy gate
+selecting where to enforce the transition.
+
+\subsection{State partition}
+
+\begin{definition}[State assignment]
+  \label{def:state}
+  For key $k$ and state count $S \in \mathbb{N}$, define
+  $\sigma_k(t) = H(k \,\|\, t) \bmod S$. This induces a partition
+  $\mathcal{V} = \bigsqcup_{s=0}^{S-1} \mathcal{V}_s$ with
+  $\mathcal{V}_s = \{t \in \mathcal{V} : \sigma_k(t) = s\}$.
+\end{definition}
+
+Under the random oracle, $\mathbb{E}[|\mathcal{V}_s|] = V/S$ and
+$\mathrm{Var}(|\mathcal{V}_s|) = V \cdot \frac{S-1}{S^2}$, so the
+partition is approximately balanced for realistic $V$.
+
+\subsection{Clockwork transitions}
+
+\begin{definition}[Clockwork matrix]
+  \label{def:clockwork}
+  The $S$-state clockwork transition matrix is
+  $\mathbf{T}^{\mathrm{clk}}_{ij} = \mathbb{1}[j \equiv i+1 \pmod{S}]$.
+\end{definition}
+
+The clockwork is deterministic (each state has exactly one legal
+successor), periodic of period $S$, and has uniform stationary
+distribution $\pi^\star = (1/S, \ldots, 1/S)$. Among $S$-state
+irreducible deterministic transition matrices, clockwork minimises the
+random-baseline validity $1/S$ -- maximising the detection gap.
+
+\subsection{Entropy gate}
+
+At each generation step, MCL decides whether to enforce the clockwork
+transition based on the model's confidence at that position.
+
+\begin{definition}[Entropy gate]
+  \label{def:gate}
+  Given an entropy threshold $\tau_H$, the gate at position $i$ is
+  $g_i = \mathbb{1}[H_i < \tau_H]$. The watermark fraction is the
+  expected proportion of gated positions,
+  $\rho = \mathbb{E}_i[g_i] \in [0, 1]$.
+\end{definition}
+
+Setting $\tau_H = \infty$ recovers the non-gated variant
+($\rho = 1$). Lower $\tau_H$ concentrates the watermark at
+near-deterministic positions where the LM's own distribution is
+narrow and the clockwork mask is cheap.
+
+\subsection{Embedding}
+
+\begin{algorithm}[t]
+  \caption{MCL Watermark Embedding}
+  \label{alg:embed}
+  \begin{algorithmic}
+    \STATE {\bfseries Input:} prompt $p$, key $k$, states $S$,
+      entropy threshold $\tau_H$, max tokens $N$
+    \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(p)$;
+      $s \leftarrow \sigma_k(\mathbf{t}_{-1})$
+    \FOR{$i = 1$ {\bfseries to} $N$}
+      \STATE $p_i \leftarrow \mathrm{softmax}(\mathcal{M}(\mathbf{t}))$;
+        $H_i \leftarrow -\sum_t p_i(t) \log p_i(t)$
+      \IF{$H_i < \tau_H$}
+        \STATE $s' \leftarrow (s+1) \bmod S$
+        \STATE $t_{i} \leftarrow \arg\max_{t \in \mathcal{V}_{s'}} p_i(t)$
+      \ELSE
+        \STATE $t_{i} \leftarrow \arg\max_t p_i(t)$
+      \ENDIF
+      \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\|\, t_i$;
+        $s \leftarrow \sigma_k(t_i)$
+      \IF{$t_i = \texttt{EOS}$} \STATE {\bfseries break} \ENDIF
+    \ENDFOR
+    \STATE \textbf{return} $\mathrm{Decode}(\mathbf{t})$
+  \end{algorithmic}
+\end{algorithm}
+
+\cref{alg:embed} requires no sampling and no temperature parameter.
+Each step does one LM forward pass and one $O(V)$ logit mask; total
+cost $O(N(V + T_{\mathrm{LM}}))$ for $N$ generated tokens.
+
+\subsection{Detection}
+
+\begin{definition}[Fingerprint score]
+  \label{def:phi}
+  For a token sequence $\mathbf{t} = (t_1, \ldots, t_n)$, the
+  \emph{fingerprint score} is the fraction of valid clockwork
+  transitions:
+  \begin{equation}
+    \phi(\mathbf{t}) = \frac{1}{n-1} \sum_{i=1}^{n-1}
+      \mathbf{T}^{\mathrm{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}.
+  \end{equation}
+\end{definition}
+
+\begin{algorithm}[t]
+  \caption{MCL Watermark Detection (model-free)}
+  \label{alg:detect}
+  \begin{algorithmic}
+    \STATE {\bfseries Input:} text $x$, key $k$, states $S$,
+      threshold $\tau$
+    \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(x)$;
+      $c \leftarrow 0$
+    \FOR{$i = 1$ {\bfseries to} $n-1$}
+      \IF{$\sigma_k(t_{i+1}) \equiv \sigma_k(t_i) + 1 \pmod{S}$}
+        \STATE $c \leftarrow c + 1$
+      \ENDIF
+    \ENDFOR
+    \STATE $\phi \leftarrow c/(n-1)$;
+      $z \leftarrow (\phi - 1/S) / \sqrt{(1/S)(1-1/S)/(n-1)}$
+    \STATE \textbf{return} $(\phi > \tau,\ \phi,\ 1 - \Phi(z))$
+  \end{algorithmic}
+\end{algorithm}
+
+\cref{alg:detect} runs in $O(n)$ hash operations with no LM access.
+This is the property that makes MCL a candidate substrate for
+third-party audit.

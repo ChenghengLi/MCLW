@@ -1,0 +1,14 @@
+% 04_preliminaries.tex
+\section{Preliminaries}
+\label{sec:prelim}
+
+Let $\mathcal{V}$ denote the vocabulary of an autoregressive LLM
+$\mathcal{M}$, $V = |\mathcal{V}|$. At step $i$ the LM defines a
+next-token distribution $p_i$ conditional on the prefix
+$t_1 \ldots t_{i-1}$; its entropy is
+$H_i = -\sum_t p_i(t) \log p_i(t)$. We assume throughout that the
+verifier and the deployer share a secret key $k \in \{0,1\}^*$ and use
+the same tokenizer. Let $H: \{0,1\}^* \to \{0,1\}^{256}$ be SHA-256,
+modelled as a random oracle in the security analysis
+(\cref{thm:security}). We write $[n] = \{1, \ldots, n\}$ and $z_\alpha$
+for the one-sided standard-normal quantile at level $\alpha$.

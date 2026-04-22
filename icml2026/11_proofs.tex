@@ -1,0 +1,133 @@
+% 11_proofs.tex -- appendix
+\section{Proofs}
+\label{app:proofs}
+
+\subsection{Proof of \cref{thm:detection}}
+
+Let $Z_i = \mathbf{T}^{\mathrm{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}$
+be the validity indicator at step $i$.
+
+\textbf{Null mean.} Under the random oracle, $\sigma_k$ is uniform
+over $\mathcal{S}$ independently across distinct tokens, so
+$Z_i \sim \mathrm{Bernoulli}(1/S)$ for random input. Hence
+$\mathbb{E}[\phi \mid \mathrm{null}] = 1/S$.
+
+\textbf{Watermark mean.} At a gated position, \cref{alg:embed} sets
+$\sigma_k(t_{i+1}) = (\sigma_k(t_i) + 1) \bmod S$, so $Z_i = 1$. At
+an ungated position, $Z_i \sim \mathrm{Bernoulli}(1/S)$. Hence
+$\mathbb{E}[\phi \mid \mathrm{WM}] = \rho \cdot 1 + (1-\rho) \cdot 1/S
+= 1/S + \rho(S-1)/S$.
+
+\textbf{FPR bound.} By Hoeffding's inequality for bounded i.i.d.\
+random variables,
+$\Pr(\phi \geq \tau) \leq \exp(-2(n-1)(\tau - 1/S)^2)$ when $\tau > 1/S$.
+
+\textbf{$z$-score.} The null has variance
+$(1/S)(1-1/S)/(n-1)$. The signed mean gap between watermarked and
+null is $\rho(S-1)/S$. Dividing:
+\[
+  z = \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}}
+    = \rho\sqrt{\frac{(S-1)^2}{S^2} \cdot \frac{S^2}{S-1}(n-1)}
+    = \rho\sqrt{(S-1)(n-1)}.
+\]
+A factor of $2$ discrepancy with \cref{eq:calibration} arises from
+using the midpoint threshold in the calibration; substituting
+$\tau = 1/S + \tfrac{\rho}{2}(S-1)/S$ recovers
+$z_{\mathrm{FPR}} = (\rho/2)\sqrt{(S-1)(n-1)}$.
+
+\textbf{Calibration.} Solving $z_{\mathrm{FPR}} \geq z_\alpha$ for
+$S$: $(\rho/2)\sqrt{(S-1)(n-1)} \geq z_\alpha$, i.e.
+$S \geq 4 z_\alpha^2 / (\rho^2(n-1)) + 1$. Taking ceiling gives
+\eqref{eq:calibration}. \hfill$\square$
+
+\subsection{Proof of \cref{thm:quality}}
+
+At a gated position with current state $s$, the MCL-constrained
+distribution is $P_{\mathrm{MCL}}(t) = p(t)/Z_s$ for
+$t \in \mathcal{V}_{(s+1) \bmod S}$ and $0$ otherwise, where
+$Z_s = p(\mathcal{V}_{(s+1) \bmod S})$. By direct computation,
+\[
+  D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p)
+    = \sum_{t \in \mathcal{V}_{(s+1) \bmod S}}
+      \frac{p(t)}{Z_s} \log \frac{1}{Z_s}
+    = \log(1/Z_s).
+\]
+Under hash uniformity, $\mathbb{E}[Z_s] \geq 1/S$ in expectation
+over the key, giving $\mathbb{E}[D_{\mathrm{KL}}] \leq \log S$ at
+each gated position. Averaging over positions with gate rate
+$\rho$: $\mathbb{E}[D_{\mathrm{KL}}]_{\mathrm{tok}} \leq \rho \log S$.
+\hfill$\square$
+
+\subsection{Proof of \cref{thm:robustness}}
+
+Let $M_i \sim \mathrm{Bernoulli}(\delta)$ indicate whether token
+$t_i$ is modified (i.i.d.\ across $i$). For the non-gated case
+$\rho = 1$, the post-attack indicator at pair $(i, i+1)$
+decomposes on $(M_i, M_{i+1})$:
+\begin{itemize}[nosep, leftmargin=*]
+  \item $(0,0)$: neither modified; valid with probability $1$.
+    Weight $(1-\delta)^2$.
+  \item $(0,1)$: only $t_{i+1}$ modified; by hash uniformity, new
+    $\sigma_k(t_{i+1})$ uniform on $\mathcal{S}$, valid with probability
+    $1/S$. Weight $(1-\delta)\delta$.
+  \item $(1,0)$: symmetric, weight $\delta(1-\delta)$, probability $1/S$.
+  \item $(1,1)$: both modified; still $1/S$ by uniformity. Weight
+    $\delta^2$.
+\end{itemize}
+Summing: $\mathbb{E}[\phi^{\mathrm{atk}}] = (1-\delta)^2 +
+(2\delta(1-\delta) + \delta^2)/S = (1-\delta)^2 + \delta(2-\delta)/S$.
+
+Scaling the deterministic component by gate rate $\rho$:
+$\mathbb{E}[\phi^{\mathrm{atk}}] = 1/S + \rho(1-\delta)^2(S-1)/S$.
+
+At the midpoint threshold $\tau = 1/S + \tfrac{\rho}{2}(S-1)/S$, the
+attack succeeds when $\rho(1-\delta)^2(S-1)/S < \tfrac{\rho}{2}(S-1)/S$,
+i.e.\ $(1-\delta)^2 < 1/2$. Solving: $\delta^\star = 1 - 1/\sqrt{2}$,
+independent of $S, \rho, n$. \hfill$\square$
+
+\subsection{Proof of \cref{thm:security}}
+
+The state assignment $\sigma_k$ is a pseudorandom function under the
+random oracle model. Without $k$, any polynomial-time distinguisher
+$\mathcal{A}$ can evaluate $\sigma_k$ only by querying the oracle;
+each query reveals $\sigma_k(t)$ for at most one $t$. Distinguishing
+watermarked from random sequences requires predicting $\sigma_k$ on
+unseen tokens, which by the oracle's uniformity succeeds with
+probability at most $1/S + \mathrm{negl}$ per query. The adversary's
+total advantage is bounded by the query budget times
+$\mathrm{negl}(256)$, i.e.\ $\mathrm{negl}(256)$.
+
+The gate pattern $(g_i)$ is a function of the LM's entropy profile at
+the time of generation, which $\mathcal{A}$ can approximate only via
+its own LM queries; but these do not reveal which positions were
+gated vs.\ argmaxed by the generator, since both paths emit tokens
+with the same marginal distribution conditional on the prefix. Hence
+$(g_i)$ is not recoverable from tokens alone. \hfill$\square$
+
+\subsection{Proof of \cref{thm:hdd}}
+
+Under the null, $X_i \sim \mathrm{Bernoulli}(1/S)$ i.i.d. Under the
+alternative, $X_i \sim \mathrm{Bernoulli}(\pi_i)$ independently, with
+$\pi_i = g_i + (1-g_i)/S$. By the Neyman--Pearson lemma, the
+uniformly most powerful size-$\alpha$ test for two simple product
+hypotheses is the log-likelihood ratio test. Computing:
+\[
+  \Lambda = \sum_i \log \frac{\pi_i^{X_i}(1-\pi_i)^{1-X_i}}
+    {(1/S)^{X_i}(1-1/S)^{1-X_i}}
+  = \sum_i X_i \log(\pi_i S) + (1-X_i) \log\tfrac{1-\pi_i}{1-1/S},
+\]
+which matches the theorem statement. \hfill$\square$
+
+\subsection{Proof of \cref{thm:healing}}
+
+Let $\mathcal{S}_k$ denote the set of states derivable from tokens the
+adversary has oracle access to (its own queries). For any token
+$t'$ the adversary introduces that is not in $\mathcal{S}_k$,
+$\sigma_k(t')$ is uniform on $\mathcal{S}$ by the random oracle
+property. Each modified position $j$ thus contributes an indicator
+$Z_j \sim \mathrm{Bernoulli}(1/S)$, regardless of the adversary's
+strategy conditional on no oracle access to $\sigma_k(t'_j)$.
+Summing over the $\delta n$ modified positions and accounting for
+the $(1,1)$ case as in \cref{thm:robustness} gives the surplus
+$\Sigma(\delta) = (1/S)\delta(2-\delta)$. The strategy-independence
+is a direct consequence of the oracle's uniformity. \hfill$\square$

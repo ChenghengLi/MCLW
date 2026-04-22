@@ -1,0 +1,15 @@
+% 10_impact.tex
+\section*{Impact Statement}
+
+This paper develops watermarking infrastructure for LLM-generated
+content in service of AI governance regimes (EU AI Act Article~50,
+OECD Hiroshima Process). Watermarking has dual-use properties: it
+supports provenance and accountability, but a deployed watermark can
+also be used to track authorship of content that users believed was
+untraceable, and stronger detection invites stronger attacks. Our
+model-free detector reduces verification-side compute and enables
+third-party audit without LM access, which we view as
+governance-positive. Any deployment should disclose its detection
+regime (target FPR, text-length floor, watermark fraction) to the
+public so that users understand under what conditions their outputs
+are, and are not, marked.

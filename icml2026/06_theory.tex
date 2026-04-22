@@ -1,0 +1,118 @@
+% 06_theory.tex
+\section{Theoretical Guarantees}
+\label{sec:theory}
+
+We state five theorems about MCL; full proofs are in
+\cref{app:proofs}.
+
+\begin{theorem}[Detection bound and calibration]
+  \label{thm:detection}
+  Let $\mathbf{t}^w$ be an MCL-watermarked sequence of length $n$ with
+  watermark fraction $\rho$, and $\mathbf{t}^r$ an i.i.d.\ random
+  sequence over $\mathcal{V}$. For the clockwork matrix with $S$
+  states and threshold $\tau \in (1/S, 1)$:
+  \begin{align}
+    \mathbb{E}[\phi(\mathbf{t}^w)]
+      &= \tfrac{1}{S} + \rho \tfrac{S-1}{S}, \\
+    \mathbb{E}[\phi(\mathbf{t}^r)] &= \tfrac{1}{S}, \\
+    \mathrm{FPR} &\leq \exp\bigl(-2(n-1)(\tau - 1/S)^2\bigr), \\
+    z_{\mathrm{FPR}}(\rho, S, n)
+      &= \tfrac{\rho}{2}\sqrt{(S-1)(n-1)}.
+  \end{align}
+  Inverting for the minimum $S$ achieving detection at FPR $\alpha$:
+  \begin{equation}
+    S^\star(n, \rho, \alpha)
+      = \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
+    \label{eq:calibration}
+  \end{equation}
+\end{theorem}
+
+\cref{eq:calibration} is the calibration formula. It maps a target
+FPR $\alpha$, a text-length floor $n$, and a watermark fraction $\rho$
+to a minimum state count $S^\star$. At $\alpha = 10^{-6}$,
+$\rho = 0.5$: $S^\star = 6$ for $n = 100$, $S^\star = 3$ for
+$n = 200$, $S^\star = 2$ for $n \geq 380$. For long texts, two states
+suffice.
+
+\begin{theorem}[Quality bound]
+  \label{thm:quality}
+  At a gated position, the KL divergence between the MCL-constrained
+  distribution and the unconstrained LM distribution satisfies
+  $D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p) = \log(1/Z_s)$, where
+  $Z_s = p(\mathcal{V}_{(s+1) \bmod S})$ is the probability mass the
+  LM assigned to the target partition. Under hash uniformity,
+  $\mathbb{E}[Z_s] \geq 1/S$, giving the position-wise bound
+  $\mathbb{E}[D_{\mathrm{KL}}] \leq \log S$ and the per-token average
+  $\mathbb{E}[D_{\mathrm{KL}}]_{\text{tok}} \leq \rho \log S$.
+\end{theorem}
+
+\begin{theorem}[Universal robustness threshold]
+  \label{thm:robustness}
+  Under uniform random modification of a fraction $\delta$ of tokens,
+  \begin{equation}
+    \mathbb{E}[\phi \mid \mathrm{attack}]
+      = \tfrac{1}{S} + \rho (1-\delta)^2 \tfrac{S-1}{S}.
+  \end{equation}
+  At the midpoint threshold
+  $\tau = \tfrac{1}{2}\bigl(1/S + \mathbb{E}[\phi \mid \mathrm{WM}]\bigr)$,
+  the critical modification fraction is
+  \begin{equation}
+    \delta^\star = 1 - 1/\sqrt{2} \approx 0.293,
+  \end{equation}
+  \emph{independent of $S$, $\rho$, and $n$}.
+\end{theorem}
+
+\begin{theorem}[Information-theoretic security]
+  \label{thm:security}
+  Under the random oracle model for $H$, any polynomial-time
+  distinguisher $\mathcal{A}$ without key $k$ satisfies
+  \begin{equation}
+    \mathrm{Adv}(\mathcal{A})
+    = \bigl|\Pr[\mathcal{A}(\mathbf{t}^w) = 1]
+         - \Pr[\mathcal{A}(\mathbf{t}^r) = 1]\bigr|
+    \leq \mathrm{negl}(256).
+  \end{equation}
+  Moreover, $\mathcal{A}$ cannot recover the gate pattern $(g_i)$
+  from tokens alone.
+\end{theorem}
+
+\begin{theorem}[Entropy-weighted detector is Neyman--Pearson optimal]
+  \label{thm:hdd}
+  Suppose the verifier has access to the LM's next-token distribution
+  at each position. Let $X_i = \mathbb{1}\bigl[\sigma_k(t_{i+1})
+  \equiv \sigma_k(t_i) + 1 \pmod{S}\bigr]$ and
+  $\pi_i = P(X_i = 1 \mid \text{watermarked})$. The log-likelihood
+  ratio test
+  \begin{equation}
+    \Lambda = \sum_{i=1}^{n-1}
+      \Bigl[ X_i \log \tfrac{\pi_i S}{1}
+        + (1-X_i) \log \tfrac{1-\pi_i}{1-1/S} \Bigr]
+  \end{equation}
+  is Neyman--Pearson optimal among all size-$\alpha$ tests for
+  distinguishing watermarked from random sequences under the known
+  entropy profile.
+\end{theorem}
+
+\begin{theorem}[Self-healing]
+  \label{thm:healing}
+  Against any adversary who modifies tokens without oracle access to
+  $\sigma_k$, each modified token contributes $1/S$ in expectation to
+  the valid-transition count. Equivalently, the self-healing surplus
+  over the null is
+  \begin{equation}
+    \Sigma(\delta) = \tfrac{1}{S}\delta(2-\delta).
+  \end{equation}
+  The surplus is \emph{strategy-independent}: the attacker cannot
+  concentrate modifications to reduce it below $1/S$ per modified
+  token.
+\end{theorem}
+
+\paragraph{Interpretation.}
+\cref{thm:detection} gives the central regulatory knob: detection
+scales as $\sqrt{n-1}$, so length trades directly against states or
+against watermark fraction. \cref{thm:robustness} gives a
+scheme-independent robustness floor -- useful as a reference number
+in Article~50 guidance. \cref{thm:hdd} tells the verifier with model
+access exactly how much detection power they stand to gain.
+\cref{thm:healing} is the mathematical backbone of robustness:
+modifications cannot drive detection below the null baseline.

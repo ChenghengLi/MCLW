@@ -1,0 +1,43 @@
+% 12_reference_tables.tex -- appendix
+\section{Reference Tables}
+\label{app:results}
+
+\begin{table}[h]
+  \centering
+  \caption{Non-gated MCL reference point on the 173-concept benchmark
+    ($\rho = 1$). Llama-3.2-3B-Instruct, greedy decoding, 200-token
+    outputs.}
+  \label{tab:baseline}
+  \begin{tabular}{cccccc}
+    \toprule
+    $S$ & WM avg $\phi$ & Null avg $\phi$ & TPR & FPR & PPL \\
+    \midrule
+    5  & 0.991 & 0.402 & 100\% & 0\% & 4.98 \\
+    \textbf{7} & \textbf{0.991} & \textbf{0.290} & \textbf{100\%}
+                                  & \textbf{0\%}   & \textbf{4.20} \\
+    9  & 0.984 & 0.221 & 100\% & 0\% & 5.37 \\
+    11 & 0.988 & 0.197 & 100\% & 0\% & 4.61 \\
+    15 & 0.988 & 0.138 & 100\% & 0\% & 5.11 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{Calibration lookup $S^\star(n, \rho, \alpha)$. Rows are
+    text lengths; columns are $(\alpha, \rho)$ pairs.}
+  \label{tab:cal}
+  \begin{tabular}{lcccc}
+    \toprule
+    & \multicolumn{2}{c}{$\alpha = 10^{-3}$}
+    & \multicolumn{2}{c}{$\alpha = 10^{-6}$} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+    $n$ & $\rho{=}0.3$ & $\rho{=}0.5$ & $\rho{=}0.3$ & $\rho{=}0.5$ \\
+    \midrule
+    100  & 5 & 3 & 13 & 6 \\
+    200  & 3 & 2 & 7  & 3 \\
+    500  & 2 & 2 & 3  & 2 \\
+    1000 & 2 & 2 & 2  & 2 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
