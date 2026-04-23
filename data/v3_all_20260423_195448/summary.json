@@ -1,0 +1,683 @@
+{
+  "run": "v3_all_20260423_195448",
+  "model": "google/gemma-3-270m-it",
+  "num_states": 5,
+  "chain_key": "clockwork",
+  "overlap": 0.0,
+  "n_prompts": 20,
+  "max_tokens": 60,
+  "alpha": 0.01,
+  "tau_H": 0.7086285352706909,
+  "tau_Delta": 0.7154706567525864,
+  "baseline_ppl": 1.5822260408032869,
+  "per_gate": {
+    "none": {
+      "rho": 0.0,
+      "H_mean": 1.0898609935739108,
+      "Delta_mean": 0.5930265430860392,
+      "phi": 0.16355932203389834,
+      "z": -0.6997653965219285,
+      "tpr": 0.0,
+      "ppl": 1.5822260408032869,
+      "tau_H_used": 0.7086285352706909,
+      "tau_Delta_used": 0.7154706567525864
+    },
+    "all": {
+      "rho": 1.0,
+      "H_mean": 1.2290813055898369,
+      "Delta_mean": 0.6089248632645524,
+      "phi": 1.0,
+      "z": 15.362291495737216,
+      "tpr": 1.0,
+      "ppl": 33.74775102460449,
+      "tau_H_used": 0.7086285352706909,
+      "tau_Delta_used": 0.7154706567525864
+    },
+    "H_high": {
+      "rho": 0.5625000000000001,
+      "H_mean": 1.137525635453853,
+      "Delta_mean": 0.5875255165001936,
+      "phi": 0.6779661016949152,
+      "z": 9.17831822414808,
+      "tpr": 1.0,
+      "ppl": 7.050752259247946,
+      "tau_H_used": 0.7086285352706909,
+      "tau_Delta_used": 0.7154706567525864
+    },
+    "H_low": {
+      "rho": 0.32166666666666666,
+      "H_mean": 1.5084056600863227,
+      "Delta_mean": 0.5086357535134057,
+      "phi": 0.45423728813559316,
+      "z": 4.882084161780893,
+      "tpr": 0.9,
+      "ppl": 12.184107250772566,
+      "tau_H_used": 0.7086285352706909,
+      "tau_Delta_used": 0.7154706567525864
+    },
+    "Delta": {
+      "rho": 0.5508333333333335,
+      "H_mean": 1.1890046936219885,
+      "Delta_mean": 0.5825647067441906,
+      "phi": 0.673728813559322,
+      "z": 9.096950154785066,
+      "tpr": 1.0,
+      "ppl": 7.19151090970733,
+      "tau_H_used": 0.7086285352706909,
+      "tau_Delta_used": 0.7154706567525864
+    }
+  },
+  "attacks": {
+    "none": {
+      "random_sub10": {
+        "tpr_post_attack": 0.0,
+        "mean_z_post": -0.5533028716685016,
+        "mean_phi_post": 0.17118644067796612,
+        "survival_all": 0.9,
+        "survival_watermarked": null,
+        "survival_free_positions": 0.9,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 465,
+            "survival": 0.8903225806451613
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 201,
+            "survival": 0.9253731343283582
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 306,
+            "survival": 0.9019607843137255
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 146,
+            "survival": 0.910958904109589
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 82,
+            "survival": 0.8658536585365854
+          }
+        ]
+      },
+      "random_sub20": {
+        "tpr_post_attack": 0.0,
+        "mean_z_post": -0.34174589132466276,
+        "mean_phi_post": 0.1822033898305085,
+        "survival_all": 0.8,
+        "survival_watermarked": null,
+        "survival_free_positions": 0.8,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 465,
+            "survival": 0.7849462365591398
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 201,
+            "survival": 0.8507462686567164
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 306,
+            "survival": 0.7973856209150327
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 146,
+            "survival": 0.8013698630136986
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 82,
+            "survival": 0.7682926829268293
+          }
+        ]
+      },
+      "synonym20": {
+        "tpr_post_attack": 0.0,
+        "mean_z_post": -0.6849203812375625,
+        "mean_phi_post": 0.16490510264374297,
+        "survival_all": 0.89,
+        "survival_watermarked": null,
+        "survival_free_positions": 0.89,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 465,
+            "survival": 0.9139784946236559
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 201,
+            "survival": 0.9154228855721394
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 306,
+            "survival": 0.8464052287581699
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 146,
+            "survival": 0.8767123287671232
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 82,
+            "survival": 0.8780487804878049
+          }
+        ]
+      }
+    },
+    "all": {
+      "random_sub10": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 12.319125701560456,
+        "mean_phi_post": 0.8415254237288137,
+        "survival_all": 0.9,
+        "survival_watermarked": 0.9,
+        "survival_free_positions": null,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 469,
+            "survival": 0.908315565031983
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 175,
+            "survival": 0.88
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 278,
+            "survival": 0.9100719424460432
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 141,
+            "survival": 0.8936170212765957
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 137,
+            "survival": 0.8832116788321168
+          }
+        ]
+      },
+      "random_sub20": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 9.99199891777823,
+        "mean_phi_post": 0.7203389830508475,
+        "survival_all": 0.8,
+        "survival_watermarked": 0.8,
+        "survival_free_positions": null,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 469,
+            "survival": 0.7931769722814499
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 175,
+            "survival": 0.8
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 278,
+            "survival": 0.7805755395683454
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 141,
+            "survival": 0.8297872340425532
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 137,
+            "survival": 0.8321167883211679
+          }
+        ]
+      },
+      "synonym20": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 12.306822630575414,
+        "mean_phi_post": 0.8315583704185594,
+        "survival_all": 0.88,
+        "survival_watermarked": 0.88,
+        "survival_free_positions": null,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 469,
+            "survival": 0.8891257995735607
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 175,
+            "survival": 0.8685714285714285
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 278,
+            "survival": 0.8884892086330936
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 141,
+            "survival": 0.8652482269503546
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 137,
+            "survival": 0.8613138686131386
+          }
+        ]
+      }
+    },
+    "H_high": {
+      "random_sub10": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 7.502135995269972,
+        "mean_phi_post": 0.590677966101695,
+        "survival_all": 0.9,
+        "survival_watermarked": 0.9022222222222223,
+        "survival_free_positions": 0.8971428571428571,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 449,
+            "survival": 0.8930957683741648
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 192,
+            "survival": 0.9322916666666666
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 321,
+            "survival": 0.9127725856697819
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 151,
+            "survival": 0.8675496688741722
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 87,
+            "survival": 0.8735632183908046
+          }
+        ]
+      },
+      "random_sub20": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 5.8259537663918675,
+        "mean_phi_post": 0.5033898305084746,
+        "survival_all": 0.8,
+        "survival_watermarked": 0.7925925925925926,
+        "survival_free_positions": 0.8095238095238095,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 449,
+            "survival": 0.8062360801781737
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 192,
+            "survival": 0.8177083333333334
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 321,
+            "survival": 0.7975077881619937
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 151,
+            "survival": 0.7682119205298014
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 87,
+            "survival": 0.7931034482758621
+          }
+        ]
+      },
+      "synonym20": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 7.457355333060273,
+        "mean_phi_post": 0.5835181078777556,
+        "survival_all": 0.8958333333333334,
+        "survival_watermarked": 0.9096296296296297,
+        "survival_free_positions": 0.878095238095238,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 449,
+            "survival": 0.89086859688196
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 192,
+            "survival": 0.8802083333333334
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 321,
+            "survival": 0.9252336448598131
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 151,
+            "survival": 0.8741721854304636
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 87,
+            "survival": 0.8850574712643678
+          }
+        ]
+      }
+    },
+    "H_low": {
+      "random_sub10": {
+        "tpr_post_attack": 0.85,
+        "mean_z_post": 3.9707617849151275,
+        "mean_phi_post": 0.4067796610169491,
+        "survival_all": 0.9,
+        "survival_watermarked": 0.8963730569948186,
+        "survival_free_positions": 0.9017199017199017,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 312,
+            "survival": 0.8974358974358975
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 190,
+            "survival": 0.8631578947368421
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 330,
+            "survival": 0.9121212121212121
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 197,
+            "survival": 0.9035532994923858
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 171,
+            "survival": 0.9181286549707602
+          }
+        ]
+      },
+      "random_sub20": {
+        "tpr_post_attack": 0.7,
+        "mean_z_post": 3.205901932902788,
+        "mean_phi_post": 0.36694915254237287,
+        "survival_all": 0.8,
+        "survival_watermarked": 0.7823834196891192,
+        "survival_free_positions": 0.8083538083538083,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 312,
+            "survival": 0.7724358974358975
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 190,
+            "survival": 0.7894736842105263
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 330,
+            "survival": 0.8212121212121212
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 197,
+            "survival": 0.8020304568527918
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 171,
+            "survival": 0.8187134502923976
+          }
+        ]
+      },
+      "synonym20": {
+        "tpr_post_attack": 0.8,
+        "mean_z_post": 4.08904339175635,
+        "mean_phi_post": 0.4086300380036813,
+        "survival_all": 0.8741666666666666,
+        "survival_watermarked": 0.8989637305699482,
+        "survival_free_positions": 0.8624078624078624,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 312,
+            "survival": 0.8878205128205128
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 190,
+            "survival": 0.8842105263157894
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 330,
+            "survival": 0.8515151515151516
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 197,
+            "survival": 0.8629441624365483
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 171,
+            "survival": 0.8947368421052632
+          }
+        ]
+      }
+    },
+    "Delta": {
+      "random_sub10": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 7.534683223015179,
+        "mean_phi_post": 0.5923728813559322,
+        "survival_all": 0.9,
+        "survival_watermarked": 0.9016641452344932,
+        "survival_free_positions": 0.8979591836734694,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 443,
+            "survival": 0.8961625282167043
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 177,
+            "survival": 0.9265536723163842
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 330,
+            "survival": 0.8939393939393939
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 150,
+            "survival": 0.88
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 100,
+            "survival": 0.92
+          }
+        ]
+      },
+      "random_sub20": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 5.777132924774058,
+        "mean_phi_post": 0.5008474576271187,
+        "survival_all": 0.8,
+        "survival_watermarked": 0.7957639939485628,
+        "survival_free_positions": 0.8051948051948052,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 443,
+            "survival": 0.8103837471783296
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 177,
+            "survival": 0.8192090395480226
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 330,
+            "survival": 0.7757575757575758
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 150,
+            "survival": 0.7733333333333333
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 100,
+            "survival": 0.84
+          }
+        ]
+      },
+      "synonym20": {
+        "tpr_post_attack": 1.0,
+        "mean_z_post": 7.329035012246682,
+        "mean_phi_post": 0.5783069844087753,
+        "survival_all": 0.8825,
+        "survival_watermarked": 0.8956127080181543,
+        "survival_free_positions": 0.8664192949907236,
+        "entropy_bins": [
+          {
+            "H_lo": 0.0,
+            "H_hi": 0.5,
+            "n": 443,
+            "survival": 0.8690744920993227
+          },
+          {
+            "H_lo": 0.5,
+            "H_hi": 1.0,
+            "n": 177,
+            "survival": 0.8757062146892656
+          },
+          {
+            "H_lo": 1.0,
+            "H_hi": 2.0,
+            "n": 330,
+            "survival": 0.9151515151515152
+          },
+          {
+            "H_lo": 2.0,
+            "H_hi": 3.0,
+            "n": 150,
+            "survival": 0.84
+          },
+          {
+            "H_lo": 3.0,
+            "H_hi": null,
+            "n": 100,
+            "survival": 0.91
+          }
+        ]
+      }
+    }
+  },
+  "elapsed_seconds": 452.67136311531067
+}
