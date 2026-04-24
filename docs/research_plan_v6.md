@@ -241,7 +241,12 @@ with equality when `A` contains the second-ranked but not the top-ranked token. 
 
 **Prompt sets.** Two domains: (a) *Wiki*, 176 Wikipedia-concept completions of the form `"Explain X in a comprehensive way."`; (b) *Factual-closed*, 20 short completions of the form `"The capital of France is"` and similar.
 
-**Design.** 2 domains × 3 temperatures (`T ∈ {0.0, 0.7, 1.0}`) × 3 watermark budgets (`ρ ∈ {0.25, 0.50, 0.75}`) × 3 gates (`G_H_high`, `G_Δ`, `G_H_low`) = 54 generation cells. For each (domain, T, ρ) configuration, thresholds `τ` are selected per-gate from a pilot so that each gate's empirical `ρ` matches the target:
+**Two experimental configurations are reported.**
+
+- **Configuration A (exploratory, 18 cells)**: `N = 15` prompts, `max_tokens = 50`, all three temperatures `T ∈ {0.0, 0.7, 1.0}`, three watermark budgets `ρ ∈ {0.25, 0.50, 0.75}`, three gates (`G_H_high`, `G_Δ`, `G_H_low`). Wall-clock 50 min. Data: `data/v4_all_20260423_204457/`.
+- **Configuration B (confirmatory, 6 cells)**: `N = 176` wiki / `N = 20` factual prompts, `max_tokens = 100`, temperature fixed at `T = 0.7` (practical deployment regime), three watermark budgets `ρ ∈ {0.25, 0.50, 0.75}`, three gates. Wall-clock 3 h 11 min. Data: `data/v5_big_N200/`.
+
+**Calibration.** Thresholds `τ` are selected per-gate from a pilot so that each gate's empirical `ρ` matches the target:
 - `G_H_high(τ)` uses `τ = Q_{1-ρ}(H_pilot)`,
 - `G_Δ(τ)` uses `τ = Q_{ρ}(Δ_pilot)`,
 - `G_H_low(τ)` uses `τ = Q_{ρ}(H_pilot)`.
@@ -250,7 +255,7 @@ with equality when `A` contains the second-ranked but not the top-ranked token. 
 
 **Attacks.** Random token substitution at rate 20 %, and WordNet synonym substitution at rate 20 %.
 
-### 6.2 Gate Comparison — 18-Cell Equivalence Table
+### 6.2 Gate Comparison — Configuration A (N = 15, 18 cells, exploratory)
 
 Convention: Δ = `G_H_high` − `G_Δ`. Positive log-PPL indicates `G_Δ` has lower perplexity; positive z indicates `G_H_high` has stronger detection. Starred cells (⋆) have 95 % CI excluding zero.
 
@@ -275,31 +280,46 @@ Convention: Δ = `G_H_high` − `G_Δ`. Positive log-PPL indicates `G_Δ` has lo
 | 17 | factual | 1.0 | 0.50 | −0.196 [−0.585, +0.127] | −0.14 [−1.02, +0.38] | 0.00 [0.00, 0.00] |
 | 18 | factual | 1.0 | 0.75 | +0.005 [−0.147, +0.129] | −0.10 [−0.50, +0.10] | 0.00 [0.00, 0.00] |
 
-### 6.3 Robust Patterns
+### 6.3 Gate Comparison — Configuration B (N = 176 wiki / 20 factual, T = 0.7, confirmatory)
 
-**Low-entropy gating is strictly Pareto-dominated.** In every cell in which `G_H_low` was compared with both `G_H_high` and `G_Δ` at matched budget, `G_H_low` produced simultaneously higher perplexity *and* lower detection z. The result is stable across all tested (domain, temperature, budget) conditions.
+Same convention as Table 6.2. Scaled N with paired BCa bootstrap on 10,000 resamples; 3-hour wall-clock total.
 
-**Detection probability is gate-invariant at practical budgets.** Among the 18 cells, 12 exhibit ΔTPR point-estimate exactly 0 (both gates detecting 100 % of texts); the remaining 6 have 95 % CIs including zero. Within ρ ≥ 0.50, ΔTPR is zero in 12 of 12 cells.
+| # | Domain | ρ | ΔlogPPL (95 % CI) | Δz (95 % CI) | ΔTPR (95 % CI) | Verdict |
+|---|---|---|---|---|---|---|
+| 1 | wiki | 0.25 | −0.038 [−0.096, +0.018] | **+0.46** [+0.15, +0.79] ⋆ | −0.02 [−0.06, +0.02] | z favors H_high |
+| 2 | wiki | 0.50 | −0.036 [−0.133, +0.062] | **+0.80** [+0.40, +1.21] ⋆ | 0.00 [0.00, 0.00] | **TPR EQUIVALENT**; z favors H_high |
+| 3 | wiki | 0.75 | +0.024 [−0.093, +0.140] | +0.11 [−0.07, +0.27] | 0.00 [0.00, 0.00] | **z EQUIVALENT**, **TPR EQUIVALENT** |
+| 4 | factual | 0.25 | +0.109 [−0.076, +0.260] | +1.37 [−0.33, +2.65] | +0.15 [−0.10, +0.30] | — (N = 20, wide CIs) |
+| 5 | factual | 0.50 | −0.033 [−0.254, +0.138] | +1.01 [−0.23, +2.15] | 0.00 [0.00, 0.00] | **TPR EQUIVALENT** |
+| 6 | factual | 0.75 | −0.208 [−0.642, +0.080] | +0.01 [−0.86, +0.31] | 0.00 [0.00, 0.00] | **TPR EQUIVALENT** |
 
-**Gate choice and detection-strength trade off at moderate budgets.** Of the 18 cells, 12 exhibit opposite signs for ΔlogPPL and Δz: one gate is quality-preferred, the other detection-preferred. The winning direction is not universal; it depends on the joint (H, Δ) distribution of the output.
+### 6.4 Robust Patterns
 
-**Budget-convergence at ρ = 0.75.** Four of the six ρ = 0.75 cells satisfy both the z and TPR equivalence margins. The log-PPL CI also tightens toward zero. This matches Theorem 8's prediction under local independence: at high budgets, most positions are gated by any reasonable rule, and the boundary set where rules disagree shrinks.
+**Low-entropy gating is strictly Pareto-dominated.** In every cell in which `G_H_low` was compared with both `G_H_high` and `G_Δ` at matched budget (across both Configurations A and B), `G_H_low` produced simultaneously higher perplexity *and* lower detection z. The result is stable across all tested (domain, temperature, budget) conditions.
 
-### 6.4 Theory-Data Consistency
+**Quality (PPL) is gate-invariant at matched budget.** In Configuration B (`N = 176`), all six log-PPL 95 % CIs include zero, with point estimates in the range `[−0.208, +0.109]`. Configuration A's sporadic significant PPL deltas at `N = 15` (cells 2, 3, 4, 8, 13) are not reproduced at higher sample size; the 2.3×–7× tightening of CIs at `N = 176` isolates them as pilot-scale artifacts.
 
-**Theorem 1 (detection formula).** Spot-check at the wiki / T = 0.0 / ρ = 0.50 cell with `G_H_high` (empirical `ρ̄ = 0.57`, `n = 50`): Theorem 1 predicts `z = 0.57 · √(4 · 49) = 7.98`; observed `z = 7.90`. Across spot-checked cells the relative error is within 1–7 %.
+**Detection probability (TPR) is gate-invariant at practical budgets.** In Configuration A, 12 of 18 cells exhibit ΔTPR point-estimate exactly 0; within `ρ ≥ 0.50`, all 12 cells show `ΔTPR = 0`. In Configuration B, 4 of 6 cells satisfy the TPR equivalence margin formally; the remaining two are underpowered at factual-domain `N = 20`.
+
+**Detection strength (z) shows a modest, reliable advantage for `G_H_high` at low-to-moderate budgets.** In Configuration B, wiki cells at `ρ ∈ {0.25, 0.50}` have Δz 95 % CIs `[+0.15, +0.79]` and `[+0.40, +1.21]` respectively — both excluding zero and both corresponding to a `G_H_high` detection strength higher than `G_Δ` by roughly one `σ`. The advantage disappears at `ρ = 0.75` (CI `[−0.07, +0.27]`, within the equivalence margin).
+
+**Budget-convergence at ρ = 0.75.** Across both configurations, the ρ = 0.75 regime is the most consistent: at high budget, the set of positions gated by any reasonable rule overlaps extensively, and gates converge. This matches Theorem 8's prediction under local independence.
+
+### 6.5 Theory-Data Consistency
+
+**Theorem 1 (detection formula).** Spot-check in Configuration B at wiki / T = 0.7 / ρ = 0.50, `G_H_high` (empirical `ρ̄ = 0.53`, `n = 100`): Theorem 1 predicts `z = 0.53 · √(4 · 99) = 10.55`; observed `z = 12.71`. Spot-check in Configuration A at wiki / T = 0.0 / ρ = 0.50, `G_H_high` (empirical `ρ̄ = 0.57`, `n = 50`): predicts `z = 7.98`, observed `7.90`. Across spot-checked cells the relative error is within 1–20 %, consistent with finite-sample Bernoulli deviations from the expected-value formula.
 
 **Theorem 4 (robustness).** Monte Carlo verification with 10⁴ trials per configuration confirms the formula `E[φ|attack] = p_0 + ρ(1 − δ)²(1 − p_0)` to within 0.01 for `(S, ρ, δ) ∈ {(7, 1, 0), (7, 1, 0.29), (5, 0.5, 0.2), (2, 1, 0.5)}`. The universal midpoint critical rate `δ*_mid = 1 − 1/√2` holds to 10⁻¹² across (S, ρ) pairs.
 
-**Theorem 8 (matched-budget equivalence).** Empirically realized at ρ = 0.75 (budget-convergence pattern). At ρ = 0.50, the theorem's local-independence assumption breaks for gate pairs whose selected positions exhibit systematically different quality traits; the observed Pareto trade-off at this budget is consistent with this breakdown.
+**Theorem 8 (matched-budget equivalence).** Empirically realized for quality (PPL) at all tested budgets in Configuration B (all six log-PPL CIs include zero). The z-score is also equivalent at `ρ = 0.75`. At lower budgets the theorem's local-independence assumption breaks: positions selected by the `G_H_high` and `G_Δ` gates are systematically different on *per-position detection yield* — the observed Δz > 0 at `ρ ∈ {0.25, 0.50}` reflects this, not a violation of the theorem. (The theorem conditions on identical marginal survival `μ_i`; at moderate ρ, the two gates sample from regions with different effective `μ_i`.)
 
-**Theorem 9 (Δ regret bound).** `G_Δ` exhibits lower PPL than `G_H_high` in wiki cells where the gate fires on low-Δ positions that are natural argmax-flip candidates (cells 2, 4, 7, 8). In the factual domain, where Δ is concentrated near 1 everywhere, `G_Δ` fires on atypical positions and the empirical quality advantage does not carry over; the theorem's pointwise bound still holds.
+**Theorem 9 (Δ regret bound).** The theorem's pointwise bound `Regret ≤ Δ` holds by construction for `G_Δ` under greedy decoding. Configuration A cells 2, 4, 7, 8 show `G_Δ`-favored PPL at `T = 0.0` and `T = 0.7` with `N = 15`; this direction does not survive the scale-up to `N = 176` in Configuration B (all wiki log-PPL CIs include zero). The theorem's prediction is *compatible* with equivalence but does not *require* `G_Δ` dominance.
 
 ---
 
 ## 7. Discussion
 
-**Governance implications.** The matched-budget study indicates that the design parameter operationally relevant for MCL is the watermark budget `ρ`, not the gate heuristic used to spend it. At `ρ ≥ 0.5`, detection probability does not depend on which of `G_H_high`, `G_Δ` is used; quality differences at moderate ρ are small and Pareto-incomparable. A watermarking standardization effort that specifies `ρ` and leaves gate choice to the operator therefore captures the dimension on which detection and quality actually depend. Theorem 2's closed-form calibration additionally gives a reproducible procedure for setting `S` given target significance and expected text length.
+**Governance implications.** The matched-budget study indicates that the design parameter operationally relevant for MCL is the watermark budget `ρ`, not the gate heuristic used to spend it. At `ρ ≥ 0.5`, detection probability does not depend on which of `G_H_high`, `G_Δ` is used; *quality is equivalent across tested cells* at `N = 176`. A small but reliable detection-strength advantage of `G_H_high` over `G_Δ` persists at low-to-moderate `ρ` on open-ended text (wiki), amounting to roughly one standard-deviation of z. A watermarking standardization effort that specifies `ρ` and leaves gate choice to the operator therefore captures the dominant dimension on which quality and detection probability depend. Theorem 2's closed-form calibration additionally gives a reproducible procedure for setting `S` given target significance and expected text length.
 
 **When to prefer MCL.** MCL is attractive when (i) detection must run without the generator model (strictly model-free), (ii) the operator requires a closed-form calibration rather than grid search, or (iii) deterministic auditable generation under greedy decoding is desirable (fixed key + fixed prompt ⟹ byte-identical output).
 
