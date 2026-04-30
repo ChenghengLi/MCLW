@@ -5,16 +5,17 @@ Evaluate non-watermarked text against all MCL configurations for curated dataset
 
 import sys
 import json
+import argparse
+import os
 from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ltw_watermark.enhanced_mcl import EnhancedMCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLDetector
 
-# The dataset directory
-DATA_DIR = Path("/home/LTW/data/curated_wiki_dataset_20260201_112721")
-MODEL_NAME = "meta-llama/Llama-3.2-3B-Instruct"
+DEFAULT_DATA_DIR = Path(__file__).parent.parent / "data" / "curated_wiki_dataset_20260201_112721"
+DEFAULT_MODEL_NAME = os.environ.get("MCL_TOKENIZER", "meta-llama/Llama-3.2-3B-Instruct")
 SECRET_KEY = "curated_wiki_dataset_2024"
 
 # MCL configurations: states 2, 4, 5, 7, 9, 11, 15 × overlaps 0%, 5%, 10%, 15%
@@ -31,8 +32,19 @@ for num_states in [2, 4, 5, 7, 9, 11, 15]:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
+    parser.add_argument("--model", default=DEFAULT_MODEL_NAME,
+                        help="Tokenizer model name. Llama-3.x family share the same tokenizer, "
+                             "so the cached Llama-3.1-8B-Instruct works as a drop-in for 3.2-3B.")
+    args = parser.parse_args()
+    global DATA_DIR, MODEL_NAME
+    DATA_DIR = args.data_dir
+    MODEL_NAME = args.model
     print("=" * 80)
     print("EVALUATING NON-WATERMARKED TEXT AGAINST ALL CONFIGURATIONS")
+    print(f"Tokenizer: {MODEL_NAME}")
+    print(f"Data dir : {DATA_DIR}")
     print("=" * 80)
     
     # Load non-watermarked samples
@@ -119,7 +131,7 @@ def main():
     with open(output_file, "w") as f:
         json.dump(output, f, indent=2)
     
-    print(f"\n✓ Results saved to: {output_file}")
+    print(f"\n[ok] Results saved to: {output_file}")
 
 
 if __name__ == "__main__":

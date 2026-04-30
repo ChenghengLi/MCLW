@@ -1,0 +1,117 @@
+{
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "secret_key": "curated_wiki_dataset_2024",
+  "tau": 0.5,
+  "chain_key": "soft_cycle",
+  "k": 2,
+  "results": [
+    {
+      "num_states": 5,
+      "n_tokens": 25,
+      "n_samples": 173,
+      "avg_score": 0.3836705202312139,
+      "empirical_fpr": 0.18497109826589594,
+      "hoeffding_bound": 0.618783391806141,
+      "bound_holds": true
+    },
+    {
+      "num_states": 5,
+      "n_tokens": 50,
+      "n_samples": 173,
+      "avg_score": 0.4026188510086115,
+      "empirical_fpr": 0.06358381502890173,
+      "hoeffding_bound": 0.37531109885139974,
+      "bound_holds": true
+    },
+    {
+      "num_states": 5,
+      "n_tokens": 100,
+      "n_samples": 173,
+      "avg_score": 0.40240555847492265,
+      "empirical_fpr": 0.017341040462427744,
+      "hoeffding_bound": 0.1380692373108929,
+      "bound_holds": true
+    },
+    {
+      "num_states": 7,
+      "n_tokens": 25,
+      "n_samples": 173,
+      "avg_score": 0.30804431599229287,
+      "empirical_fpr": 0.028901734104046242,
+      "hoeffding_bound": 0.11035182229371183,
+      "bound_holds": true
+    },
+    {
+      "num_states": 7,
+      "n_tokens": 50,
+      "n_samples": 173,
+      "avg_score": 0.2992804058039401,
+      "empirical_fpr": 0.011560693641618497,
+      "hoeffding_bound": 0.011108996538242306,
+      "bound_holds": false
+    },
+    {
+      "num_states": 7,
+      "n_tokens": 100,
+      "n_samples": 173,
+      "avg_score": 0.29106089799731416,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 0.00011258109689868543,
+      "bound_holds": true
+    },
+    {
+      "num_states": 9,
+      "n_tokens": 25,
+      "n_samples": 173,
+      "avg_score": 0.21170520231213874,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 0.02463212721614086,
+      "bound_holds": true
+    },
+    {
+      "num_states": 9,
+      "n_tokens": 50,
+      "n_samples": 173,
+      "avg_score": 0.2145806299398372,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 0.000519975743255854,
+      "bound_holds": true
+    },
+    {
+      "num_states": 9,
+      "n_tokens": 100,
+      "n_samples": 173,
+      "avg_score": 0.2141063817364395,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 2.3171034047584526e-07,
+      "bound_holds": true
+    },
+    {
+      "num_states": 11,
+      "n_tokens": 25,
+      "n_samples": 173,
+      "avg_score": 0.1859344894026975,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 0.007754328059310104,
+      "bound_holds": true
+    },
+    {
+      "num_states": 11,
+      "n_tokens": 50,
+      "n_samples": 173,
+      "avg_score": 0.2023121387283237,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 4.9108049124716174e-05,
+      "bound_holds": true
+    },
+    {
+      "num_states": 11,
+      "n_tokens": 100,
+      "n_samples": 173,
+      "avg_score": 0.20079406784609097,
+      "empirical_fpr": 0.0,
+      "hoeffding_bound": 1.9695622136727585e-09,
+      "bound_holds": true
+    }
+  ]
+}

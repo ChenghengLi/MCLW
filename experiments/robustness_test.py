@@ -12,11 +12,12 @@ import os
 import sys
 import json
 import random
+from pathlib import Path
 
 # Set HF_TOKEN environment variable before running: export HF_TOKEN="your-token"
-sys.path.insert(0, '/Users/chenghengli/Desktop/Hackathon/LTW/src')
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ltw_watermark.enhanced_mcl import EnhancedMCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLDetector
 
 
 def load_data(filepath):

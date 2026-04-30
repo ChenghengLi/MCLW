@@ -7,8 +7,8 @@ This package provides:
 - Enhanced MCL with soft partitions and flexible transitions
 """
 
-from ltw_watermark.mcl_watermark import MCLGenerator, MCLDetector
-from ltw_watermark.enhanced_mcl import EnhancedMCLGenerator, EnhancedMCLDetector
+from mcl_watermark.mcl_watermark import MCLGenerator, MCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLGenerator, EnhancedMCLDetector
 
 __version__ = "0.2.0"
 __all__ = [

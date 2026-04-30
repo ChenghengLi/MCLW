@@ -1,0 +1,151 @@
+{
+  "config": "states7_overlap0pct",
+  "num_states": 7,
+  "overlap": 0.0,
+  "chain_key": "soft_cycle",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "n_samples": 173,
+  "modification_rates": [
+    0.0,
+    0.1,
+    0.2,
+    0.3,
+    0.4
+  ],
+  "word_level_results": [
+    {
+      "attack": "word_level",
+      "modification_rate": 0.0,
+      "avg_score": 0.9355994454333697,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "word_level",
+      "modification_rate": 0.1,
+      "avg_score": 0.8385939460516619,
+      "detection_rate": 0.9942196531791907,
+      "n_samples": 173,
+      "n_detected": 172
+    },
+    {
+      "attack": "word_level",
+      "modification_rate": 0.2,
+      "avg_score": 0.7377394195650553,
+      "detection_rate": 0.9942196531791907,
+      "n_samples": 173,
+      "n_detected": 172
+    },
+    {
+      "attack": "word_level",
+      "modification_rate": 0.3,
+      "avg_score": 0.6405933809272913,
+      "detection_rate": 0.9595375722543352,
+      "n_samples": 173,
+      "n_detected": 166
+    },
+    {
+      "attack": "word_level",
+      "modification_rate": 0.4,
+      "avg_score": 0.5438189366070609,
+      "detection_rate": 0.7341040462427746,
+      "n_samples": 173,
+      "n_detected": 127
+    }
+  ],
+  "token_level_results": [
+    {
+      "attack": "token_level",
+      "modification_rate": 0.0,
+      "avg_score": 0.9908262575968348,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "token_level",
+      "modification_rate": 0.1,
+      "avg_score": 0.8608557499161886,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "token_level",
+      "modification_rate": 0.2,
+      "avg_score": 0.7534715568061897,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "token_level",
+      "modification_rate": 0.3,
+      "avg_score": 0.6573545510777954,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "token_level",
+      "modification_rate": 0.4,
+      "avg_score": 0.5823751412641011,
+      "detection_rate": 0.953757225433526,
+      "n_samples": 173,
+      "n_detected": 165
+    }
+  ],
+  "uniform_token_results": [
+    {
+      "attack": "uniform_token",
+      "modification_rate": 0.0,
+      "avg_score": 0.9908262575968348,
+      "theory_predicted_phi": 1.0,
+      "abs_error": 0.009173742403165153,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "uniform_token",
+      "modification_rate": 0.1,
+      "avg_score": 0.8540466742579684,
+      "theory_predicted_phi": 0.8642857142857143,
+      "abs_error": 0.010239040027745894,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "uniform_token",
+      "modification_rate": 0.2,
+      "avg_score": 0.7319491325101277,
+      "theory_predicted_phi": 0.742857142857143,
+      "abs_error": 0.010908010347015273,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "uniform_token",
+      "modification_rate": 0.3,
+      "avg_score": 0.6244280609025571,
+      "theory_predicted_phi": 0.6357142857142857,
+      "abs_error": 0.011286224811728585,
+      "detection_rate": 1.0,
+      "n_samples": 173,
+      "n_detected": 173
+    },
+    {
+      "attack": "uniform_token",
+      "modification_rate": 0.4,
+      "avg_score": 0.5272247550492054,
+      "theory_predicted_phi": 0.5428571428571429,
+      "abs_error": 0.01563238780793752,
+      "detection_rate": 0.7745664739884393,
+      "n_samples": 173,
+      "n_detected": 134
+    }
+  ]
+}

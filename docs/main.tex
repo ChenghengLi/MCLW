@@ -151,7 +151,7 @@ Passive detection methods analyze statistical properties of generated text: Dete
 Chen et al.~\cite{chen2024watermarkorderagnosticlanguagemodel} propose Pattern-Mark, a Markov-chain-based watermarking framework for order-agnostic language models using probabilistic transitions and pattern-frequency detection. MCL targets autoregressive LLMs with 
 deterministic transitions, enabling greedy decoding compatibility and model-free O(n) detection via transition validity verification.
 
-MCL advances prior work through: (1) deterministic embedding compatible with greedy decoding; (2) model-free $O(n)$ detection; (3) provable exponentially small FPR via Hoeffding bounds; and (4) explicit quality-security parameterization through tunable overlap $\rho$.
+MCL advances prior work through: (1) deterministic embedding compatible with greedy decoding; (2) tokenizer-only $O(n)$ detection (the language model is not required at verification time, only the same tokenizer and the secret key); (3) provable exponentially small FPR via Hoeffding bounds; and (4) explicit quality-security parameterization through tunable overlap $\rho$.
 
 % ============================================================================
 % 3. METHODS
@@ -303,6 +303,13 @@ Let $\mathbf{T}$ be an irreducible doubly stochastic transition matrix with $k$ 
 \textit{Special cases:} Clockwork ($k{=}1$): $p_{\text{random}} = 1/S$. Soft cycle ($k{=}2$): $p_{\text{random}} = 2/S$.
 \end{theorem}
 
+\begin{remark}[Independence assumption]
+\label{rem:iid}
+The Hoeffding bound in Theorem~\ref{thm:detection}(iv) treats the indicators $Z_i$ as i.i.d. Bernoulli$(k/S)$. Strictly, this holds when token states are drawn independently and the chain is doubly stochastic; for arbitrary natural language $\{Z_i\}$ are dependent because adjacent tokens are not independent. Two observations make the bound a useful proxy in practice:
+(a) the state map $\sigma_k$ is induced by a SHA-256 hash with a secret key, which under the random-oracle assumption is independent of the linguistic content of the token, so for an adversary without the key the marginal distribution of $\sigma_k(t_i)$ is uniform regardless of token-level dependencies; and
+(b) for chains with sufficient mixing, the empirical fraction of valid transitions concentrates around its mean even under weak dependence, with the variance penalty bounded by the inverse spectral gap. We treat the i.i.d. form as an approximation and report empirical FPR-vs-length curves in Section~\ref{sec:robustness} to validate that the bound is not vacuous on real text.
+\end{remark}
+
 \begin{proof}
 \textbf{(i)} Algorithm~\ref{alg:embed} enforces that each token's state is a valid successor in $\mathbf{T}$, so $\mathbf{T}_{\sigma_k(t_i), \sigma_k(t_{i+1})} > 0$ for all transitions, giving $\phi(\mathbf{t}^w) = 1$.
 \textbf{(ii)} For random text, each state $\sigma_k(t)$ is uniformly distributed over $\mathcal{S}$ by Lemma~\ref{lem:uniform}. Since $\mathbf{T}$ is doubly stochastic (Definition~\ref{def:doubly_stochastic}), the stationary distribution is uniform: $\pi^* = (1/S, \ldots, 1/S)$. With $k$ non-zero entries per row, $P(\text{valid transition}) = k/S$.
@@ -334,8 +341,12 @@ Under the random oracle model, without secret key $k$, any polynomial-time adver
 $$\text{Adv}_{\mathcal{A}} = |P[\mathcal{A}(\mathbf{t}^w) = 1] - P[\mathcal{A}(\mathbf{t}^r) = 1]| \leq \text{negl}(256)$$
 \end{theorem}
 
-\begin{proof}
-The state assignment $\sigma_k(t) = H(k \| t) \bmod S$ is a pseudorandom function under the random oracle model. Without $k$, the adversary observes only the token sequence $\mathbf{t}$, not the state sequence $(s_1, \ldots, s_n)$. Watermarked text has clockwork states; random text has i.i.d. uniform states. Distinguishing these from tokens alone requires inverting $H$, which has probability $\leq 2^{-256}$.
+\begin{proof}[Proof sketch (reduction to SHA-256 preimage resistance)]
+The state assignment $\sigma_k(t) = H(k \,\|\, t) \bmod S$ is modeled as a pseudorandom function: under the random-oracle assumption on $H$, for any $t$ the value $\sigma_k(t)$ is uniform on $\{0, \ldots, S{-}1\}$ to any algorithm that has not previously queried $H$ on input $k \,\|\, t$. The adversary $\mathcal{A}$ sees only the surface token sequence $\mathbf{t}$, not the latent states $(s_1, \ldots, s_n)$.
+
+Suppose for contradiction there exists a polynomial-time $\mathcal{A}$ with non-negligible advantage $\varepsilon$ in distinguishing watermarked from random sequences. We construct $\mathcal{B}$ that uses $\mathcal{A}$ as a black box to recover information about $k$: $\mathcal{B}$ guesses a candidate key $k'$, computes the implied state sequence on a known token stream, and forwards $\mathcal{A}$'s output. Because the only source of bias in the watermarked distribution is the chain constraint induced by $H(k \,\|\, \cdot)$, any distinguishing advantage of $\mathcal{A}$ implies an advantage in predicting $H(k \,\|\, t)$ better than uniform, which contradicts random-oracle indistinguishability and is bounded by $\Pr[\text{preimage}] \leq 2^{-256}$ for SHA-256-sized keys. Hence $\varepsilon \leq \mathrm{negl}(256)$.
+
+\textbf{Threat model clarification.} The bound assumes (a) the adversary does \emph{not} have the key $k$, (b) the chain topology $\mathbf{T}$ and state count $S$ are publicly known (security rests on $k$, not on hiding parameters), and (c) the adversary observes only the released token stream, not internal logits, RNG state, or timing/cache side channels. Side-channel resistance is out of scope and is treated as an implementation concern.
 \end{proof}
 
 \begin{theorem}[Quality Bound]
@@ -372,9 +383,9 @@ For each concept $c$, we construct a standardized prompt $p_c$ of the form: \tex
 We generate paired samples for each concept to enable controlled comparison between watermarked and baseline conditions:
 
 \begin{itemize}
-    \item \textbf{Watermarked generation.} Text is produced using Algorithm~\ref{alg:embed} with \textbf{soft cycle} transition enforcement (Example~\ref{ex:softcycle}). At each decoding step, the model's output distribution is masked to permit only tokens belonging to valid successor partitions $\mathcal{V}_{(s+1) \bmod S}$ or $\mathcal{V}_{(s+2) \bmod S}$, followed by sampling from the masked distribution. This procedure guarantees $\phi(\mathbf{t}) \approx 1.0$ for all generated sequences.
-    
-    \item \textbf{Baseline generation.} Non-watermarked text is produced using standard nucleus sampling with temperature $T = 0.7$ and cumulative probability threshold $p = 0.9$, without any vocabulary constraints. These samples establish the null distribution for false positive rate estimation.
+    \item \textbf{Watermarked generation.} Text is produced using Algorithm~\ref{alg:embed} with \textbf{soft cycle} transition enforcement (Example~\ref{ex:softcycle}). At each decoding step, the model's output distribution is masked to permit only tokens belonging to valid successor partitions $\mathcal{V}_{(s+1) \bmod S}$ or $\mathcal{V}_{(s+2) \bmod S}$, followed by greedy decoding ($\arg\max$) over the masked distribution. This procedure guarantees $\phi(\mathbf{t}) \approx 1.0$ for all generated sequences.
+
+    \item \textbf{Baseline generation.} Non-watermarked text is produced using the same greedy decoding strategy ($T = 0$) over the unmasked distribution, ensuring that any quality difference between conditions is attributable to the watermark constraint rather than to differences in decoding stochasticity. These samples establish the null distribution for false positive rate estimation.
 \end{itemize}
 
 All experiments employ Llama-3.2-3B-Instruct as the base language model, with a maximum generation length of 200 tokens. We systematically evaluate $7 \times 4 = 28$ configurations spanning state counts $S \in \{2, 4, 5, 7, 9, 11, 15\}$ and overlap ratios $\rho \in \{0\%, 5\%, 10\%, 15\%\}$. Reproducibility is ensured through fixed random seed (42) and cryptographic key (\texttt{curated\_wiki\_dataset\_2024}).
@@ -474,7 +485,15 @@ Observed scores match Theorem~\ref{thm:robustness} within 1 to 6\%. Detection re
 
 MCL watermarking addresses EU AI Act Article 50~\cite{euaiact2024} requirements for machine-readable AI content marking. The model-free detection (Algorithm~\ref{alg:detect}) enables third-party auditing without LLM access, supporting transparency frameworks~\cite{oecdhiroshima2024}, while provable guarantees (Theorems~\ref{thm:detection} to \ref{thm:quality}) provide legally defensible authentication with quantifiable error rates.
 
-\textbf{Limitations.} (1) Detection requires the same tokenizer used during generation; (2) at least 5 states are needed for reliable detection ($S = 2$ is unusable); (3) overlap $\rho \geq 10\%$ severely degrades detection; (4) perplexity increases with states, though $S = 7$ achieves reasonable PPL = 4.20.
+\textbf{Limitations.}
+\begin{enumerate}[label=(\arabic*), itemsep=1pt, topsep=2pt]
+    \item \textit{Tokenizer dependency.} Detection requires the exact tokenizer used during generation. Any post-hoc retokenization (e.g., normalising whitespace or upgrading to a newer tokenizer revision) shifts token boundaries and thus the state sequence, lowering $\phi$. We therefore consider MCL ``tokenizer-bound'' rather than truly model-free.
+    \item \textit{Short-text reliability.} Theorem~\ref{thm:detection}(iv) gives FPR $\leq 1.1{\times}10^{-4}$ at $n{=}100$ tokens for $S{=}7$, but for $n < 50$ the bound becomes loose enough that detection on short snippets (tweets, headlines) is unreliable.
+    \item \textit{Hyperparameter sensitivity.} At least 5 states are needed for reliable detection ($S{=}2$ is unusable); overlap $\rho \geq 10\%$ severely degrades detection; perplexity grows with $S$, though $S{=}7$ achieves a reasonable PPL of $4.20$.
+    \item \textit{Cryptographic overhead is negligible.} A direct micro-benchmark on a commodity CPU (\texttt{scripts/measure\_sha256\_overhead.py}) shows SHA-256 at $\approx 685$\,ns per token-state call, and a one-time state-table build of $\approx 117$\,ms for the full Llama-3 128k vocabulary. Relative to a typical $\sim 20$\,ms-per-token LLM forward pass on a modern GPU, this is $\sim 3\times 10^{-3}\%$ of generation time and is amortised away by the precomputed lookup table; the watermark constraint adds no measurable runtime cost beyond a tensor mask.
+    \item \textit{Cross-lingual coverage.} All experiments are English-only on Wikipedia-style prompts. The EU AI Act explicitly covers 24 official EU languages; SHA-256 partitioning is language-agnostic but tokenizer behaviour and PPL impact under multilingual tokenizers (e.g., XLM-R, NLLB) are not validated here.
+    \item \textit{Adversarial scope.} Theorem~\ref{thm:robustness} covers uniform random token replacement; semantic paraphrasing (DIPPER, back-translation) and human-in-the-loop rewriting are not yet empirically tested in this work and remain the most consequential open robustness questions.
+\end{enumerate}
 
 \textbf{Future Work.} A promising direction is \textit{sparse watermarking}: introducing a ``full vocabulary'' state that allows unrestricted token selection, watermarking only every $N$-th token (e.g., $N=10$). This preserves generation quality while maintaining theoretical guarantees, since any doubly stochastic transition matrix ensures uniform stationary distribution. Other directions include adaptive overlap selection based on token probability mass, C2PA metadata integration for end-to-end provenance, robustness against learned adversarial attacks, and multi-model coordination for heterogeneous deployments. Preliminary experiments on Mistral-7B and GPT-2-XL (Appendix~\ref{app:additional_models}) confirm consistent behavior across model architectures. We hypothesize that larger vocabulary sizes reduce perplexity under partitioning, as each partition contains more candidate tokens.
 

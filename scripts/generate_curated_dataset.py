@@ -23,7 +23,7 @@ import random
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ltw_watermark.enhanced_mcl import EnhancedMCLGenerator, EnhancedMCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLGenerator, EnhancedMCLDetector
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
@@ -104,9 +104,114 @@ def generate_prompt(concept: str) -> str:
     return f"Explain {readable} in a comprehensive way."
 
 
+# -----------------------------------------------------------------------------
+# Cross-domain prompt pools (used with --domain {wiki, news, social, abstract})
+# -----------------------------------------------------------------------------
+
+NEWS_PROMPTS = [
+    "Write a 200-word news brief about recent advances in renewable energy storage.",
+    "Write a wire-style report covering today's developments in central bank policy.",
+    "Summarise this week's major geopolitical events affecting global trade.",
+    "Write a short BBC-style article on a recent breakthrough in cancer research.",
+    "Report on the outcome of the latest United Nations climate summit.",
+    "Cover a major sporting event final in 200 words.",
+    "Write a market-recap piece on today's tech stock performance.",
+    "Describe a recent space mission and its scientific objectives.",
+    "Write a news piece on a notable cyber-attack on critical infrastructure.",
+    "Cover a recent natural disaster and the international response.",
+    "Report on a recent supreme court ruling and its political implications.",
+    "Write an obituary for a fictional Nobel laureate in physics.",
+    "Cover a recent diplomatic incident between two major powers.",
+    "Write a profile of a tech CEO announcing a major product launch.",
+    "Report on a vaccine rollout in a developing country.",
+    "Write a feature on a recent labour strike at a major automaker.",
+    "Cover the launch of a new high-speed rail line in Asia.",
+    "Write a piece on rising food prices and their causes.",
+    "Report on the discovery of a previously unknown archaeological site.",
+    "Write a news article on a major art-forgery investigation.",
+    "Cover a recent reshuffle in a major government cabinet.",
+    "Write a piece on regulatory action against a large social-media platform.",
+    "Report on a high-profile corporate merger announcement.",
+    "Cover the impact of a new tariff regime on global supply chains.",
+    "Write a news article on the spread of an emerging infectious disease.",
+]
+
+SOCIAL_PROMPTS = [
+    "Write a Reddit r/AskScience top-comment answer about why the sky is blue.",
+    "Compose an X (Twitter) thread of 6 tweets explaining inflation to a layperson.",
+    "Write a Reddit r/Cooking comment sharing a personal sourdough recipe.",
+    "Compose a Reddit r/Personalfinance answer about whether to pay off debt or invest.",
+    "Write a sarcastic but informative X thread on why JavaScript dates are broken.",
+    "Compose a Reddit r/legaladvice top comment carefully outlining tenant rights.",
+    "Write a Reddit r/AmItheAsshole story from a workplace conflict.",
+    "Compose a Reddit r/relationships comment offering empathetic advice.",
+    "Write a Reddit r/programming comment discussing Rust vs Go for a backend service.",
+    "Compose a viral X thread about your worst flight delay experience.",
+    "Write a Reddit r/explainlikeimfive top answer about how vaccines work.",
+    "Compose a Mastodon-style post about a hike you went on last weekend.",
+    "Write a Reddit r/buildapc comment recommending a $1500 gaming build.",
+    "Compose a heartfelt LinkedIn post about a recent job change.",
+    "Write a Reddit r/MaliciousCompliance story from your time in retail.",
+    "Compose an X thread debunking a common nutrition myth.",
+    "Write a Reddit r/MechanicalKeyboards comment reviewing a new switch.",
+    "Compose a parenting-subreddit post about a difficult bedtime routine.",
+    "Write a Reddit r/travel comment recommending an itinerary for Lisbon.",
+    "Compose an X thread on lessons learned from launching a side project.",
+    "Write a Reddit r/MachineLearning discussion comment on a recent paper.",
+    "Compose a Reddit r/Frugal comment with five concrete grocery-saving tips.",
+    "Write a Reddit r/AskHistorians-style explanation of medieval guild structures.",
+    "Compose an X thread on why your favourite local cafe just closed.",
+    "Write a Reddit r/UpliftingNews comment summarising a feel-good story.",
+]
+
+ABSTRACT_PROMPTS = [
+    "Write a 250-word academic abstract for a paper on graph neural networks for protein folding.",
+    "Compose an abstract for a study on long-context transformers for legal document analysis.",
+    "Write an abstract for an empirical study of LLM hallucinations under retrieval augmentation.",
+    "Compose an abstract for a paper introducing a new benchmark for code generation.",
+    "Write an abstract for a paper on differential privacy in federated learning.",
+    "Compose an abstract for a clinical study of a novel SGLT2 inhibitor in heart failure.",
+    "Write an abstract for an economics paper on minimum-wage effects in retail employment.",
+    "Compose an abstract for a paper proposing a new attention mechanism for long sequences.",
+    "Write an abstract for a paper on quantum error correction in surface codes.",
+    "Compose an abstract for a paper on fairness in algorithmic credit scoring.",
+    "Write an abstract for a paper on metal-organic frameworks for carbon capture.",
+    "Compose an abstract for a sociological study on remote-work adoption post-2020.",
+    "Write an abstract for a paper on parameter-efficient fine-tuning for large language models.",
+    "Compose an abstract for a study on microbiome composition and depression.",
+    "Write an abstract for a paper on hardware-aware neural architecture search.",
+    "Compose an abstract for an HCI paper on voice-assistant accessibility.",
+    "Write an abstract for a paper on robust optimisation under demand uncertainty.",
+    "Compose an abstract for a paper on watermarking image-generation models.",
+    "Write an abstract for a study on adversarial robustness of speech recognition.",
+    "Compose an abstract for a paper on lattice-based post-quantum cryptography.",
+    "Write an abstract for a paper on mechanism design for online ad auctions.",
+    "Compose an abstract for a study on deep-learning-based weather forecasting.",
+    "Write an abstract for a paper on neural radiance fields for autonomous driving.",
+    "Compose an abstract for a study on cosmological constraints from JWST observations.",
+    "Write an abstract for a paper on continuous-time reinforcement learning for robotics.",
+]
+
+
+def get_prompts(domain: str):
+    """Return (concepts, prompt_fn) for a given domain."""
+    if domain == "wiki":
+        return WIKIPEDIA_CONCEPTS, generate_prompt
+    if domain == "news":
+        return NEWS_PROMPTS, lambda p: p
+    if domain == "social":
+        return SOCIAL_PROMPTS, lambda p: p
+    if domain == "abstract":
+        return ABSTRACT_PROMPTS, lambda p: p
+    raise ValueError(f"Unknown domain: {domain}")
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--max-tokens", type=int, default=150, help="Max tokens per generation")
+    parser.add_argument("--max-tokens", type=int, default=512,
+                        help="Max new tokens per generation (default 512 for longer sequences; "
+                             "the empirical FPR-vs-length plot in Section 6 also benefits from "
+                             "having long samples to subsample).")
     parser.add_argument("--model", default="meta-llama/Llama-3.2-3B-Instruct")
     parser.add_argument("--topology", default="soft_cycle", choices=["clockwork", "binary", "soft_cycle"],
                         help="Transition topology: clockwork, binary, or soft_cycle")
@@ -115,6 +220,12 @@ def main():
     parser.add_argument("--overlaps", type=int, nargs="+", default=[0, 5, 10, 15],
                         help="Which overlap percentages to run (e.g. --overlaps 0 5 10 15)")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--decoding", choices=["greedy", "sampling"], default="greedy",
+                        help="Non-watermarked baseline decoding: greedy (matches watermarked default) "
+                             "or sampling (T=0.7, top_p=0.9). Use 'greedy' for fair PPL comparison.")
+    parser.add_argument("--domain", choices=["wiki", "news", "social", "abstract"], default="wiki",
+                        help="Prompt domain. 'wiki' uses the original 173 concepts; the others draw "
+                             "from cross-domain prompt pools (~25 each) for cross-domain evaluation.")
     parser.add_argument("--skip-non-watermarked", action="store_true", help="Skip non-watermarked generation")
     parser.add_argument("--resume-from-config", type=str, default=None, help="Resume from specific config name")
     args = parser.parse_args()
@@ -129,7 +240,7 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     secret_key = "curated_wiki_dataset_2024"
 
-    concepts = WIKIPEDIA_CONCEPTS
+    concepts, prompt_fn = get_prompts(args.domain)
     MCL_CONFIGS = build_mcl_configs(args.topology, args.states, args.overlaps)
 
     print("=" * 80)
@@ -165,18 +276,26 @@ def main():
         
         non_wm_samples = []
         for concept in tqdm(concepts, desc="Non-watermarked"):
-            prompt = generate_prompt(concept)
+            prompt = prompt_fn(concept)
             inputs = tokenizer(prompt, return_tensors="pt").to(device)
             
             with torch.no_grad():
-                outputs = model.generate(
-                    inputs["input_ids"],
-                    max_new_tokens=args.max_tokens,
-                    do_sample=True,
-                    temperature=0.7,
-                    top_p=0.9,
-                    pad_token_id=tokenizer.eos_token_id,
-                )
+                if args.decoding == "greedy":
+                    outputs = model.generate(
+                        inputs["input_ids"],
+                        max_new_tokens=args.max_tokens,
+                        do_sample=False,
+                        pad_token_id=tokenizer.eos_token_id,
+                    )
+                else:
+                    outputs = model.generate(
+                        inputs["input_ids"],
+                        max_new_tokens=args.max_tokens,
+                        do_sample=True,
+                        temperature=0.7,
+                        top_p=0.9,
+                        pad_token_id=tokenizer.eos_token_id,
+                    )
             
             text = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
             
@@ -185,6 +304,7 @@ def main():
                 "prompt": prompt,
                 "text": text,
                 "type": "non_watermarked",
+                "decoding": args.decoding,
             })
         
         # Save
@@ -246,7 +366,7 @@ def main():
         detected = 0
         
         for concept in tqdm(concepts, desc=config_name):
-            prompt = generate_prompt(concept)
+            prompt = prompt_fn(concept)
             text, meta = generator.generate(prompt, max_new_tokens=args.max_tokens)
             result = detector.detect(text)
             

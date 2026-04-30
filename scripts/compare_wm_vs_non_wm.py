@@ -6,16 +6,17 @@ Produces a detailed side-by-side comparison.
 
 import sys
 import json
+import argparse
+import os
 from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ltw_watermark.enhanced_mcl import EnhancedMCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLDetector
 
-# The dataset directory
-DATA_DIR = Path("/home/LTW/data/curated_wiki_dataset_20260201_112721")
-MODEL_NAME = "meta-llama/Llama-3.2-3B-Instruct"
+DEFAULT_DATA_DIR = Path(__file__).parent.parent / "data" / "curated_wiki_dataset_20260201_112721"
+DEFAULT_MODEL_NAME = os.environ.get("MCL_TOKENIZER", "meta-llama/Llama-3.2-3B-Instruct")
 SECRET_KEY = "curated_wiki_dataset_2024"
 
 # MCL configurations
@@ -32,8 +33,17 @@ for num_states in [2, 4, 5, 7, 9, 11, 15]:
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data-dir", type=Path, default=DEFAULT_DATA_DIR)
+    parser.add_argument("--model", default=DEFAULT_MODEL_NAME)
+    args = parser.parse_args()
+    global DATA_DIR, MODEL_NAME
+    DATA_DIR = args.data_dir
+    MODEL_NAME = args.model
     print("=" * 120)
     print("DETAILED COMPARISON: WATERMARKED vs NON-WATERMARKED FOR EACH CONFIGURATION")
+    print(f"Tokenizer: {MODEL_NAME}")
+    print(f"Data dir : {DATA_DIR}")
     print("=" * 120)
     
     # Load non-watermarked samples
@@ -139,13 +149,13 @@ def main():
         print(f"    - Score gap (WM avg - Non-WM avg): {gap:.4f}")
         
         if gap > 0.5:
-            verdict = "✅ EXCELLENT - Large separation, easy to distinguish"
+            verdict = "[EXCELLENT] Large separation, easy to distinguish"
         elif gap > 0.3:
-            verdict = "✅ GOOD - Clear separation"
+            verdict = "[GOOD] Clear separation"
         elif gap > 0.15:
-            verdict = "⚠️ MARGINAL - Some overlap, harder to distinguish"
+            verdict = "[MARGINAL] Some overlap, harder to distinguish"
         else:
-            verdict = "❌ POOR - Too much overlap, unreliable detection"
+            verdict = "[POOR] Too much overlap, unreliable detection"
         print(f"    - Verdict: {verdict}")
         
         all_results.append({
@@ -184,7 +194,7 @@ def main():
     with open(output_file, "w") as f:
         json.dump(all_results, f, indent=2)
     
-    print(f"\n✓ Results saved to: {output_file}")
+    print(f"\n[ok] Results saved to: {output_file}")
 
 
 if __name__ == "__main__":

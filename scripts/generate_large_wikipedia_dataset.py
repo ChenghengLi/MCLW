@@ -23,7 +23,7 @@ from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ltw_watermark.enhanced_mcl import EnhancedMCLGenerator, EnhancedMCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLGenerator, EnhancedMCLDetector
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 

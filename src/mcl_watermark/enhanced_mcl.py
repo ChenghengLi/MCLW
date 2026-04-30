@@ -67,14 +67,17 @@ def generate_transition_matrix(
             matrix[i][1 - (i % 2)] = 1.0
             
     elif chain_key == "soft_cycle":
-        # Soft Cycle Matrix (Definition 3.5 from paper):
-        # T^soft_ij = 0.67 if j ≡ i+1 (mod S), 0.33 if j ≡ i+2 (mod S), 0 otherwise
-        # Properties: stochastic, aperiodic, p_random = 2/S
+        # Soft Cycle Matrix (Example 3.5 / def in paper):
+        # T^soft_ij = 2/3 if j ≡ i+1 (mod S), 1/3 if j ≡ i+2 (mod S), 0 otherwise
+        # Properties: stochastic, aperiodic, doubly stochastic, p_random = 2/S.
+        # Detection only checks whether T_ij > 0, so the specific 2/3 / 1/3 split
+        # affects sampling but not the chain_score; we use exact fractions to
+        # match the paper's Definition exactly.
         for i in range(num_states):
             next1 = (i + 1) % num_states
             next2 = (i + 2) % num_states
-            matrix[i][next1] = 0.67  # Immediate successor
-            matrix[i][next2] = 0.33  # Skip one state
+            matrix[i][next1] = 2.0 / 3.0  # Immediate successor
+            matrix[i][next2] = 1.0 / 3.0  # Skip one state
             
     else:
         # Generate deterministic transitions from key

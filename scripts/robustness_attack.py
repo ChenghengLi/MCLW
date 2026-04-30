@@ -28,7 +28,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from ltw_watermark.enhanced_mcl import EnhancedMCLDetector
+from mcl_watermark.enhanced_mcl import EnhancedMCLDetector
 
 
 def word_level_attack(text: str, modification_rate: float, seed: int = 42) -> str:
@@ -45,7 +45,7 @@ def word_level_attack(text: str, modification_rate: float, seed: int = 42) -> st
 
 
 def token_level_attack(token_ids: List[int], modification_rate: float, replacement_id: int = 0, seed: int = 42) -> List[int]:
-    """Replace a fraction of token IDs with a fixed replacement token."""
+    """Replace a fraction of token IDs with a fixed replacement token (legacy)."""
     rng = random.Random(seed)
     ids = list(token_ids)
     if not ids:
@@ -54,6 +54,22 @@ def token_level_attack(token_ids: List[int], modification_rate: float, replaceme
     indices = rng.sample(range(len(ids)), min(n_modify, len(ids)))
     for i in indices:
         ids[i] = replacement_id
+    return ids
+
+
+def uniform_token_attack(token_ids: List[int], modification_rate: float, vocab_size: int, seed: int = 42) -> List[int]:
+    """Theorem 2's attack model: replace a fraction of token IDs with tokens drawn
+    uniformly at random from the full vocabulary. This is what
+    E[phi] = (1-delta)^2 + k*delta*(2-delta)/S predicts.
+    """
+    rng = random.Random(seed)
+    ids = list(token_ids)
+    if not ids:
+        return ids
+    n_modify = max(0, int(len(ids) * modification_rate))
+    indices = rng.sample(range(len(ids)), min(n_modify, len(ids)))
+    for i in indices:
+        ids[i] = rng.randrange(vocab_size)
     return ids
 
 
@@ -192,6 +208,61 @@ def main():
         del detector
 
     # =========================================================================
+    # UNIFORM TOKEN ATTACK (matches Theorem 2 attack model)
+    # =========================================================================
+    print("\n" + "=" * 80)
+    print("UNIFORM TOKEN ATTACK (Theorem 2 attack model)")
+    print(f"Replace X% of tokens with uniformly random vocab tokens")
+    print("=" * 80)
+
+    vocab_size = tokenizer.vocab_size
+    # Theorem 2 valid-transition count k
+    k = 2 if chain_key == "soft_cycle" else 1
+
+    def theory_phi(delta: float) -> float:
+        return (1 - delta) ** 2 + k * delta * (2 - delta) / num_states
+
+    uniform_results = []
+    for rate in modification_rates:
+        detector = EnhancedMCLDetector(
+            tokenizer_name=args.model,
+            secret_key=secret_key,
+            num_states=num_states,
+            chain_key=chain_key,
+            overlap_ratio=overlap,
+            detection_threshold=0.5,
+        )
+
+        scores = []
+        detected = 0
+        for i, sample in enumerate(samples):
+            token_ids = tokenizer.encode(sample["text"])
+            attacked_ids = uniform_token_attack(token_ids, rate, vocab_size, seed=args.seed + i)
+            attacked_text = tokenizer.decode(attacked_ids, skip_special_tokens=True)
+            result = detector.detect(attacked_text)
+            scores.append(result.chain_score)
+            if result.is_watermarked:
+                detected += 1
+
+        avg_score = float(np.mean(scores))
+        detection_rate = detected / len(samples)
+        predicted = theory_phi(rate)
+        uniform_results.append({
+            "attack": "uniform_token",
+            "modification_rate": rate,
+            "avg_score": avg_score,
+            "theory_predicted_phi": predicted,
+            "abs_error": abs(avg_score - predicted),
+            "detection_rate": float(detection_rate),
+            "n_samples": len(samples),
+            "n_detected": detected,
+        })
+        print(f"  {rate*100:5.0f}% modified: score={avg_score:.4f}, theory={predicted:.4f}, "
+              f"|err|={abs(avg_score - predicted):.4f}, detection={detection_rate*100:.1f}% ({detected}/{len(samples)})")
+
+        del detector
+
+    # =========================================================================
     # SAVE RESULTS
     # =========================================================================
     output = {
@@ -204,6 +275,7 @@ def main():
         "modification_rates": modification_rates,
         "word_level_results": word_results,
         "token_level_results": token_results,
+        "uniform_token_results": uniform_results,
     }
 
     output_file = data_dir / f"robustness_{args.config}.json"
@@ -223,6 +295,9 @@ def main():
     print("-" * 40)
     for r in token_results:
         print(f"{'token':<15} {r['modification_rate']*100:>5.0f}% {r['avg_score']:>8.4f} {r['detection_rate']*100:>7.1f}%")
+    print("-" * 40)
+    for r in uniform_results:
+        print(f"{'uniform_token':<15} {r['modification_rate']*100:>5.0f}% {r['avg_score']:>8.4f} {r['detection_rate']*100:>7.1f}%  (theory={r['theory_predicted_phi']:.4f})")
 
 
 if __name__ == "__main__":

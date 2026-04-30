@@ -1,0 +1,57 @@
+{
+  "config": "states7_overlap0pct",
+  "num_states": 7,
+  "overlap": 0.0,
+  "chain_key": "soft_cycle",
+  "model": "meta-llama/Llama-3.1-8B-Instruct",
+  "method": "backtranslation",
+  "n_samples": 30,
+  "original_avg_score": 0.9899565471511778,
+  "original_detection_rate": 1.0,
+  "results": [
+    {
+      "setting": "backtrans_de",
+      "avg_score": 0.7056189207227846,
+      "detection_rate": 0.9,
+      "n_samples": 30,
+      "n_detected": 27,
+      "score_drop_vs_original": 0.2843376264283931,
+      "examples": [
+        {
+          "original": " The comprehensive analysis of the US Presidents' personality, behavior in public, behavior in public office\n## Warning\n\nPlease note this article will provide information based upon publicly accessibl",
+          "paraphrased": "The comprehensive analysis of the personality of the US presidents, public behavior, public behavior ## Warning Please note that this article provides information on the basis of publicly available in"
+        },
+        {
+          "original": " The life story of the Tesla founder's complex and intriguing personal history with the automotive leader.\n## The Childhood\nBorn in the South African city Cape, on 7 November, 1969 to Justina (born Zi",
+          "paraphrased": "The life story of the complex and fascinating story of the founder of Tesla with the car leader. ## Childhood Born in the South African city of Cape, on November 7, 1969, to Justina (born Zim Pravin R"
+        },
+        {
+          "original": " The genre is not specified, but I'll assume pop.\nFrom the early 20-year-old Taylor Swift to the now 35-year-old global superstar she stands as a phenomenon, Taylor Swift embodies multiple themes of t",
+          "paraphrased": "The genre is not specified, but I accept pop. From the early 20-year-old Taylor Swift to the now 35-year-old global superstar, it stands as a phenomenon, Taylor Swift embodies several themes of pop cu"
+        }
+      ]
+    },
+    {
+      "setting": "backtrans_fr",
+      "avg_score": 0.6720075354855102,
+      "detection_rate": 0.9,
+      "n_samples": 30,
+      "n_detected": 27,
+      "score_drop_vs_original": 0.3179490116656676,
+      "examples": [
+        {
+          "original": " The comprehensive analysis of the US Presidents' personality, behavior in public, behavior in public office\n## Warning\n\nPlease note this article will provide information based upon publicly accessibl",
+          "paraphrased": "The full analysis of the personality of US presidents, behaviour in public, behaviour in the public service ## Disclaimer Please note that this article will provide information based on information ac"
+        },
+        {
+          "original": " The life story of the Tesla founder's complex and intriguing personal history with the automotive leader.\n## The Childhood\nBorn in the South African city Cape, on 7 November, 1969 to Justina (born Zi",
+          "paraphrased": "The history of the Tesla Founder's Complex and the fascinating personal history with the automobile leader. ## Childhood Born in the South African city of Cape, November 7, 1969 in Justina (n\u00e9e Zim Pr"
+        },
+        {
+          "original": " The genre is not specified, but I'll assume pop.\nFrom the early 20-year-old Taylor Swift to the now 35-year-old global superstar she stands as a phenomenon, Taylor Swift embodies multiple themes of t",
+          "paraphrased": "The genre is not specified, but I suppose pop. From the beginning of 20 years Taylor Swift to the age of 35, she presents herself as a phenomenon, Taylor Swift embodies several themes of pop culture. "
+        }
+      ]
+    }
+  ]
+}
