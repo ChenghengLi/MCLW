@@ -14,27 +14,40 @@ regulator nor deployer can set the detection regime in advance.
 \paragraph{Active watermarking.} Green--red-list
 watermarking~\citep{kirchenbauer2023watermark} biases next-token
 logits toward a hashed green list and detects via a $z$-test on
-green-token frequency. The scheme is well-understood but requires
-temperature sampling, degrades under paraphrase, and keeps the
-detection-quality tradeoff inside a single bias magnitude with no
-analytic inversion back to a regulatory parameter.
-\citet{christ2024undetectable} establish the formal quality--security
-frontier for undetectable watermarks; the result bounds what any
-scheme can achieve but does not yield a deployable construction.
-\citet{aaronson2023semstamp} and the SemStamp line embed signals in
-semantic-level features and require LLM queries at detection time,
-foreclosing lightweight third-party audit.
+green-token frequency. The scheme requires temperature sampling
+and degrades under paraphrase, and offers no analytic inversion
+from a regulatory parameter back to a bias magnitude. MCL's
+fingerprint $\phi$ is structurally a Bernoulli($1/S$) $z$-test,
+so the calibration formula~\eqref{eq:calibration} is the analogue
+KGW lacks.
 
-\paragraph{Entropy-adaptive schemes.}
-% FLAG: lee2023sweet citation details (authors/venue/year) are guessed.
-% FLAG: lu2024ewd citation is unverified.
-SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} restrict
-watermarking to \emph{high-entropy} positions, arguing the scheme has
-the most room to inject signal where the model is least committed.
-Our scheme inverts this policy: MCL watermarks at \emph{low}-entropy
-positions, trading on the intuition that near-deterministic tokens
-survive meaning-preserving rewrites at higher rates. We formalize and
-test this inversion (\S\ref{sec:experiments}).
+\paragraph{Distortion-free schemes.}
+\citet{aaronson2023semstamp}'s Gumbel-max construction and
+\citet{kuditipudi2023robust}'s inverse-transform sampling watermark
+are \emph{distortion-free}: they preserve the LM marginal in
+expectation over the key. \citet{christ2024undetectable} prove
+cryptographic indistinguishability under sufficient entropy. These
+schemes beat MCL on quality strictly (zero expected KL versus MCL's
+$\geq \rho \log S$). The trade is that they require either LM
+access or the key sequence at detection time; MCL is the
+distorting alternative that buys model-free third-party audit and
+the closed-form $(\alpha, n, \rho) \mapsto S^\star$ map.
+
+\paragraph{Entropy-adaptive schemes: gates vs.\ detectors.}
+SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} both restrict
+watermarking signal to \emph{high-entropy} positions, but at
+different layers. SWEET applies a binary gate at generation time
+(restricting where the green-list bias is added); EWD weights
+positions by entropy at detection time, approximating the
+log-likelihood ratio of Theorem~\ref{thm:hdd}. MCL is
+gate-agnostic in its mathematical specification: high-entropy,
+low-entropy, and surprisal-gap gates are all admissible. We treat
+the gate as a design parameter and compare the three at matched
+budget (\S\ref{sec:experiments}); low-entropy gating turns out to
+be strictly Pareto-dominated, while high-entropy and surprisal-gap
+gates are statistically equivalent on quality and detection
+probability at $\rho \geq 0.5$. The operational dial is therefore
+the budget $\rho$, not the gate identity.
 
 \paragraph{Technical AI governance.} Article~50 of the EU AI
 Act~\citep{euaiact2024} and the EU's draft Code of Practice on

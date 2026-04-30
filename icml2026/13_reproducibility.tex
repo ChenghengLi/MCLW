@@ -1,0 +1,135 @@
+% 13_reproducibility.tex -- appendix
+\section{Experimental Protocol and Reproducibility}
+\label{app:repro}
+
+This appendix records every setting needed to reproduce the
+matched-budget gate-comparison study of
+Section~\ref{sec:experiments}, the per-cell tables of
+Appendix~\ref{app:results}, and both figures.
+
+\subsection{Generator, tokenizer, and hardware}
+
+\paragraph{Model.} \texttt{google/gemma-3-270m-it} loaded via the
+Hugging Face \texttt{transformers} library at
+\texttt{torch\_dtype=float16} on a single NVIDIA GPU. Generation
+falls back to \texttt{cpu} when \texttt{cuda} is unavailable. The
+tokenizer is the model's default SentencePiece tokenizer.
+Perplexity (PPL) is computed on the same model's logits.
+
+\paragraph{Decoding.} Watermarked positions use greedy argmax over
+the allowed-partition mask (Algorithm~\ref{alg:embed}); ungated positions use
+greedy argmax over the unmasked logits. Pilot calibration of gate
+thresholds uses non-watermarked nucleus sampling at $T=0.7$,
+$p=0.9$.
+
+\paragraph{MCL parameters.} $S = 5$ states, clockwork topology
+$T(s,s') = \mathbb{1}[s' \equiv s{+}1 \pmod{S}]$, secret key fixed
+throughout.
+
+\subsection{Prompt sets}
+
+\paragraph{Wiki ($N{=}173$).} Wikipedia concepts spanning people,
+events, science, geography, technology, and culture. Each concept
+$c$ expands to the fixed template \emph{``Explain $c$ in a
+comprehensive way.''}.
+
+\paragraph{Factual-closed ($N{=}20$).} Single-answer completions
+such as \emph{``The capital of France is''}. Used to test the
+near-deterministic regime.
+
+\subsection{Gate calibration}
+\label{app:repro:calibration}
+
+For each target budget $\rho \in \{0.25, 0.50, 0.75\}$, every
+gate's threshold $\tau$ is fit on a held-out pilot of 32
+unwatermarked generations by quantile-matching, so that the
+realised gate rate on the pilot is within $\pm 0.02$ of $\rho$:
+\begin{align*}
+  G_{H_{\text{high}}}(\tau_H) &: \tau_H = Q_{1-\rho}(H_{\text{pilot}}),\\
+  G_{H_{\text{low}}}(\tau_H)  &: \tau_H = Q_{\rho}(H_{\text{pilot}}),\\
+  G_{\Delta}(\tau_\Delta)     &: \tau_\Delta = Q_{\rho}(\Delta_{\text{pilot}}),
+\end{align*}
+where $Q_q(X)$ is the empirical $q$-quantile of $X$ over the
+pilot's per-position signal. Realised budgets $\bar\rho$ in
+Table~\ref{tab:cells} are computed on the evaluation traces, not on the
+pilot.
+
+\subsection{Setup}
+
+The full design is $2~\text{domains} \times 3~\text{budgets} \times
+3~\text{gates} = 18$ cells. Each cell uses
+$\max\text{-tokens} = 100$, temperature $T = 0.7$ at ungated
+positions, and the calibrated threshold for its gate. Total
+wall-clock $\approx 3$~hours on a single GPU.
+
+\subsection{Paired inference (BCa bootstrap)}
+\label{app:repro:bootstrap}
+
+For each (gate-pair, cell) contrast we compute a paired per-prompt
+delta $\Delta_i = m_A(i) - m_B(i)$ for
+$m \in \{\log\text{PPL}, z, \text{TPR}\}$ and resample $10{,}000$
+times. The 95\% interval is the bias-corrected and accelerated
+(BCa) interval~\citep{lakens2017equivalence}.
+
+\paragraph{TOST equivalence margins.} Pre-registered before the run:
+$\log\text{PPL} \pm 0.05$ ($\leq 5\%$ relative PPL),
+$z \pm 0.5$ (half a detection standard deviation), and
+TPR $\pm 0.05$. A verdict of \textsc{equivalent} requires the entire
+95\% BCa interval to be contained in the margin; otherwise the
+verdict is \textsc{inconclusive} (never ``different''). The four
+TPR-equivalent cells in Table~\ref{tab:equiv} pass trivially because
+their point estimate is exactly zero.
+
+\subsection{Attack protocol}
+
+Each watermarked generation is subjected to two independent
+attacks:
+\begin{itemize}[leftmargin=1.2em, itemsep=1pt, topsep=2pt]
+  \item \textbf{Random substitution} ($\delta = 0.20$): select
+    $\lceil 0.20\,n \rceil$ token positions uniformly at random and
+    replace each with a uniform draw from the vocabulary; re-run
+    Algorithm~\ref{alg:detect}.
+  \item \textbf{WordNet synonym substitution} ($\delta = 0.20$):
+    select $\lceil 0.20\,n \rceil$ word positions at random and
+    replace each content word with a WordNet synonym; non-content
+    words are skipped and the budget is replenished.
+\end{itemize}
+Post-attack $z$ and TPR are reported per cell in
+Table~\ref{tab:cells} under the \texttt{rand20} subscript.
+
+\subsection{Randomisation}
+
+\texttt{random}, \texttt{numpy.random}, and
+\texttt{torch.manual\_seed} are all seeded to 42 at the start of
+each run. Attacks use an independent seed (43). The bootstrap RNG
+is seeded from a per-contrast key derived deterministically from
+the cell descriptor.
+
+\subsection{Released artefacts}
+\label{app:repro:paths}
+
+For each generation we record the prompt, the watermarked output,
+the per-position gate signal, the realised gate rate $\bar\rho$,
+PPL, $\phi$, $z$, and the post-attack $\phi$, $z$, and detection
+flag. All tables and figures derive from these records. Concrete
+data files and the figure-rendering script are released as
+supplementary material.
+
+\begin{table}[h]
+  \centering
+  \caption{Source-of-truth for each artefact.}
+  \label{tab:artefacts}
+  \small
+  \begin{tabular}{ll}
+    \toprule
+    Artefact                                 & Source \\
+    \midrule
+    Figure~\ref{fig:pareto} (Pareto)         & gate-comparison run \\
+    Figure~\ref{fig:theory} (theory vs data) & gate-comparison run \\
+    Table~\ref{tab:cal} (calibration lookup)      & closed-form, Theorem~\ref{thm:detection} \\
+    Table~\ref{tab:cells} (per-cell results)      & gate-comparison run \\
+    Table~\ref{tab:equiv} (TOST verdicts)         & gate-comparison run \\
+    Reference detector                       & Appendix~\ref{app:refimpl} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

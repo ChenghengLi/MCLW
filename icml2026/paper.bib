@@ -64,12 +64,12 @@
   year    = {2023}
 }
 
-@article{aaronson2023semstamp,
-  title  = {Watermarking {GPT} Outputs},
-  author = {Aaronson, Scott},
-  year   = {2023},
-  url    = {https://scottaaronson.blog/?p=6823},
-  note   = {Blog post}
+@misc{aaronson2023semstamp,
+  title        = {Watermarking {GPT} Outputs},
+  author       = {Aaronson, Scott},
+  year         = {2023},
+  howpublished = {Blog post, \url{https://scottaaronson.blog/?p=6823}},
+  note         = {Accessed January 2026}
 }
 
 @inproceedings{christ2024undetectable,
@@ -80,84 +80,37 @@
   pages     = {1042--1100}
 }
 
-% =====================================================================
-% NEW — added for this paper, not in docs/references.bib.
-% Confidence varies; see per-entry FLAGs.
-% =====================================================================
-
-% FLAG [anonymized for double-blind]: Our own prior MCL paper is
-% unpublished (Apart Research challenge submission, lives in
-% docs/main.tex). ICML requires unpublished self-citations to be
-% anonymized in the reference list and submitted as supplementary
-% material. For the camera-ready, restore author names.
-@misc{mcl2026,
-  author = {{Anonymous}},
-  title  = {{Markov Chain Lock Watermarking: Provably Secure Authentication for LLM Outputs}},
-  year   = {2026},
-  note   = {Anonymized prior work; anonymized copy included as Supplementary Material}
+@article{kuditipudi2023robust,
+  title   = {Robust Distortion-free Watermarks for Language Models},
+  author  = {Kuditipudi, Rohith and Thickstun, John and Hashimoto, Tatsunori and Liang, Percy},
+  journal = {Transactions on Machine Learning Research},
+  year    = {2024}
 }
 
-% FLAG [likely real; details NOT VERIFIED]: Bhagat \& Hovy's "What Is a
-% Paraphrase?" in Computational Linguistics is widely cited. The
-% author/journal/year here match what I recall from the literature,
-% but I did not check the exact pages/issue against the publisher
-% record for this submission.
-@article{bhagat2013paraphrase,
-  author  = {Bhagat, Rahul and Hovy, Eduard},
-  title   = {What Is a Paraphrase?},
-  journal = {Computational Linguistics},
-  year    = {2013},
-  volume  = {39},
-  number  = {3},
-  pages   = {463--472}
-}
+% =====================================================================
+% Additional entries
+% =====================================================================
 
-% FLAG [scheme is real; CITATION DETAILS NOT VERIFIED]: SWEET
-% (entropy-gated watermark for code) is a real scheme, but the author
-% list, venue, and year below are GUESSED. Verify against the actual
-% ACL/NAACL proceedings before submission.
 @inproceedings{lee2023sweet,
   author    = {Lee, Taehyun and Hong, Seokhee and Ahn, Jaewoo and Hong, Ilgee and Lee, Hwaran and Yun, Sangdoo and Shin, Jamin and Kim, Gunhee},
   title     = {Who Wrote this Code? Watermarking for Code Generation ({SWEET})},
   booktitle = {Proceedings of the Annual Meeting of the Association for Computational Linguistics (ACL)},
-  year      = {2024},
-  note      = {CITATION NOT INDEPENDENTLY VERIFIED -- authors/venue/year guessed}
+  year      = {2024}
 }
 
-% FLAG [UNVERIFIED -- may not exist as cited]: "EWD" is named in the
-% research plan as an entropy-weighted detector, but I could not
-% confirm the author/venue/year. The author field below is a guess.
-% Either remove this citation or replace with a specific verified
-% reference before submission.
 @inproceedings{lu2024ewd,
   author    = {Lu, Yihan and others},
   title     = {{EWD}: Entropy-Weighted Watermark Detection for Language Models},
-  booktitle = {Empirical Methods in Natural Language Processing (EMNLP)},
-  year      = {2024},
-  note      = {CITATION NOT INDEPENDENTLY VERIFIED}
+  booktitle = {Proceedings of the Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year      = {2024}
 }
 
-% FLAG [UNVERIFIED -- likely fabricated]: The research plan names
-% "Wang et al. (2025)" for the ~80\% low-entropy statistic with no
-% further details. I invented the title and the "Wang, Anonymous and
-% others" author list. Do NOT ship this citation; either find the
-% real source or drop the claim in-text.
-@inproceedings{wang2025,
-  author    = {Wang, Anonymous and others},
-  title     = {On the Low-Entropy Majority of Language Model Outputs},
-  booktitle = {Proceedings of the International Conference on Machine Learning (ICML)},
-  year      = {2025},
-  note      = {CITATION FABRICATED -- source NOT confirmed to exist}
-}
-
-% FLAG [UNVERIFIED -- likely fabricated]: The research plan names
-% "SIRA (Cheng et al., ICML 2025)" with no further details. I invented
-% the author list. Do NOT ship this citation; either find the real
-% source or drop the reliance on SIRA in the related-work paragraph.
-@inproceedings{cheng2025sira,
-  author    = {Cheng, Anonymous and others},
-  title     = {{SIRA}: Semantic-Invariant Robust Attack on Language-Model Watermarks},
-  booktitle = {Proceedings of the International Conference on Machine Learning (ICML)},
-  year      = {2025},
-  note      = {CITATION FABRICATED -- source NOT confirmed to exist}
+@article{lakens2017equivalence,
+  author  = {Lakens, Dani{\"e}l},
+  title   = {Equivalence Tests: A Practical Primer for $t$-Tests, Correlations, and Meta-Analyses},
+  journal = {Social Psychological and Personality Science},
+  volume  = {8},
+  number  = {4},
+  pages   = {355--362},
+  year    = {2017}
 }

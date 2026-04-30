@@ -1,0 +1,48 @@
+{
+  "run": "v5_baseline_N200",
+  "model": "google/gemma-3-270m-it",
+  "n_wiki": 176,
+  "n_factual": 20,
+  "max_tokens": 100,
+  "temperature": 0.7,
+  "num_states": 5,
+  "chain_key": "clockwork",
+  "secret_key": "mclw_v4_2026",
+  "alpha": 0.01,
+  "seed": 42,
+  "elapsed_s": 771.82,
+  "timestamp": "2026-04-25T01:25:07",
+  "wiki": {
+    "n": 173,
+    "mean_ppl": 2.061244052384394,
+    "std_ppl": 0.3730947382135347,
+    "mean_phi": 0.18070882232731944,
+    "mean_z": -0.4798619857827223,
+    "fpr": 0.0,
+    "mean_n_tokens": 100.0,
+    "min_ppl": 1.382952739794628,
+    "max_ppl": 3.3790450375748495
+  },
+  "factual": {
+    "n": 20,
+    "mean_ppl": 1.6893532317895854,
+    "std_ppl": 0.3755901848133884,
+    "mean_phi": 0.18535353535353533,
+    "mean_z": -0.36432620803146476,
+    "fpr": 0.0,
+    "mean_n_tokens": 100.0,
+    "min_ppl": 1.1543705414562861,
+    "max_ppl": 2.5739903821689576
+  },
+  "combined": {
+    "n": 193,
+    "mean_ppl": 2.0227061435144655,
+    "std_ppl": 0.38932403427037343,
+    "mean_phi": 0.18119013973936254,
+    "mean_z": -0.46788936632663336,
+    "fpr": 0.0,
+    "mean_n_tokens": 100.0,
+    "min_ppl": 1.1543705414562861,
+    "max_ppl": 3.3790450375748495
+  }
+}

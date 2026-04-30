@@ -22,3 +22,6 @@ wheels/
 
 # Claude Code local state
 .claude/
+
+# macOS
+.DS_Store

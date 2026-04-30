@@ -1,117 +1,291 @@
-% introduction.tex -- included from paper.tex via \input{introduction}
+% 02_introduction.tex
 \section{Introduction}
 \label{sec:intro}
 
-Regulatory regimes are now committing to machine-readable marking of
-AI-generated content. EU AI Act Article~50~\citep{euaiact2024}, with
-enforcement beginning August 2026, mandates that providers of
-generative AI systems embed detectable signals in their outputs;
-parallel requirements appear in the OECD Hiroshima
-Process~\citep{oecdhiroshima2024} and in the EU's draft Code of
-Practice on Transparency of AI-Generated
-Content~\citep{eucodepractice2025}. The question these regimes leave
-unspecified is \emph{what counts as compliance}: at what false
-positive rate, for what text length, at what quality cost.
+EU AI Act Article~50~\citep{euaiact2024} requires a machine-readable
+mark on AI-generated text by August 2026. It does not say what
+counts as marked: which false-positive rate, which text length,
+which quality cost.
+Existing schemes do not fill the gap. Logit-bias
+watermarks~\citep{kirchenbauer2023watermark} tune a bias and a
+green-list size by grid search.
+Undetectability-frontier results~\citep{christ2024undetectable}
+bound what any scheme can achieve, but yield no deployable
+construction. Passive
+detection~\citep{mitchell2023detectgpt,tian2023gptzero} has no
+controllable frontier at all.
 
-\paragraph{The tradeoff that no one is naming.}
-Active watermarking schemes sit on a multidimensional frontier among
-detection power, robustness to modification, text-quality cost, and
-generation-time complexity. Current deployments choose a point on this
-frontier privately. A regulator who writes ``outputs shall be marked''
-has no mechanism to specify \emph{where} on the frontier to sit, and
-an auditor has no basis on which to evaluate a deployer's choice. The
-consequence is that Article~50 is straightforward to comply with
-\emph{nominally} (mark something, anything) and essentially
-unauditable \emph{substantively}.
+\begin{figure*}[t]
+  \centering
+  \begin{tikzpicture}[
+    x=1cm, y=1cm,
+    paneltitle/.style={font=\small\bfseries, anchor=base, inner sep=0pt,
+                       text=black!85},
+    paneltitlewest/.style={font=\small\bfseries, anchor=base west,
+                           inner sep=0pt, text=black!85},
+    axisline/.style={black!60, line width=0.4pt},
+    gridline/.style={black!12, line width=0.3pt, dotted},
+    pt/.style={circle, draw=black!55, line width=0.4pt,
+               minimum size=2.2mm, inner sep=0pt},
+    bigpt/.style={circle, draw=black!50, line width=0.45pt,
+                  minimum size=4.5mm, inner sep=0pt},
+    wmline/.style={line width=1.4pt, green!55!black,
+                   line cap=round, line join=round},
+    rndline/.style={line width=1.4pt, red!75!black, dashed,
+                    line cap=round, line join=round},
+    yticklbl/.style={font=\scriptsize, anchor=east, inner sep=1.5pt},
+    xticklbl/.style={font=\scriptsize, anchor=north, inner sep=1.5pt},
+    axislabel/.style={font=\footnotesize, color=black!75},
+    score/.style={font=\normalsize\bfseries, anchor=west, inner sep=0pt},
+    flowarr/.style={->, line width=0.9pt, black!75,
+                    >={Stealth[length=2.6mm,width=2mm]}},
+  ]
+    \definecolor{c0}{HTML}{E15A5A}
+    \definecolor{c1}{HTML}{F0A030}
+    \definecolor{c2}{HTML}{E8C12F}
+    \definecolor{c3}{HTML}{4FAE5C}
+    \definecolor{c4}{HTML}{4A8FD3}
 
-Existing watermarking approaches do not fix this. Passive
-detection~\citep{mitchell2023detectgpt,tian2023gptzero} reads
-statistical traces in the text and suffers high false positive rates
-on technical prose, with no controllable frontier at all.
-Green--red-list watermarking~\citep{kirchenbauer2023watermark} biases
-logits during generation but requires temperature sampling and
-degrades under paraphrase~\citep{krishna2023paraphrasing}. Schemes
-establishing the undetectability
-frontier~\citep{christ2024undetectable} are informative bounds but
-not directly deployable. None expose a calibration map from
-regulatory parameters to deployed configuration.
+    % ===================================================================
+    % Three-panel horizontal pipeline:
+    %   A. clockwork (the hook, dominant visual)
+    %   B. generation step (logits -> mask -> token)
+    %   C. detection (watermarked vs random sequences + verdict)
+    %
+    % uniform header baseline at y = 4.95
+    % uniform content vertical band roughly y in [0.4, 4.4]
+    % ===================================================================
 
-\paragraph{Markov Chain Lock watermarking.}
-We present \emph{Markov Chain Lock} (MCL) watermarking: a scheme
-that partitions the vocabulary into $S$ states via
-$\sigma_k(t) = H(k \,\|\, t) \bmod S$ (SHA-256) and constrains
-generation to follow a clockwork transition $s \to (s+1) \bmod S$.
-Watermarking is \emph{entropy-gated}: the constraint applies only at
-positions where the model is confident, leaving high-entropy positions
-unconstrained so that the generator's expressive budget is spent on
-positions where fluency is decided. The scheme has three properties
-that suit it to operationalising Article~50:
-\begin{itemize}[nosep, leftmargin=*]
-  \item \textbf{Model-free detection.} Verification maps each token to
-    a state via the shared key and counts valid transitions in $O(n)$
-    hash operations. A third-party auditor needs neither the original
-    model nor a proxy LM.
-  \item \textbf{Exponential FPR.} A watermarked sequence has score
-    $1$ by construction; random sequences have score $1/S$ with
-    Hoeffding bound $\exp(-2(n-1)(\tau - 1/S)^2)$ on the FPR.
-  \item \textbf{Greedy decoding compatibility.} The constraint is a
-    logit mask, not a temperature bias, so generation remains
-    deterministic.
-\end{itemize}
+    % =========== PANEL A: clockwork ring (dominant hook) ===========
+    %    column x in [0, 3.6], donut centred at (1.80, 2.55)
+    \node[paneltitle] at (1.80, 4.95) {\large A.~Clockwork chain};
+    \node[font=\footnotesize, color=black!75, anchor=base]
+      at (1.80, 4.30)
+      {$\sigma_k(t) = \mathrm{SHA\text{-}256}(k\,\Vert\,t)\bmod S$};
 
-\paragraph{Calibration: the regulatory knob.}
-The core analytical result is a closed-form mapping from deployment
-regime to configuration. Under the null, the detection $z$-score is
-$z = (\rho/2)\sqrt{(S-1)(n-1)}$ where $\rho$ is the watermark
-fraction. Inverting for the minimum $S$ at which a target FPR $\alpha$
-is met gives
-\begin{equation}
-  S^\star(n, \rho, \alpha)
-    = \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
-  \label{eq:calibration-intro}
-\end{equation}
-A regulator choosing a target FPR $\alpha$ and a text-length floor
-$n_{\min}$ reads off a unique minimum configuration; a deployer can
-only adjust $\rho$ upward, trading quality for margin, but cannot
-undercut detection. This is, we argue, the regulatory knob Article~50
-has been missing.
+    \begin{scope}[shift={(1.80, 2.30)}]
+      % ring sectors (outer 1.45, inner 0.65 -> wider colour band)
+      \foreach \i [evaluate=\i as \stt using {90 - \i*72},
+                   evaluate=\i as \fin using {90 - (\i+1)*72}] in {0,1,2,3,4} {
+        \fill[c\i!55, draw=black!45, line width=0.45pt]
+          (\stt:1.45) arc[start angle=\stt, end angle=\fin, radius=1.45]
+          -- (\fin:0.65) arc[start angle=\fin, end angle=\stt, radius=0.65]
+          -- cycle;
+      }
+      \draw[black!25, line width=0.3pt] (0,0) circle (1.45);
+      \draw[black!25, line width=0.3pt] (0,0) circle (0.65);
+      \foreach \i [evaluate=\i as \mid using {90 - (\i+0.5)*72}] in {0,1,2,3,4} {
+        \node[font=\small\bfseries, color=black!85]
+          at (\mid:1.05) {$\mathcal V_{\i}$};
+      }
+      % bold clockwise rotation indicator in the inner hole.
+      % Sweeps 330 deg clockwise from upper-right (60 deg) down and
+      % around to the top (90 deg in normal coords, -270 here). The
+      % arrowhead therefore sits at the TOP of the circle and points
+      % RIGHT -- the canonical "refresh / rotate clockwise" symbol.
+      \draw[->, line width=2pt, black!85, line cap=round,
+            >={Stealth[length=3.6mm,width=3mm,inset=0.4mm]}]
+        (60:0.45) arc[start angle=60, end angle=-270, radius=0.45];
+    \end{scope}
 
-\paragraph{Contributions.}
+    % =========== PANEL B: one generation step (vertical flow) ===========
+    %    column x in [4.0, 8.2], centre at x = 6.10
+    %    vertical flow: [raw logits] -> mask -> [masked logits] -> argmax -> token
+    \node[paneltitle] at (6.10, 4.95) {\large B.~Generation step};
+
+    % --- (1) raw LM logits as 5 coloured bars (at top of the panel) ---
+    \node[font=\scriptsize, color=black!70, anchor=base]
+      at (6.10, 4.30) {LM logits};
+    \foreach \i/\xx/\h in {0/5.00/0.55, 1/5.38/0.30, 2/5.76/0.45,
+                            3/6.14/0.65, 4/6.52/0.25} {
+      \draw[fill=c\i!75, draw=black!45, line width=0.4pt]
+        (\xx, 3.55) rectangle (\xx + 0.28, 3.55 + \h);
+    }
+    \draw[axisline] (4.95, 3.55) -- (6.90, 3.55);
+
+    % --- downward arrow labelled "mask V_{s+1}" ---
+    \draw[flowarr] (6.10, 3.45) -- (6.10, 2.95)
+       node[midway, right, font=\scriptsize, color=black!75]
+       {mask $\mathcal V_{s+1}$};
+
+    % --- (2) masked logits: only V_3 retained, others faded ---
+    \foreach \i/\xx/\h in {0/5.00/0.55, 1/5.38/0.30, 2/5.76/0.45,
+                            3/6.14/0.65, 4/6.52/0.25} {
+      \draw[fill=c\i!75, draw=black!45, line width=0.4pt,
+            opacity=0.18] (\xx, 2.20) rectangle (\xx + 0.28, 2.20 + \h);
+    }
+    % highlight V_3 (target partition, for example state s=2 -> s+1=3)
+    \draw[fill=c3!75, draw=black!60, line width=0.7pt]
+        (6.14, 2.20) rectangle (6.14 + 0.28, 2.20 + 0.65);
+    \draw[axisline] (4.95, 2.20) -- (6.90, 2.20);
+
+    % --- downward arrow labelled "arg max" ---
+    \draw[flowarr] (6.10, 2.10) -- (6.10, 1.60)
+       node[midway, right, font=\scriptsize, color=black!75]
+       {$\arg\max$};
+
+    % --- (3) output token chip in V_3 ---
+    \node[bigpt, fill=c3!85] (toknext) at (6.10, 1.30) {};
+    \node[font=\scriptsize, color=black!75, anchor=base]
+      at (6.10, 0.85) {$t_{i+1} \in \mathcal V_{3}$};
+
+    % =========== PANEL C: detection  (two stacked sequence plots) ===========
+    %    Taller plots (y_step=0.30, height 1.20) for visual weight;
+    %    symmetric around the mid-figure line so both plots feel balanced
+    %    with the donut in Panel A.
+    \def\xstep{0.55}
+    \def\ystep{0.30}
+    \def\plotL{9.90}
+    \def\plotR{14.85}
+    \def\plotw{4.95}
+    \def\ploth{1.20}
+    \def\pcen{0.60}   % y-offset from bot to centre of plot
+    % title centred over the two stacked plots
+    \node[paneltitle] at (\plotL + \plotw/2, 4.95)
+      {\large C.~Detection by clockwork validity};
+
+    % WATERMARKED plot at y in [3.20, 4.40]
+    \def\wmbot{3.20}
+    \def\wmtop{4.40}
+    \node[font=\scriptsize\bfseries, color=green!45!black, anchor=base]
+      at (\plotL + \plotw/2, \wmtop + 0.18)
+      {Watermarked text:};
+
+    \foreach \s in {0,1,2,3,4} {
+      \draw[gridline] (\plotL, \wmbot + \s*\ystep) -- (\plotR, \wmbot + \s*\ystep);
+    }
+    \draw[axisline] (\plotL, \wmbot) -- (\plotR + 0.05, \wmbot);
+    \draw[axisline] (\plotL, \wmbot) -- (\plotL, \wmtop + 0.05);
+    \foreach \s in {0,1,2,3,4} {
+      \node[yticklbl] at (\plotL - 0.05, \wmbot + \s*\ystep) {$\s$};
+    }
+    \node[axislabel, rotate=90, anchor=south]
+      at (\plotL - 0.30, \wmbot + \pcen) {state};
+
+    \draw[wmline]
+      (\plotL + 0*\xstep, \wmbot + 0*\ystep)
+      -- (\plotL + 1*\xstep, \wmbot + 1*\ystep)
+      -- (\plotL + 2*\xstep, \wmbot + 2*\ystep)
+      -- (\plotL + 3*\xstep, \wmbot + 3*\ystep)
+      -- (\plotL + 4*\xstep, \wmbot + 4*\ystep)
+      -- (\plotL + 5*\xstep, \wmbot + 0*\ystep)
+      -- (\plotL + 6*\xstep, \wmbot + 1*\ystep)
+      -- (\plotL + 7*\xstep, \wmbot + 2*\ystep)
+      -- (\plotL + 8*\xstep, \wmbot + 3*\ystep)
+      -- (\plotL + 9*\xstep, \wmbot + 4*\ystep);
+    \foreach \i/\s in {0/0,1/1,2/2,3/3,4/4,5/0,6/1,7/2,8/3,9/4} {
+      \node[pt, fill=c\s!85] at (\plotL + \i*\xstep, \wmbot + \s*\ystep) {};
+    }
+    \node[score, color=green!42!black]
+      at (\plotR + 0.15, \wmbot + \pcen) {$\phi = 1$};
+
+    % RANDOM plot at y in [1.00, 2.20]
+    \def\rndbot{1.00}
+    \def\rndtop{2.20}
+    \node[font=\scriptsize\bfseries, color=red!60!black, anchor=base]
+      at (\plotL + \plotw/2, \rndtop + 0.18)
+      {Random text:};
+
+    \foreach \s in {0,1,2,3,4} {
+      \draw[gridline] (\plotL, \rndbot + \s*\ystep) -- (\plotR, \rndbot + \s*\ystep);
+    }
+    \draw[axisline] (\plotL, \rndbot) -- (\plotR + 0.05, \rndbot);
+    \draw[axisline] (\plotL, \rndbot) -- (\plotL, \rndtop + 0.05);
+    \foreach \s in {0,1,2,3,4} {
+      \node[yticklbl] at (\plotL - 0.05, \rndbot + \s*\ystep) {$\s$};
+    }
+    \node[axislabel, rotate=90, anchor=south]
+      at (\plotL - 0.30, \rndbot + \pcen) {state};
+
+    \node[xticklbl] at (\plotL,                 \rndbot - 0.10) {$1$};
+    \node[xticklbl] at (\plotL + 4.5*\xstep,    \rndbot - 0.10) {$\cdots$};
+    \node[xticklbl] at (\plotL + 9*\xstep,      \rndbot - 0.10) {$n$};
+    \node[axislabel, anchor=base]
+      at (\plotL + \plotw/2, \rndbot - 0.55) {token index $i$};
+
+    \draw[rndline]
+      (\plotL + 0*\xstep, \rndbot + 3*\ystep)
+      -- (\plotL + 1*\xstep, \rndbot + 0*\ystep)
+      -- (\plotL + 2*\xstep, \rndbot + 2*\ystep)
+      -- (\plotL + 3*\xstep, \rndbot + 4*\ystep)
+      -- (\plotL + 4*\xstep, \rndbot + 1*\ystep)
+      -- (\plotL + 5*\xstep, \rndbot + 3*\ystep)
+      -- (\plotL + 6*\xstep, \rndbot + 0*\ystep)
+      -- (\plotL + 7*\xstep, \rndbot + 4*\ystep)
+      -- (\plotL + 8*\xstep, \rndbot + 2*\ystep)
+      -- (\plotL + 9*\xstep, \rndbot + 1*\ystep);
+    \foreach \i/\s in {0/3,1/0,2/2,3/4,4/1,5/3,6/0,7/4,8/2,9/1} {
+      \node[pt, fill=c\s!85] at (\plotL + \i*\xstep, \rndbot + \s*\ystep) {};
+    }
+    \node[score, color=red!60!black]
+      at (\plotR + 0.15, \rndbot + \pcen) {$\phi \approx 1/S$};
+
+    % ----- short flow arrows between panels, centred in the gaps -----
+    %   A->B: gap center x ~ 4.10; arrow 0.60 cm long
+    %   B->C: gap center x ~ 8.40; arrow 0.80 cm long
+    \draw[flowarr] (3.80, 2.30) -- (4.40, 2.30);
+    \draw[flowarr] (8.00, 2.30) -- (8.80, 2.30)
+       node[midway, above, font=\scriptsize, color=black!60]
+       {append $t_{i+1}$};
+  \end{tikzpicture}
+  \caption{\textbf{How Markov Chain Lock works.}
+    \textbf{(A)}~A keyed SHA-256 hash $\sigma_k$ partitions the
+    vocabulary into $S{=}5$ disjoint sets $\mathcal V_0, \dots,
+    \mathcal V_{S{-}1}$ ordered into a clockwork cycle
+    $s \to s{+}1 \bmod S$.
+    \textbf{(B)}~At a watermarked position with current state $s$,
+    the language-model logits are masked to keep only the next
+    partition $\mathcal V_{s+1}$, and the next token is the masked
+    $\arg\max$.
+    \textbf{(C)}~Detection re-derives every token's state from $k$
+    in $O(n)$ hash operations: a watermarked sequence walks the
+    chain by construction (top, $\phi = 1$), whereas unwatermarked
+    text visits states uniformly and is valid only at rate $1/S$
+    in expectation (bottom).}
+  \label{fig:mcl_teaser}
+\end{figure*}
+
+We answer with \emph{Markov Chain Lock} (MCL) watermarking. MCL
+sorts the vocabulary into $S$ colour-coded sets via a keyed
+SHA-256 hash and forces a fraction $\rho$ of generated tokens to
+walk a fixed cycle through those sets
+(Figure~\ref{fig:mcl_teaser}). Detection re-derives every token's
+colour from the key in $O(n)$ hash operations and counts how often
+consecutive tokens follow the cycle. Two properties make the scheme
+attractive for governance. First, detection runs without any
+language-model access, so a third-party auditor needs neither the
+provider's weights nor a proxy LM. Second, the detection bound
+inverts in closed form to a calibration map: a regulator who fixes
+a target false-positive rate $\alpha$ and a text-length floor
+$n_{\min}$ reads off the minimum admissible state count
+(Theorem~\ref{thm:detection}); a deployer can spend more budget for
+margin but cannot cheat below the regulator's specification.
+
+The choice of \emph{which} positions to watermark is left as a
+design parameter and studied empirically. On Google's Gemma~3
+270M model across 18 matched-budget cells
+(three gates $\times$ three budgets $\times$ two domains), we find
+that low-entropy gating, the policy implicit in
+SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd}, is strictly
+Pareto-dominated; that detection is gate-invariant at $\rho \geq
+0.5$; and that the empirical post-attack scaling matches the
+predicted $0.64$ on every cell. The operational dial is the budget
+$\rho$, not the gate identity.
+
+\textbf{Contributions.}
 \begin{enumerate}[nosep, leftmargin=*]
-  \item An end-to-end active watermarking scheme (MCL) with
-    SHA-256 state partitioning, clockwork transitions, entropy-gated
-    embedding (\S\ref{sec:method}), and model-free $O(n)$ detection.
-  \item A calibration formula (\cref{eq:calibration-intro}) derived
-    from a generalized detection bound $z = (\rho/2)\sqrt{(S-1)(n-1)}$
-    (Thm.~\ref{thm:detection}), mapping regulatory parameters to
-    deployed configurations.
-  \item A universal robustness threshold
-    $\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$
-    (Thm.~\ref{thm:robustness}) at which detection crosses the
-    midpoint, independent of $S$, $\rho$, and $n$ -- a
-    scheme-independent floor regulators can reference directly.
-  \item A Neyman--Pearson optimal entropy-weighted detector
-    (Thm.~\ref{thm:hdd}) that strictly dominates the model-free
-    detector when the entropy profile is observable, and a
-    self-healing theorem (Thm.~\ref{thm:healing}) showing each
-    adversarial modification contributes $1/S$ in expectation to the
-    valid-transition count.
-  \item An experimental program (\S\ref{sec:experiments}) with one
-    critical test: whether low-entropy tokens survive paraphrasing at
-    higher rates than high-entropy ones.
-    % FLAG: lee2023sweet / lu2024ewd citations are unverified.
-    If yes, entropy gating is also a robustness win and the
-    SWEET~\citep{lee2023sweet}~/~EWD~\citep{lu2024ewd} heuristic
-    (watermark the high-entropy tokens) is inverted; if no, we revise
-    the robustness claim accordingly.
+  \item A discrete, hard-constraint watermarking primitive (MCL)
+    with cryptographic state partitions, clockwork transitions, and
+    $O(n)$ model-free detection (Section~\ref{sec:method}).
+  \item A closed-form calibration formula
+    (Theorem~\ref{thm:detection}) and a universal robustness
+    threshold $\delta^\star = 1 - 1/\sqrt{2}$ under the midpoint
+    decision convention (Theorem~\ref{thm:robustness}), strengthened
+    to every oracle-blind adversary by self-healing
+    (Theorem~\ref{thm:healing}); both identities extend to any
+    $k$-regular doubly-stochastic transition topology
+    (Proposition~\ref{prop:kregular}).
+  \item Empirical evidence that low-entropy gating is dominated and
+    that detection is gate-invariant at practical budgets
+    (Section~\ref{sec:experiments}).
 \end{enumerate}
-
-\paragraph{Governance framing.}
-The contribution is as much about \emph{operationalising} Article~50
-as it is about watermarking. The calibration formula turns an opaque
-deployer choice into a two-number policy specification
-$(\alpha, n_{\min})$ that an auditor can check. The model-free
-$O(n)$ detector makes that audit feasible without model access. And
-the universal $\delta^\star$ gives regulators a scheme-independent
-robustness benchmark. \S\ref{sec:discussion} lays out a minimum viable
-Article~50 specification in concrete numbers.

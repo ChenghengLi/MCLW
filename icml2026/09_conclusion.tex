@@ -1,17 +1,22 @@
 % 09_conclusion.tex
 \section{Conclusion}
 
-MCL watermarking makes the Article~50 detection-quality tradeoff
-analytically explicit via the calibration formula
-$S^\star = \lceil 4 z_\alpha^2 / (\rho^2 (n-1)) + 1 \rceil$, and pins
-down its robustness floor at a scheme-independent
-$\delta^\star \approx 29.3\%$. Detection is model-free and runs in
-$O(n)$ hash operations, enabling third-party audit without LM
-access. The remaining empirical question is whether low-entropy
-tokens enjoy higher survival rates under meaning-preserving rewrite
-than high-entropy ones -- inverting the conventional entropy-adaptive
-heuristic. The answer, produced by E4, decides whether entropy gating
-is a pure quality win or also a robustness win. Either way, the
-policy-to-configuration map does not depend on the outcome: MCL
-remains the first watermarking scheme to expose Article~50's
-implicit parameters as a calibration law.
+MCL watermarking turns the detection-quality tradeoff into a
+closed-form policy-to-configuration map: a target false-positive
+rate, a text-length floor, and a watermark budget determine the
+minimum state count uniquely. The scheme inherits a scheme-independent robustness floor
+$\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$ (under the midpoint
+threshold convention), and both identities extend to every
+$k$-regular transition topology (Prop.~\ref{prop:kregular}). Detection is model-free and runs in
+$O(n)$ hash operations, enabling third-party audit without model
+access.
+
+Empirically, a matched-budget comparison across 18 cells on
+\texttt{google/gemma-3-270m-it} finds that low-entropy gating is
+strictly Pareto-dominated, that detection is gate-invariant at
+$\rho \geq 0.5$, and that the predicted $(1-\delta)^2$ self-healing
+scaling holds on every cell to within sampling noise. The practical
+implication is that the operational dial for a regulated MCL
+deployment is the budget $\rho$, not a gating heuristic. The
+SWEET/EWD intuition, concentrate the watermark at near-deterministic
+positions, wins on neither quality nor robustness.

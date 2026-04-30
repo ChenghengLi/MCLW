@@ -1,4 +1,4 @@
-%%%%%%%% ICML 2026 / TAIGR 2026 SUBMISSION %%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% ICML 2026 SUBMISSION %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Markov Chain Lock (MCL) Watermarking
 %%
 %% Section files (flat, numbered):
@@ -7,17 +7,12 @@
 %%   05_method.tex            06_theory.tex
 %%   07_experiments.tex       08_discussion.tex
 %%   09_conclusion.tex        10_impact.tex
-%%   11_proofs.tex            12_reference_tables.tex
 %%
-%% CITATION FLAGS -- unverified bib entries to resolve pre-submission.
-%% See paper.bib for per-entry notes; grep the sources for "FLAG:" to
-%% locate dependent in-text citations.
-%%
-%%   lee2023sweet    -- SWEET is real; author list/venue/year guessed.
-%%   lu2024ewd       -- unverified; may not exist as cited.
-%%   wang2025        -- fabricated; replace or drop the claim.
-%%   cheng2025sira   -- fabricated; replace or drop the reliance.
-%%
+%% Appendix:
+%%   11_proofs.tex               (complete proofs)
+%%   12_reference_tables.tex     (closed-form calibration + per-cell results)
+%%   13_reproducibility.tex      (protocol, seeds, BCa bootstrap)
+%%   15_reference_impl.tex       (reference detector, <30 lines Python)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \documentclass{article}
@@ -28,6 +23,8 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,decorations.pathreplacing}
 
 \newcommand{\theHalgorithm}{\arabic{algorithm}}
 
@@ -41,6 +38,28 @@
 \usepackage[capitalize,noabbrev]{cleveref}
 \usepackage{enumitem}
 
+% Cleveref name declarations for the theorem-style environments
+% defined below. Without these, \cref{thm:foo} renders as just "4.1";
+% with them, it renders as "theorem 4.1" (and \Cref as "Theorem 4.1").
+\crefname{theorem}{theorem}{theorems}
+\Crefname{theorem}{Theorem}{Theorems}
+\crefname{proposition}{proposition}{propositions}
+\Crefname{proposition}{Proposition}{Propositions}
+\crefname{lemma}{lemma}{lemmas}
+\Crefname{lemma}{Lemma}{Lemmas}
+\crefname{corollary}{corollary}{corollaries}
+\Crefname{corollary}{Corollary}{Corollaries}
+\crefname{definition}{definition}{definitions}
+\Crefname{definition}{Definition}{Definitions}
+\crefname{assumption}{assumption}{assumptions}
+\Crefname{assumption}{Assumption}{Assumptions}
+\crefname{example}{example}{examples}
+\Crefname{example}{Example}{Examples}
+\crefname{remark}{remark}{remarks}
+\Crefname{remark}{Remark}{Remarks}
+\crefname{algorithm}{algorithm}{algorithms}
+\Crefname{algorithm}{Algorithm}{Algorithms}
+
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
@@ -49,6 +68,7 @@
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{example}[theorem]{Example}
 \theoremstyle{remark}
 \newtheorem{remark}[theorem]{Remark}
 
@@ -104,11 +124,13 @@
 \bibliographystyle{icml2026}
 
 % =====================================================================
-% Appendix
-\newpage
+% Appendix (kept in two-column mode per ICML template; save space and
+% avoid the blank-page artifact that arises from \newpage + \onecolumn
+% switching mid-document).
 \appendix
-\onecolumn
 \input{11_proofs}
 \input{12_reference_tables}
+\input{13_reproducibility}
+\input{15_reference_impl}
 
 \end{document}

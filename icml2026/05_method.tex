@@ -11,7 +11,7 @@ selecting where to enforce the transition.
 \begin{definition}[State assignment]
   \label{def:state}
   For key $k$ and state count $S \in \mathbb{N}$, define
-  $\sigma_k(t) = H(k \,\|\, t) \bmod S$. This induces a partition
+  $\sigma_k(t) = \mathcal{H}(k \,\|\, t) \bmod S$. This induces a partition
   $\mathcal{V} = \bigsqcup_{s=0}^{S-1} \mathcal{V}_s$ with
   $\mathcal{V}_s = \{t \in \mathcal{V} : \sigma_k(t) = s\}$.
 \end{definition}
@@ -32,25 +32,44 @@ The clockwork is deterministic (each state has exactly one legal
 successor), periodic of period $S$, and has uniform stationary
 distribution $\pi^\star = (1/S, \ldots, 1/S)$. Among $S$-state
 irreducible deterministic transition matrices, clockwork minimises the
-random-baseline validity $1/S$ -- maximising the detection gap.
+random-baseline validity $1/S$, maximising the detection gap.
 
-\subsection{Entropy gate}
+\subsection{Position gates}
+\label{subsec:gates}
 
 At each generation step, MCL decides whether to enforce the clockwork
-transition based on the model's confidence at that position.
+transition based on a position-gate $g_i \in \{0,1\}$; the
+\emph{watermark budget} is
+$\rho = \mathbb{E}_i[g_i] \in [0, 1]$. Let
+$H_i = -\sum_t p_i(t) \log p_i(t)$ denote the next-token entropy and
+$\Delta_i = p_i^{(1)} - p_i^{(2)}$ the \emph{surprisal gap} between
+the top-two probabilities.
 
-\begin{definition}[Entropy gate]
+\begin{definition}[Gate family]
   \label{def:gate}
-  Given an entropy threshold $\tau_H$, the gate at position $i$ is
-  $g_i = \mathbb{1}[H_i < \tau_H]$. The watermark fraction is the
-  expected proportion of gated positions,
-  $\rho = \mathbb{E}_i[g_i] \in [0, 1]$.
+  We consider four deterministic gates parameterised by a threshold
+  $\tau$:
+  \begin{align*}
+    G_{\text{all}}:\;     & g_i = 1, \\
+    G_{H_{\text{high}}}(\tau):\;  & g_i = \mathbb{1}[H_i > \tau], \\
+    G_{H_{\text{low}}}(\tau):\;   & g_i = \mathbb{1}[H_i < \tau], \\
+    G_{\Delta}(\tau):\;   & g_i = \mathbb{1}[\Delta_i < \tau].
+  \end{align*}
+  $G_{\text{all}}$ recovers the non-gated variant.
+  $G_{H_{\text{high}}}$ watermarks the model's uncertain positions;
+  $G_{H_{\text{low}}}$ is the SWEET/EWD heuristic, which concentrates
+  the mask where the LM's own distribution is narrow;
+  $G_{\Delta}$ selects positions with near-tied top-2 candidates,
+  where greedy-decoding regret from substituting the argmax is
+  bounded pointwise by $\Delta_i$.
 \end{definition}
 
-Setting $\tau_H = \infty$ recovers the non-gated variant
-($\rho = 1$). Lower $\tau_H$ concentrates the watermark at
-near-deterministic positions where the LM's own distribution is
-narrow and the clockwork mask is cheap.
+For a target budget $\rho$, $\tau$ is calibrated on a pilot corpus as
+the appropriate empirical quantile of the gate signal, so that
+$\mathbb{E}_i[g_i] \approx \rho$. Setting $\tau_H = \infty$ (or
+$\tau_\Delta = \infty$) recovers $G_{\text{all}}$
+($\rho = 1$). Section~\ref{sec:experiments} compares the four gates
+at matched budget.
 
 \subsection{Embedding}
 
@@ -59,17 +78,17 @@ narrow and the clockwork mask is cheap.
   \label{alg:embed}
   \begin{algorithmic}
     \STATE {\bfseries Input:} prompt $p$, key $k$, states $S$,
-      entropy threshold $\tau_H$, max tokens $N$
+      gate $g(\cdot)$, max tokens $N$
     \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(p)$;
       $s \leftarrow \sigma_k(\mathbf{t}_{-1})$
     \FOR{$i = 1$ {\bfseries to} $N$}
-      \STATE $p_i \leftarrow \mathrm{softmax}(\mathcal{M}(\mathbf{t}))$;
-        $H_i \leftarrow -\sum_t p_i(t) \log p_i(t)$
-      \IF{$H_i < \tau_H$}
-        \STATE $s' \leftarrow (s+1) \bmod S$
+      \STATE $p_i \leftarrow \mathrm{softmax}(\mathcal{M}(\mathbf{t}))$
+      \STATE $s' \leftarrow (s+1) \bmod S$
+      \IF{$g(p_i) = 1$ {\bfseries and} $p_i(\mathcal{V}_{s'}) > 0$}
         \STATE $t_{i} \leftarrow \arg\max_{t \in \mathcal{V}_{s'}} p_i(t)$
       \ELSE
         \STATE $t_{i} \leftarrow \arg\max_t p_i(t)$
+          \quad\textit{(ungated or empty target partition)}
       \ENDIF
       \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\|\, t_i$;
         $s \leftarrow \sigma_k(t_i)$
@@ -79,7 +98,7 @@ narrow and the clockwork mask is cheap.
   \end{algorithmic}
 \end{algorithm}
 
-\cref{alg:embed} requires no sampling and no temperature parameter.
+Algorithm~\ref{alg:embed} requires no sampling and no temperature parameter.
 Each step does one LM forward pass and one $O(V)$ logit mask; total
 cost $O(N(V + T_{\mathrm{LM}}))$ for $N$ generated tokens.
 
@@ -115,6 +134,5 @@ cost $O(N(V + T_{\mathrm{LM}}))$ for $N$ generated tokens.
   \end{algorithmic}
 \end{algorithm}
 
-\cref{alg:detect} runs in $O(n)$ hash operations with no LM access.
-This is the property that makes MCL a candidate substrate for
-third-party audit.
+Algorithm~\ref{alg:detect} runs in $O(n)$ hash operations with no LM
+access, which makes MCL a candidate substrate for third-party audit.

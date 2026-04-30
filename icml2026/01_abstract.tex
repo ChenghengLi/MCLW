@@ -1,28 +1,24 @@
 % abstract.tex -- included from paper.tex via \input{abstract}
 \begin{abstract}
-  EU AI Act Article~50 requires machine-readable marking of
-  AI-generated content but leaves two decisive parameters -- false
-  positive rate and text-quality cost -- to be chosen opaquely by
-  deployers rather than specified by regulators. We present
-  \emph{Markov Chain Lock} (MCL) watermarking, an active watermarking
-  scheme that partitions the vocabulary into $S$ states via SHA-256
-  hashing and constrains generation to follow a clockwork transition
-  $s \to (s+1) \bmod S$ at selected (low-entropy) positions. Detection
-  is model-free, runs in $O(n)$ hash operations, and admits
-  Hoeffding-style exponential false positive bounds -- making
-  third-party audit feasible without LLM access. The central result is
-  a calibration formula
-  $S^\star = \lceil 4 z_\alpha^2 / (\rho^2 (n-1)) + 1 \rceil$ that
-  maps a target FPR $\alpha$, text length $n$, and watermark fraction
-  $\rho$ to a minimum state count, turning Article~50 compliance from
-  an opaque deployer choice into an auditable policy-to-configuration
-  map. We additionally prove a universal robustness threshold
-  $\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$ independent of
-  $(S, \rho, n)$, derive a Neyman--Pearson optimal entropy-weighted
-  detector, and formalize a $1/S$ self-healing surplus under
-  adversarial modification. A critical experiment tests whether
-  low-entropy tokens survive paraphrasing at higher rates than
-  high-entropy ones -- inverting the SWEET/EWD heuristic -- and
-  decides whether the entropy gate is purely a quality improvement or
-  also a robustness one.
+  We introduce \emph{Markov Chain Lock} (MCL), an active watermarking
+  scheme for autoregressive language models that admits a closed-form
+  calibration of its design parameters. MCL partitions the vocabulary
+  into $S$ states via keyed SHA-256 hashing and forces a hard Markov
+  transition on a fraction $\rho$ of generated positions. The
+  detector is model-free, runs in $O(n)$ hash operations, and so
+  enables third-party audit without LLM access.
+  Theoretically, we derive an operator-facing formula mapping a
+  target false-positive rate, text length, and budget to the minimum
+  state count; prove a universal robustness threshold
+  $\delta^{\star} = 1 - 1/\sqrt{2} \approx 29.3\%$ (independent of
+  $(S, \rho, n)$ under the midpoint decision convention, and
+  strategy-free against oracle-blind adversaries); and generalise
+  both results to any $k$-regular transition topology.
+  Empirically, on Google's Gemma~3 270M model across 18
+  matched-budget cells (173 wiki + 20 factual prompts), three
+  findings hold: (i) low-entropy gating is strictly Pareto-dominated;
+  (ii) detection probability is gate-invariant at $\rho \geq 0.5$;
+  (iii) post-attack $z$-scores match the predicted $(1-\delta)^2$
+  scaling on every cell. The operational dial is the budget $\rho$,
+  not the choice of gate.
 \end{abstract}
