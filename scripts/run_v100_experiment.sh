@@ -75,12 +75,20 @@ for D in "${DOMAINS[@]}"; do
   echo "[$(date -Iseconds)] DOMAIN: $D"
   echo "============================================================"
   echo "domain=$D started_at=$(date -Iseconds)" >> "$HEARTBEAT"
+  set -o pipefail
   "$PY" -u scripts/generate_curated_dataset.py \
     --domain "$D" \
     --states 7 --overlaps 0 \
     --max-tokens 512 \
     --decoding greedy \
     --model "$MODEL" 2>&1 | tee "$RUN_DIR/${D}.log"
+  rc=$?
+  set +o pipefail
+  if [ "$rc" -ne 0 ]; then
+    echo "domain=$D FAILED rc=$rc at=$(date -Iseconds)" >> "$HEARTBEAT"
+    echo "ERROR: python exited $rc on domain $D — see $RUN_DIR/${D}.log" >&2
+    exit "$rc"
+  fi
   echo "domain=$D finished_at=$(date -Iseconds)" >> "$HEARTBEAT"
 done
 
