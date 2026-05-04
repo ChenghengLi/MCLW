@@ -226,6 +226,10 @@ def main():
     parser.add_argument("--domain", choices=["wiki", "news", "social", "abstract"], default="wiki",
                         help="Prompt domain. 'wiki' uses the original 173 concepts; the others draw "
                              "from cross-domain prompt pools (~25 each) for cross-domain evaluation.")
+    parser.add_argument("--batch-size", type=int, default=1,
+                        help="Batch size for the non-watermarked baseline. Recommended: 8 for "
+                             "Llama-3.2-3B on A100-80GB, 16 for gemma-1B. The watermarked path "
+                             "(EnhancedMCLGenerator) currently runs prompt-by-prompt regardless.")
     parser.add_argument("--skip-non-watermarked", action="store_true", help="Skip non-watermarked generation")
     parser.add_argument("--resume-from-config", type=str, default=None, help="Resume from specific config name")
     args = parser.parse_args()
@@ -274,38 +278,55 @@ def main():
         if tokenizer.pad_token is None:
             tokenizer.pad_token = tokenizer.eos_token
         
+        # Left-pad so each prompt's generation continues at its own real end.
+        tokenizer.padding_side = "left"
+
+        prompts = [prompt_fn(c) for c in concepts]
         non_wm_samples = []
-        for concept in tqdm(concepts, desc="Non-watermarked"):
-            prompt = prompt_fn(concept)
-            inputs = tokenizer(prompt, return_tensors="pt").to(device)
-            
+        bs = max(1, args.batch_size)
+
+        for start in tqdm(range(0, len(concepts), bs), desc=f"Non-watermarked (bs={bs})"):
+            chunk_concepts = concepts[start:start + bs]
+            chunk_prompts = prompts[start:start + bs]
+            enc = tokenizer(
+                chunk_prompts,
+                return_tensors="pt",
+                padding=True,
+                truncation=True,
+            ).to(device)
+
             with torch.no_grad():
                 if args.decoding == "greedy":
                     outputs = model.generate(
-                        inputs["input_ids"],
+                        enc["input_ids"],
+                        attention_mask=enc["attention_mask"],
                         max_new_tokens=args.max_tokens,
                         do_sample=False,
                         pad_token_id=tokenizer.eos_token_id,
                     )
                 else:
                     outputs = model.generate(
-                        inputs["input_ids"],
+                        enc["input_ids"],
+                        attention_mask=enc["attention_mask"],
                         max_new_tokens=args.max_tokens,
                         do_sample=True,
                         temperature=0.7,
                         top_p=0.9,
                         pad_token_id=tokenizer.eos_token_id,
                     )
-            
-            text = tokenizer.decode(outputs[0][inputs["input_ids"].shape[1]:], skip_special_tokens=True)
-            
-            non_wm_samples.append({
-                "concept": concept,
-                "prompt": prompt,
-                "text": text,
-                "type": "non_watermarked",
-                "decoding": args.decoding,
-            })
+
+            input_len = enc["input_ids"].shape[1]
+            for i, (concept, prompt) in enumerate(zip(chunk_concepts, chunk_prompts)):
+                gen_ids = outputs[i, input_len:]
+                text = tokenizer.decode(gen_ids, skip_special_tokens=True)
+                non_wm_samples.append({
+                    "concept": concept,
+                    "prompt": prompt,
+                    "text": text,
+                    "type": "non_watermarked",
+                    "decoding": args.decoding,
+                    "batch_size": bs,
+                })
         
         # Save
         with open(output_dir / "non_watermarked.jsonl", "w") as f:

@@ -81,6 +81,7 @@ for D in "${DOMAINS[@]}"; do
     --states 7 --overlaps 0 \
     --max-tokens 512 \
     --decoding greedy \
+    --batch-size "${BATCH_SIZE:-8}" \
     --model "$MODEL" 2>&1 | tee "$RUN_DIR/${D}.log"
   rc=$?
   set +o pipefail
