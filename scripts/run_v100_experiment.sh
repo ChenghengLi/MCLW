@@ -19,7 +19,17 @@ set -euo pipefail
 
 MODEL="${1:?usage: run_v100_experiment.sh <hf_model_id> [domains...]}"
 shift
-DOMAINS=("${@:-wiki news social abstract}")
+if [ "$#" -eq 0 ]; then
+  DOMAINS=(wiki news social abstract)
+else
+  DOMAINS=("$@")
+fi
+PY="$(command -v python || command -v python3)"
+if [ -z "$PY" ]; then
+  echo "ERROR: neither 'python' nor 'python3' is on PATH" >&2
+  exit 1
+fi
+echo "[$(date)] python:   $PY"
 
 cd /home/lichen/MCLW_runai
 echo "[$(date)] cwd: $(pwd)"
@@ -50,7 +60,7 @@ for D in "${DOMAINS[@]}"; do
   echo "============================================================"
   echo "[$(date)] DOMAIN: $D"
   echo "============================================================"
-  python scripts/generate_curated_dataset.py \
+  "$PY" scripts/generate_curated_dataset.py \
     --domain "$D" \
     --states 7 --overlaps 0 \
     --max-tokens 512 \
