@@ -8,14 +8,16 @@
 #     bash scripts/run_v100_experiment.sh google/gemma-3-1b-it
 #     bash scripts/run_v100_experiment.sh meta-llama/Llama-3.2-3B-Instruct
 #
-# For each domain, runs generate_curated_dataset.py with:
-#     --states 7 --overlaps 0 --max-tokens 512 --decoding greedy
-#
-# Outputs:
-#     data/curated_wiki_dataset_<stamp>/         (one per domain run)
-#     runs/<stamp>/<domain>.log                  (stdout/stderr per domain)
-#     runs/<stamp>/MANIFEST                      (model + git rev + stamp)
-set -euo pipefail
+# Notes for the EPFL RCP / pytorch:2.6.0-cuda image:
+#   - python lives at /opt/conda/bin/python; the system PATH for su'd users
+#     does not include it, so we hardcode the path.
+#   - We deliberately do NOT use `set -u` or `set -o pipefail` here because
+#     stderr from those shell errors gets lost when the pod is preempted.
+#     Plain `set -e` plus explicit `|| { echo ... ; exit 1; }` checks make
+#     diagnosis under preemption much easier.
+#   - python is invoked with -u so each line is flushed immediately to the
+#     pod log (otherwise CPython buffers when stdout is a pipe through tee).
+set -e
 
 MODEL="${1:?usage: run_v100_experiment.sh <hf_model_id> [domains...]}"
 shift
@@ -24,26 +26,31 @@ if [ "$#" -eq 0 ]; then
 else
   DOMAINS=("$@")
 fi
-PY="$(command -v python || command -v python3)"
-if [ -z "$PY" ]; then
-  echo "ERROR: neither 'python' nor 'python3' is on PATH" >&2
+
+PY=/opt/conda/bin/python
+if [ ! -x "$PY" ]; then
+  PY="$(command -v python3 || command -v python || true)"
+fi
+if [ -z "$PY" ] || [ ! -x "$PY" ]; then
+  echo "ERROR: no python interpreter found (tried /opt/conda/bin/python, python3, python)" >&2
   exit 1
 fi
-echo "[$(date)] python:   $PY"
 
-cd /home/lichen/MCLW_runai
-echo "[$(date)] cwd: $(pwd)"
-echo "[$(date)] git rev: $(git rev-parse HEAD)"
-echo "[$(date)] model:    $MODEL"
-echo "[$(date)] domains:  ${DOMAINS[*]}"
-nvidia-smi -L || true
-
-export HF_HOME=/home/lichen/hf_cache
-mkdir -p "$HF_HOME"
+REPO_DIR=/home/lichen/MCLW_runai
+cd "$REPO_DIR" || { echo "ERROR: cannot cd into $REPO_DIR" >&2; exit 1; }
 
 STAMP="$(date +%Y%m%d_%H%M%S)"
-RUN_DIR="runs/$STAMP"
+RUN_DIR="$REPO_DIR/runs/$STAMP"
 mkdir -p "$RUN_DIR"
+
+# Heartbeat file we can check from another job if pod gets preempted.
+HEARTBEAT="$RUN_DIR/HEARTBEAT"
+echo "started_at=$(date -Iseconds)" > "$HEARTBEAT"
+echo "model=$MODEL" >> "$HEARTBEAT"
+echo "domains=${DOMAINS[*]}" >> "$HEARTBEAT"
+echo "git_rev=$(git rev-parse HEAD)" >> "$HEARTBEAT"
+echo "host=$(hostname)" >> "$HEARTBEAT"
+echo "python=$PY ($($PY --version 2>&1))" >> "$HEARTBEAT"
 
 cat > "$RUN_DIR/MANIFEST" <<EOF
 stamp:    $STAMP
@@ -51,25 +58,36 @@ model:    $MODEL
 git_rev:  $(git rev-parse HEAD)
 domains:  ${DOMAINS[*]}
 hostname: $(hostname)
+python:   $PY ($($PY --version 2>&1))
 nvidia:   $(nvidia-smi -L 2>/dev/null | head -1 || echo "no GPU")
 EOF
-echo "[$(date)] Manifest:"; cat "$RUN_DIR/MANIFEST"
+
+echo "[$(date -Iseconds)] starting run; manifest:"
+cat "$RUN_DIR/MANIFEST"
+echo
+
+export HF_HOME=/home/lichen/hf_cache
+mkdir -p "$HF_HOME"
 
 for D in "${DOMAINS[@]}"; do
   echo
   echo "============================================================"
-  echo "[$(date)] DOMAIN: $D"
+  echo "[$(date -Iseconds)] DOMAIN: $D"
   echo "============================================================"
-  "$PY" scripts/generate_curated_dataset.py \
+  echo "domain=$D started_at=$(date -Iseconds)" >> "$HEARTBEAT"
+  "$PY" -u scripts/generate_curated_dataset.py \
     --domain "$D" \
     --states 7 --overlaps 0 \
     --max-tokens 512 \
     --decoding greedy \
     --model "$MODEL" 2>&1 | tee "$RUN_DIR/${D}.log"
+  echo "domain=$D finished_at=$(date -Iseconds)" >> "$HEARTBEAT"
 done
+
+echo "finished_at=$(date -Iseconds)" >> "$HEARTBEAT"
 
 echo
 echo "============================================================"
-echo "[$(date)] DONE."
+echo "[$(date -Iseconds)] DONE."
 ls -la data/ | tail -10
-echo "[$(date)] Run dir: $RUN_DIR"
+echo "[$(date -Iseconds)] Run dir: $RUN_DIR"
