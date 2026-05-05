@@ -90,24 +90,34 @@ def _maybe_score_mcl(records: List[dict], tokenizer_name: str,
 
 def threshold_at_fpr(neg_scores: List[float], target_fpr: float,
                      direction: str = "greater") -> float:
-    """Pick threshold so empirical FPR on neg_scores is closest to target.
-    direction='greater' means score > threshold counts as positive."""
+    """Pick the smallest threshold tau such that the empirical FPR on
+    neg_scores under "score > tau" (or "score < tau") is at most target_fpr.
+
+    For direction='greater': sort negatives descending, allow exactly
+    k = floor(target_fpr * n) of them to fire. Threshold = s[k] (the
+    (k+1)-th largest negative); then "score > s[k]" admits exactly the top
+    k negatives, giving empirical FPR = k/n <= target_fpr.
+    Edge: k=0 -> threshold strictly above the max negative -> empirical FPR=0.
+    Edge: k=n -> threshold strictly below the min negative -> all negatives fire.
+    """
     if not neg_scores:
         return float("nan")
     s = sorted(neg_scores, reverse=(direction == "greater"))
     n = len(s)
-    # Smallest threshold tau such that #{x : x > tau} / n <= target_fpr
     k = max(0, min(n, int(math.floor(target_fpr * n))))
-    # if target_fpr * n is an integer, this allows exactly k positives
+    eps = 1e-9
     if direction == "greater":
-        # threshold = k-th largest (0-indexed), then add eps
         if k == 0:
-            return float(s[0]) + 1e-9
-        return float(s[k - 1])  # everything strictly greater fires
+            return float(s[0]) + eps  # nothing fires
+        if k >= n:
+            return float(s[-1]) - eps  # everything fires
+        return float(s[k])  # top-k negatives fire (those with score > s[k])
     else:
         if k == 0:
-            return float(s[0]) - 1e-9
-        return float(s[k - 1])
+            return float(s[0]) - eps
+        if k >= n:
+            return float(s[-1]) + eps
+        return float(s[k])
 
 
 def tpr_at_threshold(pos_scores: List[float], thr: float,

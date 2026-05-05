@@ -324,9 +324,19 @@ def main():
                     # Mask pad-token positions (sequences that hit EOS early)
                     in_len = enc["input_ids"].shape[1]
                     gen_only = outputs[:, in_len:]
-                    valid = (gen_only != tokenizer.eos_token_id).float()
-                    # Keep at least 1 to avoid div-by-zero; if everything is
-                    # eos, set ppl to NaN later.
+                    # Build a mask that is 1 for positions up to and including
+                    # the FIRST eos (if any), 0 thereafter. This counts the
+                    # legitimate end-of-generation EOS in PPL but excludes
+                    # subsequent right-padding eos tokens.
+                    is_eos = (gen_only == tokenizer.eos_token_id)
+                    # arange[None, :] <= first_eos[:, None]; if no eos, keep all.
+                    arange = torch.arange(gen_only.shape[1], device=gen_only.device)
+                    has_eos = is_eos.any(dim=1)
+                    first_eos = torch.where(has_eos, is_eos.int().argmax(dim=1),
+                                            torch.full((gen_only.shape[0],),
+                                                       gen_only.shape[1] - 1,
+                                                       device=gen_only.device))
+                    valid = (arange[None, :] <= first_eos[:, None]).float()
                     n_valid = valid.sum(dim=1).clamp(min=1)
                     mean_lp = (lp_matrix * valid).sum(dim=1) / n_valid
                     sample_ppls = torch.exp(-mean_lp).cpu().tolist()
