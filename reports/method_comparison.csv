@@ -1,0 +1,2 @@
+auroc,method,n_neg,n_pos,thr_at_fpr_0p1pct,thr_at_fpr_1pct,tpr_at_fpr_0p1pct,tpr_at_fpr_0p1pct_hi,tpr_at_fpr_0p1pct_lo,tpr_at_fpr_1pct,tpr_at_fpr_1pct_hi,tpr_at_fpr_1pct_lo
+1.0,MCL_S7_rho0,173,173,0.40000000100000005,0.4,1.0,0.9999999999999999,0.9782773855954833,1.0,0.9999999999999999,0.9782773855954833
