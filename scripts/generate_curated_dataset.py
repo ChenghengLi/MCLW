@@ -422,6 +422,10 @@ def main():
                 "num_states": num_states,
                 "overlap": overlap,
                 "perplexity": meta["perplexity"],
+                "empirical_mean_kl_nats": meta.get("empirical_mean_kl_nats"),
+                "empirical_p95_kl_nats": meta.get("empirical_p95_kl_nats"),
+                "empirical_max_kl_nats": meta.get("empirical_max_kl_nats"),
+                "log_S_bound_nats": meta.get("log_S_bound_nats"),
                 "chain_score": result.chain_score,
                 "is_detected": result.is_watermarked,
             })
