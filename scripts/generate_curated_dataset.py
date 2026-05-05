@@ -296,29 +296,50 @@ def main():
             ).to(device)
 
             with torch.no_grad():
+                gen_kwargs = dict(
+                    input_ids=enc["input_ids"],
+                    attention_mask=enc["attention_mask"],
+                    max_new_tokens=args.max_tokens,
+                    pad_token_id=tokenizer.eos_token_id,
+                    return_dict_in_generate=True,
+                    output_scores=True,
+                )
                 if args.decoding == "greedy":
-                    outputs = model.generate(
-                        enc["input_ids"],
-                        attention_mask=enc["attention_mask"],
-                        max_new_tokens=args.max_tokens,
-                        do_sample=False,
-                        pad_token_id=tokenizer.eos_token_id,
-                    )
+                    gen_kwargs["do_sample"] = False
                 else:
-                    outputs = model.generate(
-                        enc["input_ids"],
-                        attention_mask=enc["attention_mask"],
-                        max_new_tokens=args.max_tokens,
-                        do_sample=True,
-                        temperature=0.7,
-                        top_p=0.9,
-                        pad_token_id=tokenizer.eos_token_id,
-                    )
+                    gen_kwargs.update(do_sample=True, temperature=0.7, top_p=0.9)
+                gen_out = model.generate(**gen_kwargs)
+                outputs = gen_out.sequences
+                # Compute per-sample mean log-prob of the chosen token under
+                # the unmasked next-token distribution -> perplexity.
+                # gen_out.scores: tuple (n_steps,) of [batch, vocab] logits
+                if gen_out.scores:
+                    log_probs_per_step = []
+                    for t, step_logits in enumerate(gen_out.scores):
+                        log_probs = torch.log_softmax(step_logits.float(), dim=-1)
+                        chosen = outputs[:, enc["input_ids"].shape[1] + t]
+                        chosen_lp = log_probs.gather(1, chosen.unsqueeze(1)).squeeze(1)
+                        log_probs_per_step.append(chosen_lp)
+                    lp_matrix = torch.stack(log_probs_per_step, dim=1)  # [batch, n_steps]
+                    # Mask pad-token positions (sequences that hit EOS early)
+                    in_len = enc["input_ids"].shape[1]
+                    gen_only = outputs[:, in_len:]
+                    valid = (gen_only != tokenizer.eos_token_id).float()
+                    # Keep at least 1 to avoid div-by-zero; if everything is
+                    # eos, set ppl to NaN later.
+                    n_valid = valid.sum(dim=1).clamp(min=1)
+                    mean_lp = (lp_matrix * valid).sum(dim=1) / n_valid
+                    sample_ppls = torch.exp(-mean_lp).cpu().tolist()
+                    n_valid_list = n_valid.cpu().tolist()
+                else:
+                    sample_ppls = [None] * outputs.size(0)
+                    n_valid_list = [0] * outputs.size(0)
 
             input_len = enc["input_ids"].shape[1]
             for i, (concept, prompt) in enumerate(zip(chunk_concepts, chunk_prompts)):
-                gen_ids = outputs[i, input_len:]
-                text = tokenizer.decode(gen_ids, skip_special_tokens=True)
+                gen_ids_t = outputs[i, input_len:]
+                text = tokenizer.decode(gen_ids_t, skip_special_tokens=True)
+                ppl = sample_ppls[i]
                 non_wm_samples.append({
                     "concept": concept,
                     "prompt": prompt,
@@ -326,6 +347,8 @@ def main():
                     "type": "non_watermarked",
                     "decoding": args.decoding,
                     "batch_size": bs,
+                    "perplexity": float(ppl) if ppl is not None and ppl == ppl else None,
+                    "n_scoring_tokens": int(n_valid_list[i]),
                 })
         
         # Save

@@ -141,23 +141,52 @@ class KGWDetector:
         self.gamma = gamma
         self.secret_key = secret_key
 
-    def detect(self, text: str):
-        ids = self.tokenizer.encode(text)
-        if len(ids) < 2:
-            return {"n_tokens": len(ids), "green_count": 0,
-                    "green_fraction": 0.0, "z_score": 0.0}
+    def detect(self, text: str = None, *, generated_ids=None,
+               prompt_last_token_id: int = None):
+        """Compute the green-list z-statistic.
+
+        Two paths:
+          1. Caller supplies `generated_ids` (preferred): we check every
+             token in the sequence under the hash seeded by the previous
+             generated id, plus an extra check at position 0 seeded by
+             `prompt_last_token_id` if provided. This matches what the
+             generator did and is robust against re-tokenisation drift.
+          2. Caller supplies just `text`: we re-encode and start at i=1.
+             This matches the original detector but loses the first token
+             (whose seed was the last prompt token).
+        """
+        if generated_ids is None:
+            assert text is not None, "must supply generated_ids or text"
+            generated_ids = self.tokenizer.encode(text)
+        ids = list(map(int, generated_ids))
+        if not ids:
+            return {"n_tokens": 0, "green_count": 0, "green_fraction": 0.0,
+                    "z_score": 0.0}
+
         green = 0
         T = 0
+        # Token 0: hash seeded by the last prompt token, if available.
+        if prompt_last_token_id is not None:
+            mask = green_mask(int(prompt_last_token_id), self.vocab_size,
+                              self.gamma, self.secret_key)
+            if bool(mask[ids[0]]):
+                green += 1
+            T += 1
+        # Tokens i >= 1: hash seeded by ids[i-1].
         for i in range(1, len(ids)):
             mask = green_mask(ids[i - 1], self.vocab_size, self.gamma,
                               self.secret_key)
             if bool(mask[ids[i]]):
                 green += 1
             T += 1
+        if T == 0:
+            return {"n_tokens": len(ids), "green_count": 0,
+                    "green_fraction": 0.0, "z_score": 0.0}
         gamma = self.gamma
         z = (green - gamma * T) / np.sqrt(gamma * (1 - gamma) * T)
         return {
             "n_tokens": len(ids),
+            "n_checks": T,
             "green_count": green,
             "green_fraction": green / T,
             "z_score": float(z),
@@ -226,20 +255,30 @@ def generate_with_kgw(args):
 
         in_len = enc["input_ids"].shape[1]
         for i, (concept, prompt) in enumerate(zip(chunk, prompts)):
-            gen_ids = out[i, in_len:]
-            text = tokenizer.decode(gen_ids, skip_special_tokens=True)
-            det = detector.detect(text)
+            gen_ids_t = out[i, in_len:]
+            gen_ids_list = gen_ids_t.tolist()
+            text = tokenizer.decode(gen_ids_t, skip_special_tokens=True)
+            # Last non-pad token of the prompt is what KGWLogitsProcessor saw
+            # as the seed for the very first generated token.
+            row_input = enc["input_ids"][i]
+            non_pad = (row_input != tokenizer.pad_token_id).nonzero(as_tuple=True)[0]
+            prompt_last_token_id = int(row_input[non_pad[-1]].item()) if len(non_pad) else None
+            det = detector.detect(generated_ids=gen_ids_list,
+                                  prompt_last_token_id=prompt_last_token_id)
             n_tokens_total += det["n_tokens"]
             samples.append({
                 "concept": concept,
                 "prompt": prompt,
                 "text": text,
+                "generated_ids": gen_ids_list,
+                "prompt_last_token_id": prompt_last_token_id,
                 "type": "kgw_watermarked",
                 "gamma": args.gamma,
                 "delta": args.delta,
                 "do_sample": args.do_sample,
                 "temperature": args.temperature,
                 "n_tokens": det["n_tokens"],
+                "n_checks": det.get("n_checks", det["n_tokens"]),
                 "green_count": det["green_count"],
                 "green_fraction": det["green_fraction"],
                 "z_score": det["z_score"],
@@ -294,10 +333,17 @@ def detect_only(args):
         with open(f, encoding="utf-8") as fh:
             for line in fh:
                 rec = json.loads(line)
-                det = detector.detect(rec["text"])
+                if "generated_ids" in rec:
+                    det = detector.detect(
+                        generated_ids=rec["generated_ids"],
+                        prompt_last_token_id=rec.get("prompt_last_token_id"),
+                    )
+                else:
+                    det = detector.detect(rec["text"])
                 rows.append({"file": f.name, "z": det["z_score"],
                              "green_frac": det["green_fraction"],
-                             "n_tokens": det["n_tokens"]})
+                             "n_tokens": det["n_tokens"],
+                             "n_checks": det.get("n_checks", det["n_tokens"])})
     arr = np.array([r["z"] for r in rows])
     print(f"n={len(rows)}  mean_z={arr.mean():.3f}  median_z={np.median(arr):.3f}  "
           f"frac_above_z=4: {float((arr > 4).mean()):.3f}")
