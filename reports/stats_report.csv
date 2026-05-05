@@ -1,0 +1,4 @@
+config,dataset,fnr_upper_95,fpr,fpr_clopper_hi,fpr_clopper_lo,fpr_upper_95,fpr_wilson_hi,fpr_wilson_lo,n_nwm,n_wm,nwm_score_mean,tpr,tpr_clopper_hi,tpr_clopper_lo,tpr_wilson_hi,tpr_wilson_lo,wm_score_mean
+states7_overlap0pct,curated_wiki_dataset_20260201_112721,0.017341040462427744,,,,,,,173,173,,1.0,1.0,0.9789027253493151,0.9999999999999999,0.9782773855954833,0.9908262575968348
+states7_overlap0pct,curated_wiki_dataset_20260202_061811,0.017341040462427744,,,,,,,0,173,,1.0,1.0,0.9789027253493151,0.9999999999999999,0.9782773855954833,0.9847302235690559
+states7_overlap0pct,large_wiki_dataset_20260201_102321,0.1,,,,,,,30,30,,1.0,1.0,0.8842966917779722,0.9999999999999999,0.8864866068260312,0.98628199520983
