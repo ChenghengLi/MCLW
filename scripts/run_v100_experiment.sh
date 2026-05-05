@@ -76,12 +76,17 @@ for D in "${DOMAINS[@]}"; do
   echo "============================================================"
   echo "domain=$D started_at=$(date -Iseconds)" >> "$HEARTBEAT"
   set -o pipefail
+  N_PROMPTS_ARG=""
+  if [ -n "${N_PROMPTS:-}" ]; then
+    N_PROMPTS_ARG="--n-prompts ${N_PROMPTS}"
+  fi
   "$PY" -u scripts/generate_curated_dataset.py \
     --domain "$D" \
     --states 7 --overlaps 0 \
     --max-tokens 512 \
     --decoding greedy \
     --batch-size "${BATCH_SIZE:-8}" \
+    $N_PROMPTS_ARG \
     --model "$MODEL" 2>&1 | tee "$RUN_DIR/${D}.log"
   rc=$?
   set +o pipefail
