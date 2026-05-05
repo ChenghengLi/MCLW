@@ -36,8 +36,22 @@ if [ -z "$PY" ] || [ ! -x "$PY" ]; then
   exit 1
 fi
 
-REPO_DIR=/home/lichen/MCLW_runai
-cd "$REPO_DIR" || { echo "ERROR: cannot cd into $REPO_DIR" >&2; exit 1; }
+# REPO_DIR resolution priority:
+#   1. $REPO_DIR env var (caller-provided, e.g. /scratch/MCLW_runai on CS-552)
+#   2. /home/lichen/MCLW_runai (legacy dlab home PVC layout)
+#   3. /scratch/MCLW_runai (course CS-552 PVC layout)
+#   4. Current working directory if it looks like the repo (has scripts/)
+if [ -z "${REPO_DIR:-}" ]; then
+  for cand in /home/lichen/MCLW_runai /scratch/MCLW_runai "$PWD"; do
+    if [ -d "$cand/scripts" ]; then REPO_DIR="$cand"; break; fi
+  done
+fi
+if [ -z "${REPO_DIR:-}" ] || [ ! -d "$REPO_DIR/scripts" ]; then
+  echo "ERROR: cannot find MCLW repo (tried REPO_DIR env, /home/lichen/MCLW_runai, /scratch/MCLW_runai, PWD)" >&2
+  exit 1
+fi
+cd "$REPO_DIR"
+echo "[$(date)] REPO_DIR=$REPO_DIR"
 
 STAMP="$(date +%Y%m%d_%H%M%S)"
 RUN_DIR="$REPO_DIR/runs/$STAMP"
