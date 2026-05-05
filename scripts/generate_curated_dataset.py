@@ -465,6 +465,9 @@ def main():
                              "Llama-3.2-3B on A100-80GB, 16 for gemma-1B. The watermarked path "
                              "(EnhancedMCLGenerator) currently runs prompt-by-prompt regardless.")
     parser.add_argument("--skip-non-watermarked", action="store_true", help="Skip non-watermarked generation")
+    parser.add_argument("--skip-watermarked", action="store_true",
+                        help="Skip watermarked generation (use to produce ONLY a large non-WM baseline "
+                             "for FPR-cert runs).")
     parser.add_argument("--resume-from-config", type=str, default=None, help="Resume from specific config name")
     args = parser.parse_args()
     
