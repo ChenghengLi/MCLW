@@ -94,10 +94,14 @@ for D in "${DOMAINS[@]}"; do
   if [ -n "${N_PROMPTS:-}" ]; then
     N_PROMPTS_ARG="--n-prompts ${N_PROMPTS}"
   fi
+  # All sweep dimensions overridable via env so one runai job can re-parameterise.
+  STATES_LIST="${STATES:-7}"
+  OVERLAPS_LIST="${OVERLAPS:-0}"
+  MAX_TOKENS_VAL="${MAX_TOKENS:-512}"
   "$PY" -u scripts/generate_curated_dataset.py \
     --domain "$D" \
-    --states 7 --overlaps 0 \
-    --max-tokens 512 \
+    --states $STATES_LIST --overlaps $OVERLAPS_LIST \
+    --max-tokens "$MAX_TOKENS_VAL" \
     --decoding greedy \
     --batch-size "${BATCH_SIZE:-8}" \
     $N_PROMPTS_ARG \
