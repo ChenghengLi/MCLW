@@ -78,10 +78,12 @@ class DipperParaphraser:
     def __init__(self, device: str = "cuda", torch_dtype: str = "float16"):
         _require_torch()
         import torch
-        from transformers import T5ForConditionalGeneration, T5Tokenizer
+        from transformers import AutoTokenizer, T5ForConditionalGeneration
 
         dtype = getattr(torch, torch_dtype)
-        self.tokenizer = T5Tokenizer.from_pretrained(self.MODEL_NAME)
+        # AutoTokenizer correctly resolves the FAST T5 tokenizer; the legacy
+        # T5Tokenizer + newer sentencepiece raises "not a string" on Load.
+        self.tokenizer = AutoTokenizer.from_pretrained(self.MODEL_NAME, use_fast=True)
         self.model = T5ForConditionalGeneration.from_pretrained(
             self.MODEL_NAME, torch_dtype=dtype
         ).to(device)
