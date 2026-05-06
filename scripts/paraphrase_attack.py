@@ -81,9 +81,11 @@ class DipperParaphraser:
         from transformers import AutoTokenizer, T5ForConditionalGeneration
 
         dtype = getattr(torch, torch_dtype)
-        # AutoTokenizer correctly resolves the FAST T5 tokenizer; the legacy
-        # T5Tokenizer + newer sentencepiece raises "not a string" on Load.
-        self.tokenizer = AutoTokenizer.from_pretrained(self.MODEL_NAME, use_fast=True)
+        # The DIPPER HF repo (kalpeshk2011/dipper-paraphraser-xxl) does NOT
+        # ship tokenizer files (only model weights). It is a fine-tune of
+        # google/t5-v1_1-xxl, which has the same vocab. Load tokenizer from
+        # the base; load model weights from DIPPER.
+        self.tokenizer = AutoTokenizer.from_pretrained("google/t5-v1_1-xxl", use_fast=True)
         self.model = T5ForConditionalGeneration.from_pretrained(
             self.MODEL_NAME, torch_dtype=dtype
         ).to(device)
