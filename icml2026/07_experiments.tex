@@ -90,7 +90,7 @@ domain, and prompt set.
 
 \begin{figure*}[t]
   \centering
-  \todoplot{Figure 1 (\texttt{fig:headline-tpr}): grouped bar chart of TPR@$\mathrm{FPR}{=}0.01$ for each (method, attack) cell, averaged over the 3 models and 4 domains. Error bars are bootstrap 95\% CIs over the per-(model, domain) means. One panel per attack condition (clean / random-sub / ZH back-translation / DIPPER paraphrase).}
+  \includegraphics[width=0.95\linewidth]{pictures/fig_headline_tpr.pdf}
   \caption{\textbf{Head-to-head TPR comparison across attacks.}
     MCL ($S{=}5$, $\rho{=}0.5$, $G_{H_{\mathrm{high}}}$, $k{=}1$)
     vs KGW ($\gamma{=}0.5, \delta{=}2$) vs SWEET (same KGW params,
@@ -110,14 +110,15 @@ domain, and prompt set.
     \textbf{SWEET}: same KGW parameters with high-entropy gate at
     $\rho=0.5$ matched to MCL. Bold = best per column.}
   \label{tab:headline-aggregate}
+  \small
+  \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lcccc}
     \toprule
-    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}{-}\delta{=}0.20}$
-      & TPR$_{\mathrm{ZH\text{-}back}}$ & median PPL \\
+    Method & Clean & Random & ZH & PPL \\
     \midrule
-    \textbf{MCL (ours)} & \textbf{100.0\%} & \textbf{99.9\%} & \textbf{72.8\%} & 2.89 \\
-    KGW & 65.9\% & 44.8\% & 18.7\% & 1.66 \\
-    SWEET & 66.0\% & 46.3\% & 19.0\% & 1.62 \\
+    \textbf{MCL (ours)} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 2.89 \\
+    KGW                 & 65.9  & 44.8  & 18.7  & 1.66 \\
+    SWEET               & 66.0  & 46.3  & 19.0  & 1.62 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -178,7 +179,7 @@ overlaying the slope-1 identity.
 
 \begin{figure*}[t]
   \centering
-  \todoplot{Figure 2 (\texttt{fig:translation-decay}): scatter of empirical $z_{\mathrm{post}} / z_{\mathrm{clean}}$ vs $(1 - \delta_{\mathrm{eff}})^2$, with one point per (model, domain, pivot, prompt). Marker shape encodes pivot language $\in \{$FR, DE, RU, ZH$\}$; colour encodes model. Slope-1 identity line overlaid; secondary panel: residuals against $\delta_{\mathrm{eff}}$.}
+  \includegraphics[width=\linewidth]{pictures/fig_translation_decay.pdf}
   \caption{\textbf{Translation robustness curve.} Empirical
     detection-decay ratio under NLLB-200 EN$\to$\{FR, DE, RU,
     ZH\}$\to$EN pivots, with $\delta_{\mathrm{eff}}$ measured per
@@ -217,11 +218,12 @@ attack regime on the open web).
     \autoref{thm:detection} (formal: \autoref{thm:k-regular},
     \autoref{app:proofs}).}
   \label{tab:kregular}
+  \small
+  \setlength{\tabcolsep}{3.5pt}
   \begin{tabular}{lrrrrr}
     \toprule
-    Model & $\bar\phi_{\mathrm{clean}}$ & $\bar z_{\mathrm{clean}}$ &
-      TPR$_{\mathrm{clean}}$ & $\bar z_{\mathrm{ZH}}$ &
-      TPR$_{\mathrm{ZH}}$ \\
+    Model & $\bar\phi_{\mathrm{cl}}$ & $\bar z_{\mathrm{cl}}$ & TPR$_{\mathrm{cl}}$
+          & $\bar z_{\mathrm{ZH}}$ & TPR$_{\mathrm{ZH}}$ \\
     \midrule
     Llama-3.1-8B & 0.883 & 13.91 & 100\% & 3.19 & 54\% \\
     Mistral-7B   & 0.965 & 16.23 & 100\% & 3.91 & 70\% \\
@@ -258,7 +260,7 @@ form derived in \autoref{app:proofs}.
 
 \begin{figure}[t]
   \centering
-  \todoplot{Figure 3 (\texttt{fig:cal-fpr}): empirical $\mathrm{FPR}$ on non-watermarked text vs $S \in \{2,3,5,7,11\}$, one curve per model, plus the $\rho \log S$-style Hoeffding upper bound from \autoref{thm:detection} as a dashed line. Threshold fixed at $z_\alpha$ for $\alpha = 0.01$. Domain pooled across the four content categories.}
+  \includegraphics[width=\linewidth]{pictures/fig_cal_fpr.pdf}
   \caption{\textbf{Calibration anchor.} Empirical FPR on
     non-watermarked completions as a function of state count $S$,
     with the closed-form Hoeffding upper bound from
@@ -281,17 +283,19 @@ form derived in \autoref{app:proofs}.
     formula gives the right ordering but a 20--30\,\% threshold
     inflation is recommended in deployment.}
   \label{tab:cal-sstar}
-  \begin{tabular}{rrrrrr}
+  \small
+  \setlength{\tabcolsep}{4.5pt}
+  \begin{tabular}{rrrrr}
     \toprule
-    $S$ & $\bar z_{\mathrm{wm}}^{\mathrm{obs}}$ &
-        $z_{\mathrm{wm}}^{\mathrm{pred}}$ & TPR$_{\mathrm{wm}}$ &
-        FPR$_{\mathrm{nwm}}$ & target \\
+    $S$ & $\bar z_{\mathrm{wm}}^{\mathrm{obs}}$
+        & $z_{\mathrm{wm}}^{\mathrm{pred}}$
+        & TPR$_{\mathrm{wm}}$ & FPR$_{\mathrm{nwm}}$ \\
     \midrule
-    2  & 10.86 & 7.05  & 100.0\% & 2.18\% & 1.00\% \\
-    3  & 17.41 & 9.97  & 100.0\% & 2.00\% & 1.00\% \\
-    5  & 25.36 & 14.11 & 100.0\% & 1.22\% & 1.00\% \\
-    7  & 30.61 & 17.28 & 100.0\% & 6.91\% & 1.00\% \\
-    11 & 41.46 & 22.30 & 100.0\% & 6.06\% & 1.00\% \\
+    2  & 10.86 & 7.05  & 100\% & 2.18\% \\
+    3  & 17.41 & 9.97  & 100\% & 2.00\% \\
+    5  & 25.36 & 14.11 & 100\% & 1.22\% \\
+    7  & 30.61 & 17.28 & 100\% & 6.91\% \\
+    11 & 41.46 & 22.30 & 100\% & 6.06\% \\
     \bottomrule
   \end{tabular}
 \end{table}
