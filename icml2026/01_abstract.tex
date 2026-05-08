@@ -1,24 +1,30 @@
 % abstract.tex -- included from paper.tex via \input{abstract}
 \begin{abstract}
-  We introduce \emph{Markov Chain Lock} (MCL), an active watermarking
-  scheme for autoregressive language models that admits a closed-form
-  calibration of its design parameters. MCL partitions the vocabulary
-  into $S$ states via keyed SHA-256 hashing and forces a hard Markov
-  transition on a fraction $\rho$ of generated positions. The
-  detector is model-free, runs in $O(n)$ hash operations, and so
-  enables third-party audit without LLM access.
-  Theoretically, we derive an operator-facing formula mapping a
-  target false-positive rate, text length, and budget to the minimum
-  state count; prove a universal robustness threshold
-  $\delta^{\star} = 1 - 1/\sqrt{2} \approx 29.3\%$ (independent of
-  $(S, \rho, n)$ under the midpoint decision convention, and
-  strategy-free against oracle-blind adversaries); and generalise
-  both results to any $k$-regular transition topology.
-  Empirically, on Google's Gemma~3 270M model across 18
-  matched-budget cells (173 wiki + 20 factual prompts), three
-  findings hold: (i) low-entropy gating is strictly Pareto-dominated;
-  (ii) detection probability is gate-invariant at $\rho \geq 0.5$;
-  (iii) post-attack $z$-scores match the predicted $(1-\delta)^2$
-  scaling on every cell. The operational dial is the budget $\rho$,
-  not the choice of gate.
+  Regulatory regimes such as the EU AI Act mandate machine-readable
+  marking of synthetic text, but existing watermark detectors rely on
+  access to the generating language model and on entropy-based
+  heuristics with no closed-form calibration to a target false-positive
+  rate.
+  We introduce \emph{Markov Chain Lock} (MCL), an active watermark that
+  partitions the vocabulary into $S$ states via keyed SHA-256 hashing
+  and forces a hard Markov transition on a fraction $\rho$ of generated
+  positions; the detector replays the partition from the same secret
+  key and is therefore model-free, running in $O(n)$ hash operations.
+  Theoretically, we derive an operator-facing formula mapping a target
+  false-positive rate, text length, and budget to the minimum state
+  count $S^\star$, prove a universal robustness threshold
+  $\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$ that is independent of
+  $(S, \rho, n)$ under the midpoint decision convention, and generalise
+  both results to any $k$-regular transition topology
+  (\autoref{thm:detection}, \autoref{thm:robustness},
+  \autoref{thm:k-regular}).
+  Empirically, we run head-to-head comparisons against KGW and SWEET
+  across multiple instruction-tuned LLMs and four text domains under
+  matched-budget translation and paraphrase attacks, sweep the state
+  count $S$ to anchor the calibration formula on data, and validate the
+  $k$-regular generalisation at $k=2$
+  (\autoref{sec:experiments}).
+  The closed-form calibration and model-free detector together let a
+  third-party auditor verify a marked deployment from text alone,
+  without LM access.
 \end{abstract}

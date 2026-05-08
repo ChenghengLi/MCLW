@@ -3,17 +3,47 @@
 \label{sec:intro}
 
 EU AI Act Article~50~\citep{euaiact2024} requires a machine-readable
-mark on AI-generated text by August 2026. It does not say what
-counts as marked: which false-positive rate, which text length,
-which quality cost.
-Existing schemes do not fill the gap. Logit-bias
-watermarks~\citep{kirchenbauer2023watermark} tune a bias and a
-green-list size by grid search.
+mark on AI-generated text by August 2026, but does not specify
+which false-positive rate, text length, or quality cost constitute a
+compliant detector. Operators therefore need a watermark whose
+detector is auditable end-to-end: a regulator or third-party
+verifier should be able to confirm provenance from the text and a
+secret key alone, without query access to the generating language
+model. The widely used logit-bias schemes do not meet this
+bar. KGW~\citep{kirchenbauer2023watermark} and its
+entropy-gated variants such as
+SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} require the
+language model (or a faithful proxy) at detection time in order to
+recompute the green-list bias or to weight tokens by entropy.
 Undetectability-frontier results~\citep{christ2024undetectable}
-bound what any scheme can achieve, but yield no deployable
-construction. Passive
-detection~\citep{mitchell2023detectgpt,tian2023gptzero} has no
-controllable frontier at all.
+characterise what any scheme can achieve information-theoretically
+but yield no deployable construction, and passive
+detectors~\citep{mitchell2023detectgpt,tian2023gptzero} expose no
+controllable false-positive frontier at all.
+
+\paragraph{Markov Chain Lock.}
+We propose \emph{Markov Chain Lock} (MCL), an active watermark whose
+detector is model-free. A keyed SHA-256 hash partitions the
+vocabulary into $S$ equivalence classes (states); a fixed cycle over
+those states defines a Markov transition pattern; and on a fraction
+$\rho$ of generated positions the language-model logits are masked
+to keep only tokens whose state is the legal successor of the
+current state, so the produced text walks the chain by construction.
+Detection re-derives every token's state from the key in $O(n)$ hash
+operations and counts how often consecutive tokens follow the cycle.
+Because the state map is a function of the token id and the key
+only, no language-model forward pass, weights, or proxy LM is
+required to verify a transcript. Two operational consequences follow.
+First, third-party audit becomes lightweight: a regulator with the
+key can verify provenance from a string of plain text. Second, the
+detector's null-and-alternative law inverts in closed form to a
+calibration map (\autoref{thm:detection}, derived in
+\autoref{app:proofs}): a regulator who fixes a target false-positive
+rate $\alpha$ and a text-length floor $n_{\min}$ reads off the
+minimum admissible state count, while a deployer can spend more
+budget for margin but cannot evade the regulator's specification.
+\autoref{fig:mcl_teaser} summarises the construction; the formal
+treatment is in \autoref{sec:method} and \autoref{sec:theory}.
 
 \begin{figure*}[t]
   \centering
@@ -46,25 +76,13 @@ controllable frontier at all.
     \definecolor{c3}{HTML}{4FAE5C}
     \definecolor{c4}{HTML}{4A8FD3}
 
-    % ===================================================================
-    % Three-panel horizontal pipeline:
-    %   A. clockwork (the hook, dominant visual)
-    %   B. generation step (logits -> mask -> token)
-    %   C. detection (watermarked vs random sequences + verdict)
-    %
-    % uniform header baseline at y = 4.95
-    % uniform content vertical band roughly y in [0.4, 4.4]
-    % ===================================================================
-
     % =========== PANEL A: clockwork ring (dominant hook) ===========
-    %    column x in [0, 3.6], donut centred at (1.80, 2.55)
     \node[paneltitle] at (1.80, 4.95) {\large A.~Clockwork chain};
     \node[font=\footnotesize, color=black!75, anchor=base]
       at (1.80, 4.30)
       {$\sigma_k(t) = \mathrm{SHA\text{-}256}(k\,\Vert\,t)\bmod S$};
 
     \begin{scope}[shift={(1.80, 2.30)}]
-      % ring sectors (outer 1.45, inner 0.65 -> wider colour band)
       \foreach \i [evaluate=\i as \stt using {90 - \i*72},
                    evaluate=\i as \fin using {90 - (\i+1)*72}] in {0,1,2,3,4} {
         \fill[c\i!55, draw=black!45, line width=0.45pt]
@@ -78,22 +96,13 @@ controllable frontier at all.
         \node[font=\small\bfseries, color=black!85]
           at (\mid:1.05) {$\mathcal V_{\i}$};
       }
-      % bold clockwise rotation indicator in the inner hole.
-      % Sweeps 330 deg clockwise from upper-right (60 deg) down and
-      % around to the top (90 deg in normal coords, -270 here). The
-      % arrowhead therefore sits at the TOP of the circle and points
-      % RIGHT -- the canonical "refresh / rotate clockwise" symbol.
       \draw[->, line width=2pt, black!85, line cap=round,
             >={Stealth[length=3.6mm,width=3mm,inset=0.4mm]}]
         (60:0.45) arc[start angle=60, end angle=-270, radius=0.45];
     \end{scope}
 
     % =========== PANEL B: one generation step (vertical flow) ===========
-    %    column x in [4.0, 8.2], centre at x = 6.10
-    %    vertical flow: [raw logits] -> mask -> [masked logits] -> argmax -> token
     \node[paneltitle] at (6.10, 4.95) {\large B.~Generation step};
-
-    % --- (1) raw LM logits as 5 coloured bars (at top of the panel) ---
     \node[font=\scriptsize, color=black!70, anchor=base]
       at (6.10, 4.30) {LM logits};
     \foreach \i/\xx/\h in {0/5.00/0.55, 1/5.38/0.30, 2/5.76/0.45,
@@ -103,48 +112,38 @@ controllable frontier at all.
     }
     \draw[axisline] (4.95, 3.55) -- (6.90, 3.55);
 
-    % --- downward arrow labelled "mask V_{s+1}" ---
     \draw[flowarr] (6.10, 3.45) -- (6.10, 2.95)
        node[midway, right, font=\scriptsize, color=black!75]
        {mask $\mathcal V_{s+1}$};
 
-    % --- (2) masked logits: only V_3 retained, others faded ---
     \foreach \i/\xx/\h in {0/5.00/0.55, 1/5.38/0.30, 2/5.76/0.45,
                             3/6.14/0.65, 4/6.52/0.25} {
       \draw[fill=c\i!75, draw=black!45, line width=0.4pt,
             opacity=0.18] (\xx, 2.20) rectangle (\xx + 0.28, 2.20 + \h);
     }
-    % highlight V_3 (target partition, for example state s=2 -> s+1=3)
     \draw[fill=c3!75, draw=black!60, line width=0.7pt]
         (6.14, 2.20) rectangle (6.14 + 0.28, 2.20 + 0.65);
     \draw[axisline] (4.95, 2.20) -- (6.90, 2.20);
 
-    % --- downward arrow labelled "arg max" ---
     \draw[flowarr] (6.10, 2.10) -- (6.10, 1.60)
        node[midway, right, font=\scriptsize, color=black!75]
        {$\arg\max$};
 
-    % --- (3) output token chip in V_3 ---
     \node[bigpt, fill=c3!85] (toknext) at (6.10, 1.30) {};
     \node[font=\scriptsize, color=black!75, anchor=base]
       at (6.10, 0.85) {$t_{i+1} \in \mathcal V_{3}$};
 
-    % =========== PANEL C: detection  (two stacked sequence plots) ===========
-    %    Taller plots (y_step=0.30, height 1.20) for visual weight;
-    %    symmetric around the mid-figure line so both plots feel balanced
-    %    with the donut in Panel A.
+    % =========== PANEL C: detection ===========
     \def\xstep{0.55}
     \def\ystep{0.30}
     \def\plotL{9.90}
     \def\plotR{14.85}
     \def\plotw{4.95}
     \def\ploth{1.20}
-    \def\pcen{0.60}   % y-offset from bot to centre of plot
-    % title centred over the two stacked plots
+    \def\pcen{0.60}
     \node[paneltitle] at (\plotL + \plotw/2, 4.95)
       {\large C.~Detection by clockwork validity};
 
-    % WATERMARKED plot at y in [3.20, 4.40]
     \def\wmbot{3.20}
     \def\wmtop{4.40}
     \node[font=\scriptsize\bfseries, color=green!45!black, anchor=base]
@@ -179,7 +178,6 @@ controllable frontier at all.
     \node[score, color=green!42!black]
       at (\plotR + 0.15, \wmbot + \pcen) {$\phi = 1$};
 
-    % RANDOM plot at y in [1.00, 2.20]
     \def\rndbot{1.00}
     \def\rndtop{2.20}
     \node[font=\scriptsize\bfseries, color=red!60!black, anchor=base]
@@ -220,72 +218,77 @@ controllable frontier at all.
     \node[score, color=red!60!black]
       at (\plotR + 0.15, \rndbot + \pcen) {$\phi \approx 1/S$};
 
-    % ----- short flow arrows between panels, centred in the gaps -----
-    %   A->B: gap center x ~ 4.10; arrow 0.60 cm long
-    %   B->C: gap center x ~ 8.40; arrow 0.80 cm long
     \draw[flowarr] (3.80, 2.30) -- (4.40, 2.30);
     \draw[flowarr] (8.00, 2.30) -- (8.80, 2.30)
        node[midway, above, font=\scriptsize, color=black!60]
        {append $t_{i+1}$};
   \end{tikzpicture}
-  \caption{\textbf{How Markov Chain Lock works.}
+  \caption{\textbf{Markov Chain Lock at a glance.}
     \textbf{(A)}~A keyed SHA-256 hash $\sigma_k$ partitions the
-    vocabulary into $S{=}5$ disjoint sets $\mathcal V_0, \dots,
-    \mathcal V_{S{-}1}$ ordered into a clockwork cycle
-    $s \to s{+}1 \bmod S$.
+    vocabulary into $S$ disjoint sets $\mathcal V_0, \dots,
+    \mathcal V_{S-1}$ ordered into a clockwork cycle
+    $s \to s{+}1 \bmod S$ (here $S{=}5$).
     \textbf{(B)}~At a watermarked position with current state $s$,
     the language-model logits are masked to keep only the next
     partition $\mathcal V_{s+1}$, and the next token is the masked
     $\arg\max$.
-    \textbf{(C)}~Detection re-derives every token's state from $k$
-    in $O(n)$ hash operations: a watermarked sequence walks the
-    chain by construction (top, $\phi = 1$), whereas unwatermarked
-    text visits states uniformly and is valid only at rate $1/S$
-    in expectation (bottom).}
+    \textbf{(C)}~Detection re-derives every token's state from the
+    key $k$ in $O(n)$ hash operations: a watermarked sequence walks
+    the chain by construction (top, validity rate $\phi=1$), whereas
+    unwatermarked text visits states uniformly and is valid only at
+    rate $1/S$ in expectation (bottom).}
   \label{fig:mcl_teaser}
 \end{figure*}
 
-We answer with \emph{Markov Chain Lock} (MCL) watermarking. MCL
-sorts the vocabulary into $S$ colour-coded sets via a keyed
-SHA-256 hash and forces a fraction $\rho$ of generated tokens to
-walk a fixed cycle through those sets
-(Figure~\ref{fig:mcl_teaser}). Detection re-derives every token's
-colour from the key in $O(n)$ hash operations and counts how often
-consecutive tokens follow the cycle. Two properties make the scheme
-attractive for governance. First, detection runs without any
-language-model access, so a third-party auditor needs neither the
-provider's weights nor a proxy LM. Second, the detection bound
-inverts in closed form to a calibration map: a regulator who fixes
-a target false-positive rate $\alpha$ and a text-length floor
-$n_{\min}$ reads off the minimum admissible state count
-(Theorem~\ref{thm:detection}); a deployer can spend more budget for
-margin but cannot cheat below the regulator's specification.
+\paragraph{Gating as a design dial.}
+A second design choice — \emph{which} of the $n$ positions to
+watermark — is left as a parameter we call the gate. Existing
+schemes implicitly fix this choice: SWEET and EWD watermark only
+low-entropy positions, on the intuition that high-entropy positions
+contribute the bulk of detection statistic. Whether that intuition
+survives once detection is decoupled from the language model is an
+empirical question, which we resolve in \autoref{sec:experiments}
+through a matched-budget head-to-head against KGW and SWEET on
+multiple instruction-tuned LLMs and four text domains, including
+translation and paraphrase attacks.
 
-The choice of \emph{which} positions to watermark is left as a
-design parameter and studied empirically. On Google's Gemma~3
-270M model across 18 matched-budget cells
-(three gates $\times$ three budgets $\times$ two domains), we find
-that low-entropy gating, the policy implicit in
-SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd}, is strictly
-Pareto-dominated; that detection is gate-invariant at $\rho \geq
-0.5$; and that the empirical post-attack scaling matches the
-predicted $0.64$ on every cell. The operational dial is the budget
-$\rho$, not the gate identity.
-
-\textbf{Contributions.}
+\paragraph{Contributions.}
 \begin{enumerate}[nosep, leftmargin=*]
-  \item A discrete, hard-constraint watermarking primitive (MCL)
-    with cryptographic state partitions, clockwork transitions, and
-    $O(n)$ model-free detection (Section~\ref{sec:method}).
-  \item A closed-form calibration formula
-    (Theorem~\ref{thm:detection}) and a universal robustness
-    threshold $\delta^\star = 1 - 1/\sqrt{2}$ under the midpoint
-    decision convention (Theorem~\ref{thm:robustness}), strengthened
-    to every oracle-blind adversary by self-healing
-    (Theorem~\ref{thm:healing}); both identities extend to any
-    $k$-regular doubly-stochastic transition topology
-    (Proposition~\ref{prop:kregular}).
-  \item Empirical evidence that low-entropy gating is dominated and
-    that detection is gate-invariant at practical budgets
-    (Section~\ref{sec:experiments}).
+  \item \textbf{A model-free watermarking primitive.} We introduce
+    MCL, a discrete hard-constraint watermark with cryptographic
+    state partitions, clockwork transitions, and $O(n)$ model-free
+    detection (\autoref{sec:method}).
+  \item \textbf{Closed-form calibration.} We derive an
+    operator-facing calibration map taking a target false-positive
+    rate, text-length floor, and budget to the minimum admissible
+    state count (\autoref{thm:detection},
+    \autoref{app:proofs}), and a universal robustness threshold
+    that is invariant to $(S, \rho, n)$ under the midpoint decision
+    convention (\autoref{thm:robustness}), strengthened against
+    every oracle-blind adversary by self-healing
+    (\autoref{thm:healing}).
+  \item \textbf{$k$-regular generalisation.} Both the detection law
+    and the robustness threshold extend verbatim to any $k$-regular
+    doubly-stochastic transition topology
+    (\autoref{prop:kregular}); clockwork is the $k{=}1$ instance.
+  \item \textbf{Empirical comparison and gate analysis.} We evaluate
+    MCL head-to-head against KGW and SWEET across multiple
+    instruction-tuned language models and four text domains under
+    translation and paraphrase attacks (\autoref{sec:experiments}),
+    and show that low-entropy gating is Pareto-dominated and that
+    detection is gate-invariant at practical budgets
+    (\autoref{subsec:exp2-headline}, \autoref{subsec:exp5-calibration}).
+  \item \textbf{Empirical anchor of the calibration formula.} An
+    independent state-count sweep matches the closed-form
+    calibration map cell-by-cell
+    (\autoref{subsec:exp3-translation}).
 \end{enumerate}
+
+\paragraph{Roadmap.}
+\autoref{sec:related} situates MCL within active and passive
+watermarking. \autoref{sec:prelim} fixes notation;
+\autoref{sec:method} specifies the construction;
+\autoref{sec:theory} states the calibration, robustness, and
+$k$-regular results; and \autoref{sec:experiments} reports the
+empirical comparison. Proofs and additional derivations are in
+\autoref{app:proofs}.

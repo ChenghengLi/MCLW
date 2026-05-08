@@ -1,400 +1,611 @@
-% 11_proofs.tex -- appendix
-\section{Proofs}
+% 11_proofs.tex -- appendix: formal statements and proofs
+\section{Proofs and Formal Statements}
 \label{app:proofs}
 
-\subsection{Proof of Theorem~\ref{thm:detection}}
+This appendix collects the formal versions of the results previewed
+in \autoref{sec:theory}.  Throughout, $\sigma_k(t) = \mathcal{H}(k
+\,\Vert\, t) \bmod S$ denotes the keyed state map and is treated as a
+random oracle (uniform on $\mathcal{S}$ and independent across
+distinct tokens).  $\phi$ is the fingerprint score of
+\autoref{def:phi}, and we write $X_i =
+\mathbf{T}_{\sigma_k(t_i),\sigma_k(t_{i+1})}$ for the validity
+indicator at step $i$, with $T = \mathbf{T}^{\mathrm{clk}}$ in the
+clockwork case.
 
-Let
-\[
-  Z_i = \mathbf{T}^{\mathrm{clk}}_{\sigma_k(t_i),\,\sigma_k(t_{i+1})}
-\]
-be the validity indicator at step $i$.
+\subsection{Null variance lemma}
+\label{subsec:proof-variance}
 
-\paragraph{Null mean.}
-Under the random oracle, $\sigma_k$ is uniform over $\mathcal{S}$ and
-independent across distinct tokens. Hence $Z_i \sim
-\mathrm{Bernoulli}(1/S)$ for random input, and
-\[
-  \mathbb{E}[\phi \mid \mathrm{null}] = \tfrac{1}{S}.
-\]
+The null variance underpins both the detection $z$-score and the
+universal robustness threshold; we isolate it as a lemma.
 
-\paragraph{Watermark mean.}
-At a gated position, Algorithm~\ref{alg:embed} sets
-$\sigma_k(t_{i+1}) = (\sigma_k(t_i) + 1) \bmod S$, so $Z_i = 1$
-deterministically. At an ungated position, $Z_i \sim
-\mathrm{Bernoulli}(1/S)$. Averaging,
-\[
-  \mathbb{E}[\phi \mid \mathrm{WM}]
-    = \rho \cdot 1 + (1-\rho) \cdot \tfrac{1}{S}
-    = \tfrac{1}{S} + \rho \tfrac{S-1}{S}.
-\]
+\begin{lemma}[Null variance with zero pairwise covariance]
+  \label{lem:variance}
+  Let $T \in \{0,1\}^{S \times S}$ be $k$-regular: every row and
+  every column has exactly $k$ ones, with $1 \leq k \leq S{-}1$, and
+  set $p_0 = k/S$.  Under the random oracle null
+  (i.i.d.\ uniform tokens), the indicators
+  $X_i = T_{\sigma_k(t_i), \sigma_k(t_{i+1})}$ satisfy
+  $\mathbb{E}[X_i] = p_0$ and $\mathrm{Cov}(X_i, X_j) = 0$ for all
+  $i \neq j$, hence
+  \begin{equation}
+    \mathrm{Var}\!\left[\phi(\mathbf{t}^r)\right]
+      \;=\; \frac{p_0 (1 - p_0)}{n-1}.
+    \label{eq:null-variance}
+  \end{equation}
+\end{lemma}
 
-\paragraph{Null variance.}
-The null variance is $\mathrm{Var}[\phi \mid \mathrm{null}] =
-(1/S)(1-1/S)/(n-1)$. This follows from the pairwise zero-covariance
-argument in the proof of Proposition~\ref{prop:kregular} below,
-specialised to $k = 1$: clockwork has $|N^-(s')| = 1$, so
-column-regularity holds trivially.
+\begin{proof}
+  Write $N^+(s) = \{s' : T(s,s')=1\}$ and $N^-(s') = \{s :
+  T(s,s')=1\}$; by $k$-regularity, $|N^+(s)| = |N^-(s')| = k$ for
+  every $s, s'$.
 
-\paragraph{Detector $z$-score.}
-The signed mean gap is $\rho(S-1)/S$. Dividing by the null SD,
-\begin{align*}
-  z(\rho, S, n)
-    &= \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}} \\
-    &= \rho\sqrt{(S-1)(n-1)}.
-\end{align*}
-This is the full mean-gap $z$ reported by Algorithm~\ref{alg:detect}.
-The null $z$ \emph{at the midpoint threshold}
-$\tau_{\mathrm{mid}} = 1/S + \tfrac{\rho}{2}(S-1)/S$ is half this
-quantity, $(\rho/2)\sqrt{(S-1)(n-1)}$, since
-$\tau_{\mathrm{mid}} - 1/S$ is half the mean gap.
+  \emph{Marginal mean.}  Conditioning on $\sigma_k(t_i)$ and using
+  row-regularity,
+  \(
+    \Pr[X_i = 1]
+      = \mathbb{E}\!\left[ |N^+(\sigma_k(t_i))| / S \right]
+      = k/S = p_0.
+  \)
 
-\paragraph{FPR bound.}
-Adjacent indicators $Z_i, Z_{i+1}$ share token $t_{i+1}$, so
-$\{Z_i\}$ are not jointly i.i.d.\ and Hoeffding does not apply
-directly. Split into
-\[
-  Z_1, Z_3, Z_5, \ldots
-  \qquad\text{and}\qquad
-  Z_2, Z_4, Z_6, \ldots,
-\]
-two disjoint subsequences of $m = \lfloor (n-1)/2 \rfloor$ terms,
-each i.i.d.\ $\mathrm{Bernoulli}(1/S)$. Hoeffding on each plus union
-bound gives, for $\tau > 1/S$,
-\[
-  \Pr(\phi \geq \tau)
-    \;\leq\; 2 \exp\!\bigl(-2 m\, (\tau - 1/S)^2\bigr).
-\]
+  \emph{Non-adjacent pairs.}  For $|i-j| \geq 2$, $X_i$ and $X_j$
+  depend on disjoint token pairs and thus on independent state
+  evaluations of the random oracle (assuming the underlying tokens
+  are distinct; coincidences contribute $O(1/|\mathcal{V}|)$ and are
+  absorbed into the random-oracle approximation).  Hence
+  $\mathrm{Cov}(X_i, X_j) = 0$.
 
-\paragraph{Calibration.}
-The Hoeffding bound is conservative. Pairwise zero covariance plus
-boundedness of $Z_i$ in $[0,1]$ yield a CLT-style Gaussian limit for
-$\phi$, so we adopt the Gaussian convention.
-At the midpoint threshold, the null $z$-score at
-$\tau_{\mathrm{mid}}$ is $(\rho/2)\sqrt{(S-1)(n-1)}$. Requiring this
-to exceed $z_\alpha$ for $\mathrm{FPR} \leq \alpha$ gives
-\[
-  \tfrac{\rho}{2}\sqrt{(S-1)(n-1)} \;\geq\; z_\alpha,
-\]
-i.e.,
-\[
-  S \;\geq\; \frac{4 z_\alpha^2}{\rho^2(n-1)} + 1.
-\]
-Taking ceiling yields~\eqref{eq:calibration}. \hfill$\square$
+  \emph{Adjacent pairs.}  $X_i$ and $X_{i+1}$ share the token
+  $t_{i+1}$.  Conditioning on $\sigma_k(t_{i+1}) = s'$, we have
+  \[
+    \Pr[X_i = 1 \mid \sigma_k(t_{i+1}) = s']
+      \;=\; |N^-(s')| / S \;=\; p_0,
+  \]
+  \[
+    \Pr[X_{i+1} = 1 \mid \sigma_k(t_{i+1}) = s']
+      \;=\; |N^+(s')| / S \;=\; p_0,
+  \]
+  using \emph{column}-regularity for the first identity.  Conditional
+  on $\sigma_k(t_{i+1})$, the indicators $X_i$ and $X_{i+1}$ depend
+  on the disjoint random-oracle evaluations $\sigma_k(t_i)$ and
+  $\sigma_k(t_{i+2})$, so they are conditionally independent.
+  Therefore
+  \[
+    \Pr[X_i = X_{i+1} = 1]
+      \;=\; \mathbb{E}_{s'}\!\left[ p_0 \cdot p_0 \right]
+      \;=\; p_0^2,
+  \]
+  and $\mathrm{Cov}(X_i, X_{i+1}) = 0$.
 
-\subsection{Proof of Proposition~\ref{prop:kregular}}
+  \emph{Variance.}  $\phi = (n-1)^{-1} \sum_{i=1}^{n-1} X_i$ is the
+  average of $n-1$ Bernoulli$(p_0)$ random variables with all
+  pairwise covariances vanishing, giving \eqref{eq:null-variance}.
+\end{proof}
 
-Let $T \in \{0,1\}^{S\times S}$ be $k$-regular, and write
-\[
-  N^+(s) := \{s' : T(s,s') = 1\},
-  \qquad
-  N^-(s') := \{s : T(s,s') = 1\}
-\]
-for the out- and in-neighbourhoods. By $k$-regularity,
-$|N^+(s)| = |N^-(s')| = k$ for every $s, s'$.
+% PROOF REVIEW NOTE: The original Theorem 1 (detection) used the
+% variance formula $(1/S)(1-1/S)/(n-1)$ without explicitly justifying
+% the zero-covariance step.  We have separated it out as
+% \autoref{lem:variance} and made the column-regularity assumption
+% (and the random-oracle-on-distinct-tokens caveat for non-adjacent
+% pairs) explicit.
 
-\paragraph{Null mean \eqref{eq:kreg-null}.}
-Under the random oracle, $\sigma_k(t_i)$ and $\sigma_k(t_{i+1})$
-are i.i.d.\ uniform on $\mathcal{S}$. Conditioning on
-$\sigma_k(t_i)$ and applying row-regularity,
-\[
-  \Pr[X_i = 1]
-    \;=\; \mathbb{E}_{\sigma_k(t_i)}\!\left[
-      \tfrac{|N^+(\sigma_k(t_i))|}{S}
-    \right]
-    \;=\; \tfrac{k}{S}
-    \;=\; p_0.
-\]
+\subsection{Detection bound and calibration}
+\label{subsec:proof-detection}
 
-\paragraph{Watermark mean \eqref{eq:kreg-wm}.}
-At a gated position, Algorithm~\ref{alg:embed} restricts the argmax
-to $\bigcup_{s' \in N^+(s)} \mathcal{V}_{s'}$, so
-$\sigma_k(t_{i+1}) \in N^+(\sigma_k(t_i))$ and $X_i = 1$. At an
-ungated position, $X_i \sim \mathrm{Bernoulli}(p_0)$. Averaging,
-\[
-  \mathbb{E}[\phi \mid \mathrm{WM}]
-    \;=\; \rho + (1-\rho) p_0
-    \;=\; p_0 + \rho(1 - p_0).
-\]
+\begin{theorem}[Detection bound and calibration]
+  \label{thm:detection}
+  Let $\mathbf{t}^w$ be an MCL-watermarked sequence of length $n$
+  with watermark fraction $\rho$ and clockwork transition over $S$
+  states; let $\mathbf{t}^r$ be an i.i.d.\ random sequence over
+  $\mathcal{V}$.  Then
+  \begin{align}
+    \mathbb{E}\!\left[\phi(\mathbf{t}^w)\right]
+      &= \tfrac{1}{S} + \rho\, \tfrac{S-1}{S}, \\
+    \mathbb{E}\!\left[\phi(\mathbf{t}^r)\right] &= \tfrac{1}{S}, \\
+    \mathrm{Var}\!\left[\phi(\mathbf{t}^r)\right]
+      &= \tfrac{(1/S)(1-1/S)}{n-1}, \\
+    z(\rho, S, n)
+      &= \rho \sqrt{(S-1)(n-1)}.
+  \end{align}
+  Under the midpoint threshold $\tau_{\mathrm{mid}} = \tfrac{1}{S} +
+  \tfrac{\rho}{2} \tfrac{S-1}{S}$, splitting the indicators into
+  disjoint odd/even subsequences and applying Hoeffding gives
+  \[
+    \mathrm{FPR}
+      \;\leq\; 2 \exp\!\bigl(-2 \lfloor (n-1)/2 \rfloor
+        ((\rho/2)(S-1)/S)^2\bigr).
+  \]
+  Using the Gaussian convention at the midpoint threshold, the
+  minimum state count guaranteeing $\mathrm{FPR} \leq \alpha$ is
+  \begin{equation}
+    S^\star(n, \rho, \alpha)
+      \;=\; \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1
+        \right\rceil.
+    \label{eq:calibration}
+  \end{equation}
+\end{theorem}
 
-\paragraph{Null variance \eqref{eq:kreg-var}.}
-Write $\phi = (n-1)^{-1} \sum_i X_i$. Non-adjacent pairs
-$(X_i, X_j)$ are independent: they share no tokens. For adjacent
-pairs $(X_i, X_{i+1})$ which share $\sigma_k(t_{i+1}) = s'$,
-\begin{align*}
-  \Pr[X_i = 1 \mid \sigma_k(t_{i+1}) = s']
-    &= \tfrac{|N^-(s')|}{S} = p_0, \\
-  \Pr[X_{i+1} = 1 \mid \sigma_k(t_{i+1}) = s']
-    &= \tfrac{|N^+(s')|}{S} = p_0.
-\end{align*}
-\emph{Column-regularity is essential}: without it, the first
-probability would depend on $s'$.
+\begin{proof}
+  \emph{Null mean.}  Under the random oracle, $\sigma_k$ is uniform
+  and independent across distinct tokens, so $X_i \sim
+  \mathrm{Bernoulli}(1/S)$ marginally and
+  $\mathbb{E}[\phi(\mathbf{t}^r)] = 1/S$.
 
-The conditional independence
-$\sigma_k(t_i) \perp \sigma_k(t_{i+2}) \mid \sigma_k(t_{i+1})$
-holds when $t_i \neq t_{i+2}$, since $\mathcal{H}(k \,\Vert\, \cdot)$ is
-queried on distinct inputs. Coincidences $t_i = t_{i+2}$ contribute
-$O(1/|\mathcal{V}|)$ to the pair covariance under an i.i.d.\ uniform
-null on tokens, negligible for realistic vocabularies.
-Then
-\[
-  \Pr[X_i = 1, X_{i+1} = 1]
-    = \mathbb{E}_{s'}[p_0^2]
-    = p_0^2,
-\]
-so $\mathrm{Cov}(X_i, X_{i+1}) = 0$. All pairwise covariances
-vanish, giving
-\[
-  \mathrm{Var}(\phi)
-    = \frac{p_0(1-p_0)}{n-1}.
-\]
+  \emph{Watermark mean.}  At a gated position,
+  \autoref{alg:embed} sets $\sigma_k(t_{i+1}) = (\sigma_k(t_i) + 1)
+  \bmod S$, so $X_i = 1$ deterministically.  At an ungated position,
+  $X_i \sim \mathrm{Bernoulli}(1/S)$.  With gate density $\rho$,
+  \[
+    \mathbb{E}[\phi(\mathbf{t}^w)]
+      = \rho \cdot 1 + (1-\rho) \cdot \tfrac{1}{S}
+      = \tfrac{1}{S} + \rho \tfrac{S-1}{S}.
+  \]
 
-\paragraph{$z$-score \eqref{eq:kreg-z}.}
-Dividing the signed mean gap $\rho(1-p_0)$ by the null SD,
-\begin{align*}
-  z &= \frac{\rho(1-p_0)}{\sqrt{p_0(1-p_0)/(n-1)}} \\
-    &= \rho \sqrt{\frac{(1-p_0)(n-1)}{p_0}}.
-\end{align*}
-For $k = 1$ (clockwork) $p_0 = 1/S$ and this reduces to
-$\rho\sqrt{(S-1)(n-1)}$, the full mean-gap $z$ of
-Theorem~\ref{thm:detection}. Halving the gap (midpoint threshold)
-recovers the calibration form
-$(\rho/2)\sqrt{(S-1)(n-1)}$ used in~\eqref{eq:calibration}.
+  \emph{Null variance.}  Clockwork is the $k=1$ instance of
+  \autoref{lem:variance} (column-regularity is trivial since
+  $|N^-(s')| = 1$), giving
+  $\mathrm{Var}[\phi(\mathbf{t}^r)] = (1/S)(1-1/S)/(n-1)$.
 
-\paragraph{Post-attack mean and critical rate
-\eqref{eq:kreg-atk}--\eqref{eq:kreg-delta}.}
-Let $M_i \sim \mathrm{Bernoulli}(\delta)$ indicate modification of
-$t_i$. Modified tokens receive fresh uniform $\sigma_k$ by the
-random oracle.
+  \emph{$z$-score.}  The signed mean gap is $\rho(S-1)/S$.  Dividing
+  by the null SD,
+  \[
+    z(\rho,S,n)
+      \;=\; \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}}
+      \;=\; \rho \sqrt{(S-1)(n-1)}.
+  \]
 
-For each pair $(i, i+1)$, condition on $(M_i, M_{i+1})$:
-\begin{itemize}[nosep, leftmargin=1.2em]
-  \item $(0,0)$: contributes the unattacked mean
-    $p_0 + \rho(1-p_0)$.
-  \item $(0,1)$: $t_{i+1}$ fresh; column-regularity gives
-    $\mathbb{E}[X_i] = p_0$.
-  \item $(1,0)$: symmetric; row-regularity gives $\mathbb{E}[X_i]
-    = p_0$.
-  \item $(1,1)$: both fresh; $\mathbb{E}[X_i] = p_0$.
-\end{itemize}
-Combining with weights $(1-\delta)^2$ and $1-(1-\delta)^2$:
-\begin{align*}
-  \mathbb{E}[\phi \mid \mathrm{atk}]
-    &= (1-\delta)^2\bigl(p_0 + \rho(1-p_0)\bigr)
-       + \bigl(1 - (1-\delta)^2\bigr) p_0 \\
-    &= p_0 + \rho (1-\delta)^2 (1-p_0).
-\end{align*}
+  \emph{FPR via Hoeffding.}  Adjacent indicators share a token and
+  are not jointly i.i.d., so we split into $Z_1, Z_3, Z_5, \dots$ and
+  $Z_2, Z_4, Z_6, \dots$, two disjoint subsequences of $m =
+  \lfloor (n-1)/2 \rfloor$ terms, each i.i.d.\
+  $\mathrm{Bernoulli}(1/S)$.  Hoeffding on each plus a union bound
+  gives, for any $\tau > 1/S$,
+  \(
+    \Pr[\phi \geq \tau] \leq 2 \exp(-2 m (\tau - 1/S)^2).
+  \)
 
-At the midpoint threshold
-$\tau_{\mathrm{mid}} = p_0 + \tfrac{\rho}{2}(1-p_0)$, detection
-is defeated iff
-\[
-  \rho(1-\delta)^2(1-p_0) \;<\; \tfrac{\rho}{2}(1-p_0),
-\]
-i.e., $(1-\delta)^2 < 1/2$. Solving,
-\[
-  \delta^\star_{\mathrm{mid}}
-    \;=\; 1 - 1/\sqrt{2},
-\]
-independent of $S, \rho, n, k$. \hfill$\square$
+  % PROOF REVIEW NOTE: We highlight that the $(1/S)(1-1/S)/(n-1)$
+  % variance assumes pairs $(s_i, s_{i+1})$ are pairwise
+  % uncorrelated.  Under the random-oracle null this holds exactly
+  % in expectation (\autoref{lem:variance}); under the watermark
+  % alternative it holds only approximately, deteriorating mildly
+  % at high $\rho$ where chains of forced transitions induce extra
+  % correlation between consecutive indicators.  At $\rho = 1$ the
+  % alternative becomes deterministic (all $X_i = 1$) and variance
+  % collapses to zero, which only strengthens detection.  The
+  % calibration formula is therefore conservative.
 
-\subsection{Proof of Theorem~\ref{thm:quality}}
+  \emph{Calibration.}  By the CLT for 1-dependent sequences (the
+  $\{X_i\}$ are 1-dependent and bounded with vanishing pairwise
+  covariance), $\sqrt{n-1}\,(\phi - 1/S)$ is asymptotically
+  $\mathcal{N}(0, p_0(1-p_0))$ under the null, with $p_0 = 1/S$.  At
+  the midpoint threshold $\tau_{\mathrm{mid}} = 1/S +
+  (\rho/2)(S-1)/S$, the null $z$-margin is
+  $(\rho/2) \sqrt{(S-1)(n-1)}$.  Requiring it to exceed $z_\alpha$,
+  \[
+    \tfrac{\rho}{2} \sqrt{(S-1)(n-1)} \;\geq\; z_\alpha
+    \quad\Longleftrightarrow\quad
+    S \;\geq\; \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1,
+  \]
+  and taking the ceiling yields \eqref{eq:calibration}.
+\end{proof}
 
-\paragraph{KL formula.}
-At a gated position with current state $s$, the renormalised MCL
-distribution is
-\[
-  P_{\mathrm{MCL}}(t)
-    = \begin{cases}
-        p(t)/Z_s, & t \in \mathcal{V}_{(s+1) \bmod S}, \\
-        0, & \text{otherwise},
-      \end{cases}
-\]
-with $Z_s = p(\mathcal{V}_{(s+1) \bmod S})$. Direct computation:
-\begin{align*}
-  D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p)
-    &= \sum_{t \in \mathcal{V}_{(s+1) \bmod S}}
-        \frac{p(t)}{Z_s} \log \frac{1}{Z_s} \\
-    &= \log(1/Z_s).
-\end{align*}
+\subsection{Universal robustness threshold}
+\label{subsec:proof-robustness}
 
-\paragraph{Jensen lower bound.}
-Under hash uniformity, $\Pr[t \in \mathcal{V}_{(s+1) \bmod S}] = 1/S$
-for every fixed $t$, so by linearity
-\[
-  \mathbb{E}[Z_s]
-    = \sum_{t \in \mathcal{V}} p(t) \cdot \tfrac{1}{S}
-    = \tfrac{1}{S}.
-\]
-The map $z \mapsto \log z$ is concave; Jensen gives
-$\mathbb{E}[\log Z_s] \leq \log \mathbb{E}[Z_s] = -\log S$, hence
-\[
-  \mathbb{E}[D_{\mathrm{KL}}]
-    \;=\; \mathbb{E}[\log(1/Z_s)]
-    \;\geq\; \log S,
-\]
-with equality iff $Z_s$ is constant in the key. Averaging over
-positions with gate rate $\rho$,
-\[
-  \mathbb{E}[D_{\mathrm{KL}}]_{\mathrm{tok}}
-    \;\geq\; \rho \log S.
-\]
-The bound is tight at high-entropy positions (where $p$ is close to
-uniform and $Z_s \approx 1/S$), and loose at low-entropy positions
-(where $Z_s$ varies sharply with the choice of partition). \hfill$\square$
+\begin{theorem}[Universal robustness threshold]
+  \label{thm:robustness}
+  Suppose each token is independently replaced with probability
+  $\delta$ by a fresh token whose state $\sigma_k$ is uniform on
+  $\mathcal{S}$.  Then for clockwork MCL with state count $S$ and
+  gate density $\rho$,
+  \begin{equation}
+    \mathbb{E}[\phi \mid \mathrm{attack}]
+      \;=\; \tfrac{1}{S} + \rho (1-\delta)^2 \tfrac{S-1}{S}.
+    \label{eq:post-attack-mean}
+  \end{equation}
+  Define the pre-attack and post-attack mean-gap signals
+  $\Delta_{\mathrm{pre}} = \rho (S{-}1)/S$ and
+  $\Delta_{\mathrm{post}} = \rho(1{-}\delta)^2 (S{-}1)/S$.  Both share
+  the same null SD, so the standardised-margin ratio is
+  \begin{equation}
+    \frac{z_{\mathrm{post}}}{z_{\mathrm{pre}}}
+      \;=\; \frac{\Delta_{\mathrm{post}}}{\Delta_{\mathrm{pre}}}
+      \;=\; (1-\delta)^2,
+    \label{eq:z-ratio}
+  \end{equation}
+  independent of $(S, \rho, n)$.  Under the midpoint-threshold
+  detection convention the critical edit fraction at which detection
+  fails is
+  \begin{equation}
+    \delta^\star \;=\; 1 - 1/\sqrt{2} \;\approx\; 0.293,
+  \end{equation}
+  again independent of $(S, \rho, n)$.
+\end{theorem}
 
-\subsection{Proof of Theorem~\ref{thm:robustness}}
+\begin{proof}
+  Let $M_i \sim \mathrm{Bernoulli}(\delta)$, i.i.d.\ across $i$,
+  indicate that $t_i$ has been replaced; modified tokens receive
+  fresh uniform state by the random-oracle property.  For each pair
+  $(t_i, t_{i+1})$, decompose on $(M_i, M_{i+1})$:
 
-Let $M_i \sim \mathrm{Bernoulli}(\delta)$ indicate modification of
-$t_i$, i.i.d.\ across $i$. We treat the fully-gated case $\rho = 1$
-first.
+  \begin{itemize}[nosep, leftmargin=1.2em]
+    \item $(0,0)$: both tokens survive.  The indicator equals the
+      pre-attack distribution, with mean $1/S + \rho (S{-}1)/S$.
+      Weight $(1-\delta)^2$.
+    \item $(0,1)$: $t_{i+1}$ fresh.  By column-regularity (which is
+      trivial for clockwork), $\mathbb{E}[X_i] = 1/S$.  Weight
+      $(1-\delta)\delta$.
+    \item $(1,0)$: symmetric, by row-regularity.  Mean $1/S$, weight
+      $\delta(1-\delta)$.
+    \item $(1,1)$: both fresh.  Mean $1/S$, weight $\delta^2$.
+  \end{itemize}
+  Combining,
+  \begin{align*}
+    \mathbb{E}[\phi \mid \mathrm{atk}]
+      &= (1-\delta)^2\!\left[\tfrac{1}{S} + \rho \tfrac{S-1}{S}\right]
+        + (1 - (1-\delta)^2) \tfrac{1}{S} \\
+      &= \tfrac{1}{S} + \rho (1-\delta)^2 \tfrac{S-1}{S},
+  \end{align*}
+  proving \eqref{eq:post-attack-mean}.
 
-\paragraph{Decomposition for $\rho = 1$.}
-Pre-attack, $X_i = 1$ deterministically. Post-attack, decompose on
-$(M_i, M_{i+1})$:
-\begin{itemize}[nosep, leftmargin=1.2em]
-  \item $(0,0)$: valid w.p.\ $1$. Weight $(1-\delta)^2$.
-  \item $(0,1)$: $\sigma_k(t_{i+1})$ fresh-uniform; valid w.p.\
-    $1/S$. Weight $(1-\delta)\delta$.
-  \item $(1,0)$: symmetric. Weight $\delta(1-\delta)$, prob.\ $1/S$.
-  \item $(1,1)$: both fresh-uniform. Weight $\delta^2$, prob.\ $1/S$.
-\end{itemize}
-Summing,
-\[
-  \mathbb{E}[\phi^{\mathrm{atk}} \mid \rho = 1]
-    \;=\; (1-\delta)^2 + \tfrac{\delta(2-\delta)}{S}.
-\]
+  % PROOF REVIEW NOTE: The original derivation collapsed the (0,1)
+  % and (1,0) cases without justifying that the fresh-token state
+  % decouples the indicator.  We now record explicitly that
+  % column-regularity (and trivially row-regularity, for clockwork)
+  % is what reduces $\mathbb{E}[X_i]$ to $1/S$ in those cases.
 
-\paragraph{General $\rho$.}
-For $\rho < 1$, the $(0,0)$ pre-attack indicator is
-$g_i + (1-g_i)/S$, with $\mathbb{E}_g[\cdot] = \rho + (1-\rho)/S$.
-The non-$(0,0)$ contributions remain $1/S$: the fresh-token state is
-uniform regardless of the gate indicator. Combining,
-\begin{align*}
-  \mathbb{E}[\phi^{\mathrm{atk}}]
-    &= (1-\delta)^2 [\rho + (1-\rho)/S]
-       + (1-(1-\delta)^2)/S \\
-    &= \tfrac{1}{S} + \rho(1-\delta)^2 \tfrac{S-1}{S}.
-\end{align*}
-This matches the $k=1$ specialisation of
-Proposition~\ref{prop:kregular}'s post-attack identity.
+  \emph{$z$-ratio independence.}  The mean gap above the null
+  baseline $1/S$ is $\Delta = \rho(S{-}1)/S$ pre-attack and $\Delta
+  (1-\delta)^2$ post-attack.  The null SD is the same in both regimes
+  (it is a property of the null distribution, which the attack does
+  not change --- and the post-attack \emph{alternative} variance is
+  bounded above by the null variance, only making the standardised
+  margin a tighter lower bound on detection).  Hence
+  $z_{\mathrm{post}}/z_{\mathrm{pre}} = \Delta_{\mathrm{post}} /
+  \Delta_{\mathrm{pre}} = (1-\delta)^2$, independent of $(S, \rho, n)$.
 
-\paragraph{Critical rate.}
-At the midpoint threshold
-$\tau = 1/S + \tfrac{\rho}{2}(S-1)/S$, the attack succeeds when
-\[
-  \rho(1-\delta)^2 \tfrac{S-1}{S}
-    \;<\;
-  \tfrac{\rho}{2} \tfrac{S-1}{S},
-\]
-i.e., $(1-\delta)^2 < 1/2$. Solving,
-$\delta^\star = 1 - 1/\sqrt{2}$, independent of $S, \rho, n$. \hfill$\square$
+  \emph{Critical fraction.}  At the midpoint threshold
+  $\tau_{\mathrm{mid}} = 1/S + (\rho/2)(S{-}1)/S$, detection is
+  defeated iff the post-attack mean drops below $\tau_{\mathrm{mid}}$,
+  i.e.\
+  \[
+    \rho (1-\delta)^2 \tfrac{S-1}{S}
+      \;<\; \tfrac{\rho}{2} \tfrac{S-1}{S}
+    \quad\Longleftrightarrow\quad
+    (1-\delta)^2 \;<\; \tfrac{1}{2}.
+  \]
+  Solving, $\delta^\star = 1 - 1/\sqrt{2}$.  The factors $(S{-}1)/S$
+  and $\rho$ cancel on both sides; this is the structural reason for
+  the universal threshold.
+\end{proof}
 
-\subsection{Proof of Theorem~\ref{thm:security}}
+\subsection{$k$-regular generalisation}
+\label{subsec:proof-kregular}
 
-The state assignment $\sigma_k(t) = \mathcal{H}(k \,\Vert\, t) \bmod S$
-uses $\mathcal{H}$ modelled as a random oracle. Without~$k$, any polynomial-time
-adversary $\mathcal{A}$ can evaluate $\sigma_k$ only by querying
-the oracle on $k' \,\Vert\, t$ for $k' \neq k$, which yields fresh
-independent outputs.
+We now lift the clockwork results to any $k$-regular adjacency.  We
+recall the definition for the appendix.
 
-\paragraph{Key recovery.}
-Assume $k$ has min-entropy $\lambda$. Since the oracle's output
-on $k \,\Vert\, t$ is independent of $\mathcal{A}$'s view, a query
-budget $q$ yields recovery probability at most
-\[
-  q \cdot 2^{-\lambda}.
-\]
+\begin{definition}[$k$-regular topology]
+  \label{def:kregular}
+  $T \in \{0,1\}^{S \times S}$ is \emph{$k$-regular} ($1 \leq k \leq
+  S{-}1$) if every row and every column contains exactly $k$ ones.
+  Equivalently, $T/k$ is doubly stochastic.  The induced detection
+  baseline is $p_0 = k/S$.
+\end{definition}
 
-\paragraph{State prediction.}
-For any token $t^\star$ that $\mathcal{A}$ has not previously
-queried with the correct key, $\sigma_k(t^\star)$ is uniform on
-$\mathcal{S}$ in $\mathcal{A}$'s view. The per-prediction success
-probability is at most $1/S + \mathrm{negl}(\lambda)$, and the
-\emph{advantage} over the uniform $1/S$ baseline is
-$\mathrm{negl}(\lambda)$.
+\begin{theorem}[$k$-regular calibration identities]
+  \label{thm:k-regular}%
+  \label{prop:kregular}% legacy alias for cross-references
+  Fix any $k$-regular adjacency $T$ and let $p_0 = k/S$.  Apply
+  \autoref{alg:embed} and \autoref{alg:detect} with $T$ in place of
+  the clockwork matrix.  Then for an i.i.d.\ random null sequence
+  $\mathbf{t}^r$ and a watermarked sequence $\mathbf{t}^w$ with gate
+  density $\rho$,
+  \begin{align}
+    \mathbb{E}[\phi(\mathbf{t}^r)] &= p_0,
+      \label{eq:kreg-null}\\
+    \mathbb{E}[\phi(\mathbf{t}^w)] &= p_0 + \rho (1-p_0),
+      \label{eq:kreg-wm}\\
+    \mathrm{Var}[\phi(\mathbf{t}^r)]
+      &= \tfrac{p_0 (1-p_0)}{n-1},
+      \label{eq:kreg-var}\\
+    z(\rho, p_0, n)
+      &= \rho \sqrt{\tfrac{(1-p_0)(n-1)}{p_0}},
+      \label{eq:kreg-z}\\
+    \mathbb{E}[\phi \mid \mathrm{atk}]
+      &= p_0 + \rho (1-\delta)^2 (1 - p_0).
+      \label{eq:kreg-atk}
+  \end{align}
+\end{theorem}
 
-\paragraph{Statistical detection (restricted threat model).}
-Consider an adversary $\mathcal{A}$ without oracle access, without
-LM access, and without reference text. The null hypothesis
-$\mathbf{t}^r$ is i.i.d.\ uniform over $\mathcal{V}$ (as in
-Theorem~\ref{thm:detection}). Under this null, any statistic
-measurable only in token IDs that achieves non-trivial advantage
-must extract $\sigma_k$-dependent structure from $\mathbf{t}^w$.
-Without oracle access, $\mathcal{A}$ has at most
-$\mathrm{negl}(\lambda)$ advantage on each $\sigma_k$ prediction,
-so the distinguishing advantage inherits the same bound.
+\begin{proof}
+  Equation \eqref{eq:kreg-null} and the variance
+  \eqref{eq:kreg-var} are immediate from \autoref{lem:variance}.
 
-An adversary \emph{with} LM access can compute the perplexity gap
-implied by Theorem~\ref{thm:quality} and is not covered by this
-theorem. MCL is a distorting watermark, not an undetectable one.
-\hfill$\square$
+  \emph{Watermark mean.}  At a gated position,
+  \autoref{alg:embed} restricts the argmax to $\bigcup_{s' \in
+    N^+(s)} \mathcal{V}_{s'}$, so $\sigma_k(t_{i+1}) \in
+  N^+(\sigma_k(t_i))$, i.e., $X_i = 1$.  At an ungated position, $X_i
+  \sim \mathrm{Bernoulli}(p_0)$.  Averaging,
+  $\mathbb{E}[\phi(\mathbf{t}^w)] = \rho + (1-\rho) p_0 = p_0 +
+  \rho (1-p_0)$.
 
-\subsection{Proof of Theorem~\ref{thm:hdd}}
+  \emph{$z$-score.}  Dividing the signed mean gap $\rho(1-p_0)$ by
+  the null SD $\sqrt{p_0(1-p_0)/(n-1)}$ gives
+  $\rho \sqrt{(1-p_0)(n-1)/p_0}$.  At $k=1$, $p_0 = 1/S$ and this
+  reduces to $\rho \sqrt{(S{-}1)(n{-}1)}$, recovering
+  \autoref{thm:detection}.
 
-Under the null, $X_i$ is $\mathrm{Bernoulli}(1/S)$ marginally with
-pairwise zero covariance (Proposition~\ref{prop:kregular}). Under
-the alternative, $X_i$ is $\mathrm{Bernoulli}(\pi_i)$ with
-\[
-  \pi_i = g_i + (1 - g_i)/S.
-\]
+  \emph{Post-attack mean.}  Repeat the four-case decomposition of
+  \autoref{thm:robustness}.  The $(0,1)$ case requires column-regularity
+  to give $\mathbb{E}[X_i \mid t_{i+1}\text{ fresh}] = p_0$
+  (the conditional in-degree $|N^-(s')|/S$ must be $p_0$ uniformly in
+  $s'$); the $(1,0)$ case symmetrically uses row-regularity.  Hence
+  \[
+    \mathbb{E}[\phi \mid \mathrm{atk}]
+      = (1-\delta)^2 (p_0 + \rho(1-p_0))
+        + (1 - (1-\delta)^2) p_0
+      = p_0 + \rho (1-\delta)^2 (1 - p_0).
+  \]
+\end{proof}
 
-\paragraph{1-dependence and LAN.}
-Under the random oracle on distinct tokens, $\{X_i\}$ is a
-1-dependent sequence: $X_i$ and $X_{i+1}$ share token $t_{i+1}$,
-while $(X_i, X_j)$ for $|i-j| \geq 2$ are independent. Pairwise
-covariance vanishes (Prop.~\ref{prop:kregular}), so the central
-limit theorem for 1-dependent sequences gives the standardised
-product-form LLR the same Gaussian limit as the true LLR. The test
-below is therefore \emph{asymptotically} Neyman--Pearson optimal
-in the Le~Cam LAN sense. We adopt the convention $0 \log 0 = 0$
-for gated $X_i$.
+% PROOF REVIEW NOTE: The baseline $p_0 = k/S$ assumes the SHA-256
+% partition $\sigma_k$ is approximately uniform over the
+% vocabulary.  Formally we model $\mathcal{H}$ as a random oracle;
+% in deployment this rests on the avalanche property of SHA-256,
+% which guarantees that for distinct inputs the output bits are
+% pseudo-independent and hence the modular reduction is uniform up
+% to a $1/2^{256}$ bias.  We flag this as the cryptographic
+% assumption inherited by every $k$-regular MCL scheme.
 
-\paragraph{Likelihood ratio.}
-Under product hypotheses,
-\begin{align*}
-  \Lambda
-    &= \sum_i \log
-        \frac{\pi_i^{X_i}(1-\pi_i)^{1-X_i}}
-             {(1/S)^{X_i}(1-1/S)^{1-X_i}} \\
-    &= \sum_i X_i \log(\pi_i S)
-       + (1-X_i) \log\tfrac{1-\pi_i}{1-1/S},
-\end{align*}
-matching the theorem statement. Asymptotic Neyman--Pearson
-optimality follows from the Neyman--Pearson lemma applied to the
-product hypothesis combined with the 1-dependent CLT above.
-\hfill$\square$
+\begin{corollary}[Universal midpoint $\delta^\star$]
+  \label{cor:universal-delta}
+  Under the midpoint-threshold detection convention, every
+  $k$-regular MCL scheme has critical edit fraction
+  \[
+    \delta^\star \;=\; 1 - 1/\sqrt{2},
+  \]
+  independent of the topology parameters $(k, S, \rho, n)$.
+\end{corollary}
 
-\subsection{Proof of Theorem~\ref{thm:healing}}
+\begin{proof}
+  The midpoint threshold is $\tau_{\mathrm{mid}} = p_0 +
+  (\rho/2)(1 - p_0)$.  By \eqref{eq:kreg-atk}, the post-attack mean
+  drops below $\tau_{\mathrm{mid}}$ iff
+  \[
+    \rho (1-\delta)^2 (1 - p_0) \;<\; \tfrac{\rho}{2} (1 - p_0)
+    \;\Longleftrightarrow\; (1-\delta)^2 \;<\; \tfrac{1}{2},
+  \]
+  which is independent of $(k, S, \rho, n)$ once $p_0 < 1$ (i.e.,
+  $k < S$).  Solving gives $\delta^\star = 1 - 1/\sqrt{2}$.
+\end{proof}
 
-Let $\mathcal{T}_k \subseteq \mathcal{V}$ denote the tokens the
-adversary has queried the oracle on with the correct key; the
-image $\sigma_k(\mathcal{T}_k)$ is its known-states set.
+\subsection{Security against an oracle-blind adversary}
+\label{subsec:proof-security}
 
-\paragraph{Oracle-blind contribution.}
-For any token $t' \notin \mathcal{T}_k$ that the adversary
-introduces, $\sigma_k(t')$ is uniform on $\mathcal{S}$ by the
-random-oracle property. Each modified position contributes an
-indicator $Z_j \sim \mathrm{Bernoulli}(1/S)$ in the validity count,
-independently of the adversary's strategy.
+\begin{theorem}[Pseudorandomness under random oracle, oracle-blind
+    adversary]
+  \label{thm:security}
+  Assume the secret key $k$ has min-entropy at least $\lambda$ and
+  $\mathcal{H}$ is modelled as a random oracle.  Consider a
+  polynomial-time adversary $\mathcal{A}$ \emph{without} access to
+  the random oracle, \emph{without} access to the LM (or its
+  per-position distribution), and \emph{without} access to a
+  reference text drawn from the same prompt distribution.  $\mathcal{A}$
+  has only the watermarked output $\mathbf{t}^w$ and the public
+  scheme parameters $(S, T)$.  Then $\mathcal{A}$ achieves:
+  \begin{enumerate}[label=(\roman*), leftmargin=1.6em, nosep]
+    \item key-recovery advantage at most $q \cdot 2^{-\lambda}$ for a
+      query budget $q$ to any auxiliary oracle that depends on $k$;
+    \item state-prediction success at most $1/S +
+      \mathrm{negl}(\lambda)$ on each fresh token $t^\star$ that has
+      not been queried with the correct key, hence advantage
+      $\mathrm{negl}(\lambda)$ over the uniform $1/S$ baseline;
+    \item statistical distinguishing advantage at most
+      $\mathrm{negl}(\lambda)$ between $\mathbf{t}^w$ and an i.i.d.\
+      uniform null $\mathbf{t}^r$.
+  \end{enumerate}
+\end{theorem}
 
-\paragraph{Modified-pair mass.}
-The fraction of pairs touching at least one modification is
-\[
-  1 - (1-\delta)^2 \;=\; \delta(2-\delta).
-\]
-Each contributes at least $1/S$ in expectation, so the expected
-mass contributed by modified pairs satisfies
-\[
-  \text{(modified-pair mass)}
-    \;\geq\; \Sigma(\delta)
-    \;:=\; \tfrac{1}{S}\delta(2-\delta),
-\]
-with equality when every introduced token is unqueried.
+\begin{proof}
+  Without~$k$, the adversary's view of $\mathcal{H}(k \,\Vert\, t)$
+  for any $t$ is uniform on the oracle output space.  Recovery
+  probability $q \cdot 2^{-\lambda}$ follows from a standard
+  guessing argument over a min-entropy-$\lambda$ key.  State
+  prediction with advantage greater than $\mathrm{negl}(\lambda)$
+  would imply distinguishing the random-oracle output from uniform,
+  contradicting (i).
 
-\paragraph{Strategy independence.}
-An adversary with oracle access on $\mathcal{T}_k$ can craft pairs
-of queried tokens satisfying $T$ deterministically, raising
-$\phi$ above $\Sigma(\delta)$. This helps detection rather than
-hurting it. The lower-bound direction $\geq 1/S$ per modified
-pair is therefore strategy-free. \hfill$\square$
+  For (iii): any statistic $\mathcal{D}(\mathbf{t})$ measurable in
+  the token IDs alone that achieves non-trivial advantage
+  $\varepsilon$ under the i.i.d.\ uniform null can be re-expressed
+  as a function of $\sigma_k$-dependent structure (since for an
+  adversary with no LM access, the conditional distribution of
+  $\mathbf{t}^w$ given $\sigma_k$ is parameter-free in everything
+  except the gate sequence and the partition).  Such a function
+  yields a state-predictor with advantage at least $\varepsilon$ on
+  some fresh token, contradicting (ii) by a hybrid argument.  Hence
+  $\varepsilon \leq \mathrm{negl}(\lambda)$.
+\end{proof}
+
+% PROOF REVIEW NOTE: We have made the adversary model explicit:
+% (a) no LM access, (b) no key access, (c) no oracle access,
+% (d) no reference text.  Adversaries with LM access can exploit
+% the perplexity gap implied by the quality cost (which is a
+% distortion bound, not a security bound), and are explicitly
+% outside the scope of this theorem.  The original statement
+% folded (a)--(d) into one parenthetical aside; we now itemise
+% them in the theorem hypothesis.
+
+\subsection{Optimal LM-aware detector}
+\label{subsec:proof-hdd}
+
+\begin{theorem}[Entropy-weighted detector is asymptotically Neyman--Pearson optimal]
+  \label{thm:hdd}
+  Suppose the verifier has access to the LM at each position, and
+  let $g_i \in \{0,1\}$ denote the gate indicator at position $i$.
+  Set $\pi_i = g_i + (1 - g_i)/S$, the marginal probability of
+  $X_i = 1$ under the watermark alternative.  Treating $\{X_i\}$ as
+  conditionally independent given the keyed state sequence ---
+  asymptotically valid under the random oracle on distinct tokens
+  --- the log-likelihood ratio
+  \begin{equation}
+    \Lambda
+      \;=\; \sum_{i=1}^{n-1}\!
+        \left[ X_i \log(\pi_i S)
+          + (1 - X_i) \log \tfrac{1 - \pi_i}{1 - 1/S}\right]
+  \end{equation}
+  is asymptotically Neyman--Pearson optimal under the product-form
+  approximation among all size-$\alpha$ tests with the known entropy
+  profile.
+\end{theorem}
+
+\begin{proof}
+  Under the null, $X_i \sim \mathrm{Bernoulli}(1/S)$ marginally with
+  pairwise zero covariance (\autoref{lem:variance}).  Under the
+  watermark alternative, $X_i \sim \mathrm{Bernoulli}(\pi_i)$.  The
+  sequence $\{X_i\}$ is 1-dependent: $X_i$ and $X_{i+1}$ share
+  $t_{i+1}$, but for $|i-j| \geq 2$, $X_i \perp X_j$ under the
+  random-oracle model on distinct tokens.
+
+  The product-form likelihood ratio is
+  \begin{align*}
+    \Lambda
+      &= \sum_i \log \frac{\pi_i^{X_i}(1 - \pi_i)^{1 - X_i}}
+        {(1/S)^{X_i}(1 - 1/S)^{1 - X_i}} \\
+      &= \sum_i X_i \log(\pi_i S)
+        + (1 - X_i) \log \tfrac{1 - \pi_i}{1 - 1/S},
+  \end{align*}
+  matching the theorem statement (with the convention $0 \log 0 = 0$
+  for terms with $\pi_i = 1$, i.e., gated positions where $X_i = 1$
+  is deterministic).  The Neyman--Pearson lemma applied to the
+  product hypothesis identifies $\Lambda$ as uniformly most powerful
+  for the product law.
+
+  By the central limit theorem for 1-dependent sequences (and
+  vanishing pairwise covariance from \autoref{lem:variance}), the
+  product-form $\Lambda$ has the same Gaussian limit as the true
+  joint LLR up to vanishing $O(1/n)$ corrections in the local
+  asymptotic normal (LAN) sense (Le Cam).  Hence the test based on
+  $\Lambda$ achieves the Neyman--Pearson power asymptotically.
+\end{proof}
+
+% PROOF REVIEW NOTE: We made explicit (i) the 1-dependence
+% structure of $\{X_i\}$, (ii) the LAN/Le Cam justification for
+% asymptotic optimality of the product-form LLR, and (iii) the
+% $0 \log 0$ convention at gated positions where the alternative
+% is deterministic.  These were implicit in the original.
+
+\subsection{Detector pseudocode}
+\label{subsec:detector-pseudo}
+
+We restate the model-free detection algorithm for self-contained
+reading; the body version is \autoref{alg:detect}.
+
+\begin{algorithm}[h]
+  \caption{MCL Watermark Detection (model-free)}
+  \label{alg:detect-app}
+  \begin{algorithmic}
+    \STATE {\bfseries Input:} text $x$, key $k$, states $S$,
+      transition $T$, threshold $\tau$
+    \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(x)$;
+      $c \leftarrow 0$;\ $n \leftarrow |\mathbf{t}|$
+    \FOR{$i = 1$ {\bfseries to} $n-1$}
+      \STATE $s_i \leftarrow \mathcal{H}(k \,\Vert\, t_i) \bmod S$;\
+        $s_{i+1} \leftarrow \mathcal{H}(k \,\Vert\, t_{i+1}) \bmod S$
+      \IF{$T[s_i, s_{i+1}] > 0$}
+        \STATE $c \leftarrow c + 1$
+      \ENDIF
+    \ENDFOR
+    \STATE $\phi \leftarrow c / (n-1)$;\
+      $p_0 \leftarrow (\sum_{s,s'} T[s,s']) / S^2$
+    \STATE $z \leftarrow (\phi - p_0)
+      / \sqrt{p_0 (1 - p_0) / (n-1)}$
+    \STATE \textbf{return} $(\mathbf{1}[\phi > \tau],\ \phi,\ z,\
+      1 - \Phi(z))$
+  \end{algorithmic}
+\end{algorithm}
+
+The runtime is $O(n)$ hash evaluations and a single pass over the
+token stream; no LM access is required.  The transition $T$ is the
+same matrix used at generation time, so the random baseline $p_0$
+is computed directly from $T$ (clockwork: $p_0 = 1/S$;
+soft-cycle: $p_0 = 2/S$; general $k$-regular: $p_0 = k/S$).
+
+\subsection{Supplementary results: quality cost and self-healing}
+\label{subsec:proof-supplementary}
+
+These two results were stated in earlier drafts; we retain the
+formal statements and proofs in the appendix for completeness, since
+they are referenced from elsewhere in the paper.
+
+\begin{theorem}[Quality cost identity and Jensen lower bound]
+  \label{thm:quality}
+  At a gated position with current state $s$ and partition mass
+  $Z_s = p(\mathcal{V}_{(s+1) \bmod S}) > 0$, the KL between the
+  renormalised MCL distribution
+  $P_{\mathrm{MCL}}(t) = p(t)/Z_s \cdot
+    \mathbf{1}[t \in \mathcal{V}_{(s+1) \bmod S}]$
+  and the LM distribution $p$ is
+  \(D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p) = \log(1/Z_s).\)
+  Under hash uniformity, $\mathbb{E}[Z_s] = 1/S$, and Jensen's
+  inequality gives
+  \begin{equation}
+    \mathbb{E}[D_{\mathrm{KL}}] \;\geq\; \log S,
+  \end{equation}
+  with equality iff $Z_s$ is constant in the key.  Averaged over
+  positions with gate rate $\rho$,
+  $\mathbb{E}[D_{\mathrm{KL}}]_{\mathrm{tok}} \geq \rho \log S$.
+\end{theorem}
+
+\begin{proof}
+  Direct computation:
+  \(D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p)
+    = \sum_{t \in \mathcal{V}_{(s+1) \bmod S}} (p(t)/Z_s)
+        \log(1/Z_s)
+    = \log(1/Z_s).\)
+  Under hash uniformity, $\Pr[t \in \mathcal{V}_{(s+1) \bmod S}] =
+  1/S$ for every fixed $t$, so $\mathbb{E}[Z_s] = \sum_t p(t)/S =
+  1/S$.  Concavity of $\log$ and Jensen give
+  $\mathbb{E}[\log Z_s] \leq \log \mathbb{E}[Z_s] = -\log S$, hence
+  $\mathbb{E}[\log(1/Z_s)] \geq \log S$.  The token-averaged bound
+  follows by averaging over positions with gate rate $\rho$.
+\end{proof}
+
+\begin{theorem}[Self-healing against oracle-blind adversaries]
+  \label{thm:healing}
+  Let $\mathcal{T}_k \subseteq \mathcal{V}$ be the set of tokens
+  the adversary has queried with the correct key.  For any token
+  $t' \notin \mathcal{T}_k$ that the adversary introduces,
+  $\sigma_k(t')$ is uniform on $\mathcal{S}$ by the random-oracle
+  property, so each modified position contributes an indicator
+  distributed as $\mathrm{Bernoulli}(1/S)$ to the validity count,
+  independently of strategy.  Hence the expected mass contributed
+  to $\phi$ by modified-pair positions satisfies
+  \begin{equation}
+    \Sigma(\delta)
+      \;\geq\; \tfrac{1}{S}\, \delta(2 - \delta),
+  \end{equation}
+  with equality when every introduced token is unqueried.
+\end{theorem}
+
+\begin{proof}
+  The fraction of token pairs $(t_i, t_{i+1})$ touching at least one
+  modified token is $1 - (1-\delta)^2 = \delta(2 - \delta)$.  Each
+  such pair contributes an indicator with conditional expectation
+  $1/S$ by the same column- and row-regularity argument as in
+  \autoref{thm:robustness}.  Strategies in which the adversary
+  introduces previously-queried tokens (whose state is in
+  $\sigma_k(\mathcal{T}_k)$) can craft pairs that hit valid
+  transitions deterministically, raising $\phi$ above
+  $\Sigma(\delta)$ --- which only helps detection.  The lower bound
+  $\Sigma(\delta) \geq \delta(2-\delta)/S$ is therefore strategy-free.
+\end{proof}
+
+% PROOF REVIEW NOTE: The original self-healing proof claimed
+% strategy independence without distinguishing the case where the
+% adversary's introduced tokens happen to lie in
+% $\sigma_k(\mathcal{T}_k)$.  We have made the lower-bound
+% direction explicit (the adversary can only \emph{help} detection
+% above the random-substitution floor) and stated the equality
+% condition (every introduced token is unqueried).

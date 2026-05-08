@@ -7,9 +7,9 @@
 \begin{table}[h]
   \centering
   \caption{Calibration lookup $S^\star(n, \rho, \alpha)$ from
-    Theorem~\ref{thm:detection}. Rows are text lengths; columns are
-    $(\alpha, \rho)$ pairs. Entries are derived analytically from the
-    detection formula and do not require empirical anchoring.}
+    \autoref{thm:detection}.  Rows are text lengths; columns are
+    $(\alpha, \rho)$ pairs.  Entries are derived analytically from the
+    closed-form detection bound and do not require empirical anchoring.}
   \label{tab:cal}
   \begin{tabular}{lcccc}
     \toprule
@@ -25,76 +25,3 @@
     \bottomrule
   \end{tabular}
 \end{table}
-
-\subsection{Per-cell Results}
-
-Table~\ref{tab:cells} gives per-cell descriptive statistics for all 18
-$(\text{domain}, \rho, \text{gate})$ cells of the matched-budget
-study (Section~\ref{subsec:protocol}); $\bar\rho$ is the realised fraction
-of gated positions and the \texttt{rand20} columns are post-random
-substitution at $\delta = 0.20$. Table~\ref{tab:equiv} reports the TOST
-equivalence verdicts on the $G_{H_{\text{high}}}$--$G_{\Delta}$
-contrast.
-
-\begin{table*}[t]
-  \centering
-  \caption{Per-cell descriptive statistics. $z$ and TPR are
-    pre-attack; \texttt{rand20} columns are post-random-token
-    substitution at $\delta = 0.20$.}
-  \label{tab:cells}
-  \small
-  \begin{tabular}{llccccccc}
-    \toprule
-    domain & gate & $\rho$ & $\bar\rho$ & PPL & $z$ & TPR & $z_{\text{rand}20}$ & $\text{TPR}_{\text{rand}20}$ \\
-    \midrule
-    wiki & $G_{H_{\text{high}}}$   & 0.25 & 0.28 & 3.40  & 5.53  & 0.94 & 3.55  & 0.74 \\
-    wiki & $G_{\Delta}$            & 0.25 & 0.26 & 3.47  & 5.06  & 0.96 & 3.20  & 0.68 \\
-    wiki & $G_{H_{\text{low}}}$    & 0.25 & 0.15 & 9.09  & 2.79  & 0.57 & 1.79  & 0.29 \\
-    \midrule
-    wiki & $G_{H_{\text{high}}}$   & 0.50 & 0.53 & 8.15  & 12.71 & 1.00 & 8.17  & 1.00 \\
-    wiki & $G_{\Delta}$            & 0.50 & 0.52 & 8.08  & 11.91 & 1.00 & 7.50  & 1.00 \\
-    wiki & $G_{H_{\text{low}}}$    & 0.50 & 0.32 & 19.68 & 5.87  & 0.98 & 3.68  & 0.82 \\
-    \midrule
-    wiki & $G_{H_{\text{high}}}$   & 0.75 & 0.76 & 19.65 & 17.92 & 1.00 & 11.35 & 1.00 \\
-    wiki & $G_{\Delta}$            & 0.75 & 0.75 & 19.41 & 17.81 & 1.00 & 11.31 & 1.00 \\
-    wiki & $G_{H_{\text{low}}}$    & 0.75 & 0.51 & 32.40 & 9.94  & 1.00 & 6.32  & 0.99 \\
-    \midrule
-    factual & $G_{H_{\text{high}}}$ & 0.25 & 0.29 & 3.36  & 5.92  & 0.95 & 3.86  & 0.80 \\
-    factual & $G_{\Delta}$          & 0.25 & 0.22 & 2.95  & 4.55  & 0.80 & 3.12  & 0.65 \\
-    factual & $G_{H_{\text{low}}}$  & 0.25 & 0.14 & 6.45  & 2.40  & 0.45 & 1.60  & 0.25 \\
-    \midrule
-    factual & $G_{H_{\text{high}}}$ & 0.50 & 0.49 & 5.63  & 13.19 & 1.00 & 8.58  & 0.95 \\
-    factual & $G_{\Delta}$          & 0.50 & 0.46 & 6.10  & 12.19 & 1.00 & 7.83  & 0.95 \\
-    factual & $G_{H_{\text{low}}}$  & 0.50 & 0.34 & 16.21 & 6.56  & 1.00 & 4.27  & 0.95 \\
-    \midrule
-    factual & $G_{H_{\text{high}}}$ & 0.75 & 0.68 & 12.94 & 17.37 & 1.00 & 11.31 & 1.00 \\
-    factual & $G_{\Delta}$          & 0.75 & 0.72 & 14.77 & 17.36 & 1.00 & 11.39 & 1.00 \\
-    factual & $G_{H_{\text{low}}}$  & 0.75 & 0.55 & 26.03 & 10.77 & 1.00 & 6.88  & 1.00 \\
-    \bottomrule
-  \end{tabular}
-\end{table*}
-
-\begin{table*}[t]
-  \centering
-  \caption{Paired bootstrap CIs and TOST equivalence verdicts for the
-    $G_{H_{\text{high}}} - G_{\Delta}$ contrast (10{,}000 BCa
-    resamples). Pre-registered margins: $\log\text{PPL} \pm 0.05$,
-    $z \pm 0.5$, TPR $\pm 0.05$. Positive $\Delta$ favours
-    $G_{H_{\text{high}}}$.}
-  \label{tab:equiv}
-  \small
-  \begin{tabular}{llccc}
-    \toprule
-    domain & $\rho$ & $\Delta \log\text{PPL}$ [95\% CI] & $\Delta z$ [95\% CI] & $\Delta$TPR [95\% CI] \\
-    \midrule
-    wiki & 0.25 & $-0.04$ $[-0.10, +0.02]$ & $+0.46$ $[+0.15, +0.79]$ & $-0.02$ $[-0.06, +0.02]$ \\
-    wiki & 0.50 & $-0.04$ $[-0.13, +0.06]$ & $+0.80$ $[+0.40, +1.21]$ & $\mathbf{+0.00}$ $[0.00, 0.00]^\dagger$ \\
-    wiki & 0.75 & $+0.02$ $[-0.09, +0.14]$ & $\mathbf{+0.11}$ $[-0.07, +0.27]^\dagger$ & $\mathbf{+0.00}$ $[0.00, 0.00]^\dagger$ \\
-    factual & 0.25 & $+0.11$ $[-0.08, +0.26]$ & $+1.37$ $[-0.33, +2.65]$ & $+0.15$ $[-0.10, +0.30]$ \\
-    factual & 0.50 & $-0.03$ $[-0.25, +0.14]$ & $+1.01$ $[-0.23, +2.15]$ & $\mathbf{+0.00}$ $[0.00, 0.00]^\dagger$ \\
-    factual & 0.75 & $-0.21$ $[-0.64, +0.08]$ & $+0.01$ $[-0.86, +0.31]$ & $\mathbf{+0.00}$ $[0.00, 0.00]^\dagger$ \\
-    \bottomrule
-    \multicolumn{5}{l}{\footnotesize $^\dagger$ TOST verdict:
-      \textsc{equivalent} (CI contained within margin).}
-  \end{tabular}
-\end{table*}

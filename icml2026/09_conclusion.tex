@@ -1,22 +1,23 @@
 % 09_conclusion.tex
 \section{Conclusion}
 
-MCL watermarking turns the detection-quality tradeoff into a
-closed-form policy-to-configuration map: a target false-positive
-rate, a text-length floor, and a watermark budget determine the
-minimum state count uniquely. The scheme inherits a scheme-independent robustness floor
-$\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$ (under the midpoint
-threshold convention), and both identities extend to every
-$k$-regular transition topology (Prop.~\ref{prop:kregular}). Detection is model-free and runs in
-$O(n)$ hash operations, enabling third-party audit without model
-access.
-
-Empirically, a matched-budget comparison across 18 cells on
-\texttt{google/gemma-3-270m-it} finds that low-entropy gating is
-strictly Pareto-dominated, that detection is gate-invariant at
-$\rho \geq 0.5$, and that the predicted $(1-\delta)^2$ self-healing
-scaling holds on every cell to within sampling noise. The practical
-implication is that the operational dial for a regulated MCL
-deployment is the budget $\rho$, not a gating heuristic. The
-SWEET/EWD intuition, concentrate the watermark at near-deterministic
-positions, wins on neither quality nor robustness.
+We presented Markov Chain Lock (MCL), an active watermark whose
+closed-form calibration $S^\star(n_{\min}, \rho, \alpha)$ maps a
+regulator-facing specification --- target false-positive rate, text
+length, and budget --- directly to the minimum state count, and
+whose detector requires only the secret key, no language model
+access. The scheme inherits a universal robustness floor
+$\delta^\star = 1 - 1/\sqrt{2} \approx 29.3\%$ under the midpoint
+threshold convention, and both the calibration and the floor extend
+to every $k$-regular transition topology
+(\autoref{thm:detection}, \autoref{thm:robustness},
+\autoref{thm:k-regular}). Under matched-budget head-to-head
+comparison against KGW and SWEET on multiple instruction-tuned
+LLMs and across four text domains, MCL is competitive on detection
+and resists translation and paraphrase attacks at the level
+predicted by theory (\autoref{sec:experiments}).
+Three directions are immediate: extending the protocol to longer
+text regimes where small $S^\star$ becomes the operative regime;
+validating $k$-regular topologies at $k\geq 3$; and characterising
+behaviour on base (non-instruction-tuned) LLMs whose entropy
+profile differs from the instruct-tuned fleet studied here.

@@ -2,137 +2,139 @@
 \section{The MCL Scheme}
 \label{sec:method}
 
-MCL has three components: a cryptographic partition of the vocabulary
-into states, a clockwork transition over states, and an entropy gate
-selecting where to enforce the transition.
-
 \subsection{State partition}
 
-\begin{definition}[State assignment]
-  \label{def:state}
-  For key $k$ and state count $S \in \mathbb{N}$, define
-  $\sigma_k(t) = \mathcal{H}(k \,\|\, t) \bmod S$. This induces a partition
-  $\mathcal{V} = \bigsqcup_{s=0}^{S-1} \mathcal{V}_s$ with
-  $\mathcal{V}_s = \{t \in \mathcal{V} : \sigma_k(t) = s\}$.
-\end{definition}
+For each token id $v \in \mathcal{V}$ define
+\begin{equation}
+  \sigma(v) \;=\; \mathcal{H}(\kappa \,\Vert\, v) \bmod S,
+\end{equation}
+which deterministically maps $\mathcal{V}$ onto $S$ equivalence
+classes $\mathcal{V}_s = \{v : \sigma(v) = s\}$, $s \in [S]$. Under
+the random-oracle model $\sigma$ is uniform and independent across
+distinct tokens, so $\mathbb{E}[|\mathcal{V}_s|] = V/S$; knowledge
+of $\sigma$ on queried tokens reveals nothing about unqueried ones
+(\autoref{thm:security}).
 
-Under the random oracle, $\mathbb{E}[|\mathcal{V}_s|] = V/S$ and
-$\mathrm{Var}(|\mathcal{V}_s|) = V \cdot \frac{S-1}{S^2}$, so the
-partition is approximately balanced for realistic $V$.
+\subsection{Transition topology}
+\label{subsec:topology}
 
-\subsection{Clockwork transitions}
+A successor function $\Sigma_k : [S] \to \binom{[S]}{k}$ assigns
+each state a $k$-element set of legal next states; we require
+$\Sigma_k$ to be $k$-regular in both out- and in-degree, with
+column-regularity essential for the null-variance and robustness
+arguments (\autoref{thm:k-regular}, \autoref{lem:variance}). The
+default is the \emph{clockwork} chain at $k = 1$,
+$\Sigma_1(s) = \{(s{+}1) \bmod S\}$: deterministic, periodic of
+period $S$, uniform stationary distribution, and the smallest random
+baseline $1/S$ among $1$-regular topologies. We additionally
+evaluate the \emph{soft-cycle} variant $k = 2$,
+$\Sigma_2(s) = \{(s{+}1) \bmod S,\,(s{+}2) \bmod S\}$, which doubles
+the per-state successor budget at the cost of raising the random
+baseline to $2/S$ (\autoref{sec:experiments}).
 
-\begin{definition}[Clockwork matrix]
-  \label{def:clockwork}
-  The $S$-state clockwork transition matrix is
-  $\mathbf{T}^{\mathrm{clk}}_{ij} = \mathbb{1}[j \equiv i+1 \pmod{S}]$.
-\end{definition}
+\subsection{Generation}
 
-The clockwork is deterministic (each state has exactly one legal
-successor), periodic of period $S$, and has uniform stationary
-distribution $\pi^\star = (1/S, \ldots, 1/S)$. Among $S$-state
-irreducible deterministic transition matrices, clockwork minimises the
-random-baseline validity $1/S$, maximising the detection gap.
-
-\subsection{Position gates}
-\label{subsec:gates}
-
-At each generation step, MCL decides whether to enforce the clockwork
-transition based on a position-gate $g_i \in \{0,1\}$; the
-\emph{watermark budget} is
-$\rho = \mathbb{E}_i[g_i] \in [0, 1]$. Let
-$H_i = -\sum_t p_i(t) \log p_i(t)$ denote the next-token entropy and
-$\Delta_i = p_i^{(1)} - p_i^{(2)}$ the \emph{surprisal gap} between
-the top-two probabilities.
-
-\begin{definition}[Gate family]
-  \label{def:gate}
-  We consider four deterministic gates parameterised by a threshold
-  $\tau$:
-  \begin{align*}
-    G_{\text{all}}:\;     & g_i = 1, \\
-    G_{H_{\text{high}}}(\tau):\;  & g_i = \mathbb{1}[H_i > \tau], \\
-    G_{H_{\text{low}}}(\tau):\;   & g_i = \mathbb{1}[H_i < \tau], \\
-    G_{\Delta}(\tau):\;   & g_i = \mathbb{1}[\Delta_i < \tau].
-  \end{align*}
-  $G_{\text{all}}$ recovers the non-gated variant.
-  $G_{H_{\text{high}}}$ watermarks the model's uncertain positions;
-  $G_{H_{\text{low}}}$ is the SWEET/EWD heuristic, which concentrates
-  the mask where the LM's own distribution is narrow;
-  $G_{\Delta}$ selects positions with near-tied top-2 candidates,
-  where greedy-decoding regret from substituting the argmax is
-  bounded pointwise by $\Delta_i$.
-\end{definition}
-
-For a target budget $\rho$, $\tau$ is calibrated on a pilot corpus as
-the appropriate empirical quantile of the gate signal, so that
-$\mathbb{E}_i[g_i] \approx \rho$. Setting $\tau_H = \infty$ (or
-$\tau_\Delta = \infty$) recovers $G_{\text{all}}$
-($\rho = 1$). Section~\ref{sec:experiments} compares the four gates
-at matched budget.
-
-\subsection{Embedding}
+At step $i$ with current state $s_i = \sigma(t_i)$, MCL forms the
+legal token set $\mathcal{V}_{s_i}^\star =
+\bigcup_{s' \in \Sigma_k(s_i)} \mathcal{V}_{s'}$, masks the LM
+logits outside $\mathcal{V}_{s_i}^\star$ to $-\infty$, and picks
+the argmax at gated positions or samples from the original
+distribution at ungated ones. Each step costs one LM forward pass
+plus an $O(V)$ logit mask (precomputed once per state).
 
 \begin{algorithm}[t]
   \caption{MCL Watermark Embedding}
   \label{alg:embed}
   \begin{algorithmic}
-    \STATE {\bfseries Input:} prompt $p$, key $k$, states $S$,
-      gate $g(\cdot)$, max tokens $N$
+    \STATE {\bfseries Input:} prompt $p$, key $\kappa$, states $S$,
+      successor $\Sigma_k$, gate $g(\cdot)$, max tokens $N$
     \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(p)$;
-      $s \leftarrow \sigma_k(\mathbf{t}_{-1})$
+      $s \leftarrow \sigma(\mathbf{t}_{-1})$
     \FOR{$i = 1$ {\bfseries to} $N$}
       \STATE $p_i \leftarrow \mathrm{softmax}(\mathcal{M}(\mathbf{t}))$
-      \STATE $s' \leftarrow (s+1) \bmod S$
-      \IF{$g(p_i) = 1$ {\bfseries and} $p_i(\mathcal{V}_{s'}) > 0$}
-        \STATE $t_{i} \leftarrow \arg\max_{t \in \mathcal{V}_{s'}} p_i(t)$
+      \STATE $\mathcal{V}^\star \leftarrow
+        \bigcup_{s' \in \Sigma_k(s)} \mathcal{V}_{s'}$
+      \IF{$g(p_i) = 1$ {\bfseries and} $p_i(\mathcal{V}^\star) > 0$}
+        \STATE $t_i \leftarrow \arg\max_{t \in \mathcal{V}^\star} p_i(t)$
       \ELSE
-        \STATE $t_{i} \leftarrow \arg\max_t p_i(t)$
-          \quad\textit{(ungated or empty target partition)}
+        \STATE $t_i \leftarrow \arg\max_t p_i(t)$
       \ENDIF
-      \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\|\, t_i$;
-        $s \leftarrow \sigma_k(t_i)$
+      \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\Vert\, t_i$;
+        $s \leftarrow \sigma(t_i)$
       \IF{$t_i = \texttt{EOS}$} \STATE {\bfseries break} \ENDIF
     \ENDFOR
     \STATE \textbf{return} $\mathrm{Decode}(\mathbf{t})$
   \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:embed} requires no sampling and no temperature parameter.
-Each step does one LM forward pass and one $O(V)$ logit mask; total
-cost $O(N(V + T_{\mathrm{LM}}))$ for $N$ generated tokens.
+\subsection{Watermark budget and entropy gate}
+\label{subsec:gates}
+
+The mask is applied only at a subset of positions; the
+\emph{watermark budget} is $\rho = \mathbb{E}_i[g_i] \in [0,1]$. Let
+$H_i = -\sum_t p_i(t) \log p_i(t)$ be the next-token entropy and
+$\Delta_i = p_i^{(1)} - p_i^{(2)}$ the gap between the top two
+probabilities.
+
+\begin{definition}[Gate family]
+  \label{def:gate}
+  $G_{\mathrm{all}}{:}\; g_i = 1$;\;
+  $G_{H_{\mathrm{high}}}(\tau){:}\; g_i = \mathbb{1}[H_i > \tau]$;\;
+  $G_{H_{\mathrm{low}}}(\tau){:}\; g_i = \mathbb{1}[H_i < \tau]$;\;
+  $G_{\Delta}(\tau){:}\; g_i = \mathbb{1}[\Delta_i < \tau]$.
+\end{definition}
+
+Our default is $G_{H_{\mathrm{high}}}$, which masks only the model's
+uncertain positions and matches the high-entropy gating policy of
+SWEET~\citep{lee2023sweet} at the same budget;
+\autoref{sec:experiments} reports the head-to-head. The threshold
+$\tau$ is calibrated by quantile-matching on a held-out pilot so the
+realised gate rate tracks $\rho$. $G_{H_{\mathrm{low}}}$ is the
+\emph{anti-SWEET} ablation, and $G_{\Delta}$ targets near-tied
+top-two positions where the greedy substitution regret is bounded
+pointwise by $\Delta_i$.
 
 \subsection{Detection}
 
-\begin{definition}[Fingerprint score]
+The verifier tokenises the candidate text, re-derives states by
+re-applying $\sigma$, and computes the fraction of legal transitions
+\begin{equation}
   \label{def:phi}
-  For a token sequence $\mathbf{t} = (t_1, \ldots, t_n)$, the
-  \emph{fingerprint score} is the fraction of valid clockwork
-  transitions:
-  \begin{equation}
-    \phi(\mathbf{t}) = \frac{1}{n-1} \sum_{i=1}^{n-1}
-      \mathbf{T}^{\mathrm{clk}}_{\sigma_k(t_i), \sigma_k(t_{i+1})}.
-  \end{equation}
-\end{definition}
+  \phi(\mathbf{t})
+    \;=\; \frac{1}{n-1} \sum_{i=1}^{n-1}
+      \mathbb{1}\!\left[\sigma(t_{i+1}) \in \Sigma_k(\sigma(t_i))\right].
+\end{equation}
+With $p_0 = k/S$, the random-oracle null gives $\mathbb{E}[\phi] =
+p_0$ with pairwise-zero covariance for any $k$-regular $\Sigma_k$
+(\autoref{lem:variance}); the watermarked mean gap is
+$\rho(1 - p_0)$ (\autoref{thm:detection}, \autoref{thm:k-regular}).
+The verifier reports the standardised score
+$z = (\phi - p_0)/\sqrt{p_0(1-p_0)/(n-1)}$, declares $H_1$ when
+$z > z_\alpha$, and uses the closed-form calibration of
+\autoref{thm:detection} (proved in \autoref{app:proofs}) to choose
+$S$ given target FPR $\alpha$, budget $\rho$, and length $n$;
+robustness under per-token modification rate $\delta$ follows from
+the same identities (\autoref{thm:robustness}).
 
 \begin{algorithm}[t]
   \caption{MCL Watermark Detection (model-free)}
   \label{alg:detect}
   \begin{algorithmic}
-    \STATE {\bfseries Input:} text $x$, key $k$, states $S$,
-      threshold $\tau$
+    \STATE {\bfseries Input:} text $x$, key $\kappa$, states $S$,
+      successor $\Sigma_k$, level $\alpha$
     \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(x)$;
       $c \leftarrow 0$
     \FOR{$i = 1$ {\bfseries to} $n-1$}
-      \IF{$\sigma_k(t_{i+1}) \equiv \sigma_k(t_i) + 1 \pmod{S}$}
+      \IF{$\sigma(t_{i+1}) \in \Sigma_k(\sigma(t_i))$}
         \STATE $c \leftarrow c + 1$
       \ENDIF
     \ENDFOR
-    \STATE $\phi \leftarrow c/(n-1)$;
-      $z \leftarrow (\phi - 1/S) / \sqrt{(1/S)(1-1/S)/(n-1)}$
-    \STATE \textbf{return} $(\phi > \tau,\ \phi,\ 1 - \Phi(z))$
+    \STATE $\phi \leftarrow c/(n-1)$;\;
+      $p_0 \leftarrow k/S$
+    \STATE $z \leftarrow (\phi - p_0)/\sqrt{p_0(1-p_0)/(n-1)}$
+    \STATE \textbf{return} $(z > z_\alpha,\ \phi,\ z)$
   \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:detect} runs in $O(n)$ hash operations with no LM
-access, which makes MCL a candidate substrate for third-party audit.
+\autoref{alg:detect} runs in $O(n)$ hash operations without LM
+access, making MCL deployable as a third-party audit primitive.

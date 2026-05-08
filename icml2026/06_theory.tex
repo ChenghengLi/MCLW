@@ -1,271 +1,88 @@
 % 06_theory.tex
-\section{Theoretical Guarantees}
+\section{Theoretical Properties}
 \label{sec:theory}
 
-We give six theorems and one proposition. Detection
-(Theorem~\ref{thm:detection}) extends to any $k$-regular topology
-(Proposition~\ref{prop:kregular}). Quality
-(Theorem~\ref{thm:quality}), robustness
-(Theorem~\ref{thm:robustness}), security
-(Theorem~\ref{thm:security}), Neyman--Pearson optimality
-(Theorem~\ref{thm:hdd}), and self-healing
-(Theorem~\ref{thm:healing}) follow. Proofs are in
-Appendix~\ref{app:proofs}.
+This section gives an intuitive tour of the five formal results that
+characterise MCL: detection, robustness, $k$-regular generalisation,
+security, and a Neyman--Pearson optimal LM-aware detector.  Formal
+statements and proofs are deferred to \autoref{app:proofs}; we collect
+their pointers here so the body remains a narrative.  Empirical
+anchoring of \autoref{thm:detection} appears in
+\autoref{subsec:exp5-calibration}.
 
-\subsection{Detection and calibration}
-\label{subsec:detection}
-
-\begin{theorem}[Detection bound and calibration]
-  \label{thm:detection}
-  Let $\mathbf{t}^w$ be an MCL-watermarked sequence of length $n$
-  with watermark fraction $\rho$, and $\mathbf{t}^r$ an i.i.d.\ random
-  sequence over $\mathcal{V}$. For the clockwork transition with $S$
-  states:
-  \begin{align}
-    \mathbb{E}[\phi(\mathbf{t}^w)]
-      &= \tfrac{1}{S} + \rho \tfrac{S-1}{S}, \\
-    \mathbb{E}[\phi(\mathbf{t}^r)] &= \tfrac{1}{S}, \\
-    \mathrm{Var}[\phi(\mathbf{t}^r)]
-      &= \tfrac{(1/S)(1-1/S)}{n-1}, \\
-    z(\rho, S, n)
-      &= \rho \sqrt{(S-1)(n-1)}.
-  \end{align}
-  Under the midpoint threshold
-  $\tau_{\mathrm{mid}} = \tfrac{1}{S} + \tfrac{\rho}{2}\tfrac{S-1}{S}$,
-  $\mathrm{FPR} \leq 2\exp\!\bigl(-2\lfloor(n-1)/2\rfloor\,((\rho/2)(S-1)/S)^2\bigr)$
-  by Hoeffding on disjoint odd/even subsequences, and the minimum
-  state count guaranteeing $\mathrm{FPR} \leq \alpha$ is
-  \begin{equation}
-    S^\star(n, \rho, \alpha)
-      = \left\lceil \frac{4 z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
-    \label{eq:calibration}
-  \end{equation}
-\end{theorem}
-
-The displayed $z$ is the full mean-gap statistic returned by
-Algorithm~\ref{alg:detect}. The calibration formula uses the midpoint
-threshold; requiring the null $z$ at $\tau_{\mathrm{mid}}$, which is
-$(\rho/2)\sqrt{(S-1)(n-1)}$, to exceed $z_\alpha$ produces the factor
-of $4$. At $\alpha = 10^{-6}$, $\rho = 0.5$ this gives $S^\star = 5$
-for $n = 100$, $S^\star = 3$ for $n = 200$, $S^\star = 2$ for
-$n \geq 363$. Figure~\ref{fig:calibration} plots the surface at
-$\alpha \in \{10^{-3}, 10^{-6}\}$.
+\paragraph{Detection bound and calibration.}
+Under the null hypothesis that the input is a uniformly random token
+sequence, the fingerprint score $\phi$ of \autoref{def:phi} is
+approximately Gaussian with mean $1/S$ and variance
+$(1/S)(1-1/S)/(n-1)$, while a watermarked sequence with gate density
+$\rho$ shifts the mean to $1/S + \rho(S{-}1)/S$.  Standardising gives
+the closed-form $z$-statistic $z(\rho, S, n) = \rho\sqrt{(S-1)(n-1)}$.
+Inverting at false-positive level $\alpha$ under the midpoint
+threshold convention yields a state-count rule that practitioners can
+read off directly,
+\[
+  S^\star(n,\rho,\alpha)
+    \;=\; \left\lceil \frac{4\, z_\alpha^2}{\rho^2 (n-1)} + 1 \right\rceil.
+\]
+Formal statement and proof in \autoref{thm:detection} of
+\autoref{app:proofs}; the corresponding lookup table is
+\autoref{tab:cal}; the calibration surface is plotted in
+\autoref{fig:calibration}.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{pictures/fig_calibration.pdf}
-  \caption{\textbf{Closed-form calibration map} from
-    Theorem~\ref{thm:detection}. Minimum state count
-    $S^\star(n, \rho, \alpha)$ as a function of the text-length floor
-    $n$ for four watermark budgets $\rho \in \{0.25, 0.5, 0.75, 1\}$
-    at $\alpha = 10^{-3}$ (A) and $\alpha = 10^{-6}$ (B). A regulator
-    fixing $(\alpha, n_{\min})$ reads off the minimum admissible
-    configuration directly.}
+  \caption{Closed-form calibration surface from
+    \autoref{thm:detection}: minimum state count $S^\star(n,\rho,\alpha)$
+    versus text length $n$ for $\rho \in \{0.25, 0.5, 0.75, 1\}$ at
+    $\alpha = 10^{-3}$ (left) and $\alpha = 10^{-6}$ (right).  A
+    regulator who fixes $(\alpha, n_{\min})$ reads the minimum
+    admissible configuration off the curve.}
   \label{fig:calibration}
 \end{figure}
 
-\subsection{Generalisation to $k$-regular topologies}
-\label{subsec:kregular}
+\paragraph{Universal robustness threshold.}
+Suppose an adversary independently replaces each token with
+probability $\delta$ by a fresh token whose state is uniform on
+$\mathcal{S}$.  Both the watermarked-pair signal and the
+midpoint-threshold gap scale by the same affine factor
+$\rho(S{-}1)/S$, so the post-attack-to-pre-attack $z$ ratio collapses
+to $(1-\delta)^2$, independently of $(S, \rho, n)$.  The critical
+edit fraction at which detection fails is therefore the universal
+constant $\delta^\star = 1 - 1/\sqrt{2} \approx 0.293$.  Formal
+statement and proof in \autoref{thm:robustness}.
 
-The same identities hold for every $k$-regular adjacency, with the
-baseline shifted from $1/S$ to $k/S$.
+\paragraph{$k$-regular generalisation.}
+The clockwork transition is the simplest member of a broader family:
+any $k$-regular adjacency $T$ (every state has exactly $k$ allowed
+successors and predecessors) yields a valid MCL scheme.  Replacing
+the random baseline $1/S$ by $p_0 = k/S$ gives the same calibration
+identities, the same midpoint critical fraction $\delta^\star$, and a
+single quality-versus-detection dial in $k$.  Column-regularity is
+load-bearing: it is what makes adjacent indicator pairs have zero
+covariance under the null, so the variance formula carries through.
+Formal statement and proof in \autoref{thm:k-regular}.  The random
+baseline $p_0 = k/S$ relies on the SHA-256 partition being
+approximately uniform across the vocabulary --- an assumption we
+inherit from the standard avalanche property of cryptographic hashes.
 
-\begin{definition}[$k$-regular topology]
-  \label{def:kregular}
-  A transition matrix $T \in \{0,1\}^{S\times S}$ is
-  \emph{$k$-regular}, $1 \leq k \leq S{-}1$, if every row and every
-  column of $T$ contains exactly $k$ ones. Equivalently, $T/k$ is
-  doubly stochastic. The induced detection baseline is
-  $p_0 := k/S$.
-\end{definition}
+\paragraph{Security against an oracle-blind adversary.}
+The state map $\sigma_k(t) = \mathcal{H}(k \,\Vert\, t) \bmod S$ uses
+a hash modelled as a random oracle.  An adversary without access to
+$k$, without access to the LM, and without reference text cannot
+predict $\sigma_k(t^\star)$ on a fresh token with advantage better
+than negligible in the key min-entropy.  Consequently the same
+adversary cannot statistically distinguish MCL output from random
+text with non-negligible advantage.  This is a computational, not
+information-theoretic, guarantee, and explicitly excludes adversaries
+with LM access (who can exploit the perplexity gap implied by the
+quality cost).  Formal statement and proof in \autoref{thm:security}.
 
-\begin{example}[Concrete topologies]
-  \label{ex:topologies}
-  All four are $k$-regular and give valid MCL schemes; only the first
-  is used in our experiments.
-  \begin{itemize}[leftmargin=1.2em, itemsep=1pt, topsep=2pt]
-    \item \textbf{Clockwork} ($k{=}1$):
-      $T(s,s') = 1 \iff s' \equiv s{+}1 \pmod{S}$. \hfill $p_0 = 1/S$.
-    \item \textbf{Skip-cycle} ($k{=}1$, $\gcd(j,S){=}1$):
-      $T(s,s') = 1 \iff s' \equiv s{+}j \pmod{S}$.
-    \item \textbf{Soft cycle} ($k{=}2$):
-      $T(s,s') = 1 \iff s' \equiv s{+}1$ or $s{+}2 \pmod{S}$.
-      \hfill $p_0 = 2/S$.
-    \item \textbf{Union of $k$ disjoint permutations}:
-      $T = \sum_{j=1}^{k} P_{\pi_j}$ for disjoint permutation matrices.
-      By König's edge-colouring theorem, every $k$-regular $T$
-      decomposes this way.
-  \end{itemize}
-\end{example}
+\paragraph{Optimal detection with LM access.}
+A verifier with LM access at every position can replace the plain
+fingerprint score by an entropy-weighted log-likelihood ratio that is
+asymptotically Neyman--Pearson optimal under the product-form
+approximation given by the random oracle.  We give the explicit form
+and a 1-dependent CLT justification in \autoref{thm:hdd}.
 
-\begin{proposition}[Universal $k$-regular identities]
-  \label{prop:kregular}
-  Fix any $k$-regular $T$ with baseline $p_0 = k/S$, and apply
-  Algorithms~\ref{alg:embed},~\ref{alg:detect} with $T$ in place of
-  the clockwork matrix. Then:
-  \begin{align}
-    \mathbb{E}[\phi(\mathbf{t}^r)]
-      &= p_0, \label{eq:kreg-null}\\
-    \mathbb{E}[\phi(\mathbf{t}^w)]
-      &= p_0 + \rho(1-p_0), \label{eq:kreg-wm}\\
-    \mathrm{Var}[\phi(\mathbf{t}^r)]
-      &= \tfrac{p_0(1-p_0)}{n-1}, \label{eq:kreg-var}\\
-    z(\rho, p_0, n)
-      &= \rho\sqrt{\tfrac{(1-p_0)(n-1)}{p_0}}, \label{eq:kreg-z}\\
-    \mathbb{E}[\phi \mid \mathrm{attack}]
-      &= p_0 + \rho(1-\delta)^2 (1-p_0), \label{eq:kreg-atk}\\
-    \delta^\star_{\text{mid}}
-      &= 1 - 1/\sqrt{2}. \label{eq:kreg-delta}
-  \end{align}
-\end{proposition}
-
-\begin{remark}[Scope]
-  \label{rem:kregular_scope}
-  Proposition~\ref{prop:kregular} subsumes
-  Theorems~\ref{thm:detection} and~\ref{thm:robustness} at $k{=}1$,
-  and the surplus form of Theorem~\ref{thm:healing} follows from
-  \eqref{eq:kreg-atk} at $\rho{=}1$. Equation~\eqref{eq:kreg-z} is
-  monotone decreasing in $p_0$, so $k$ acts as a quality-versus-detection
-  dial at fixed~$S$. Column-regularity is load-bearing: pairwise
-  zero covariance under the null requires
-  $P(X_i{=}1 \mid \sigma_k(t_{i+1})=s')$ to be independent of $s'$,
-  which fails for matrices that are row-regular only.
-\end{remark}
-
-\subsection{Quality cost}
-
-\begin{theorem}[Quality cost identity and Jensen lower bound]
-  \label{thm:quality}
-  At a gated position with current state $s$ and target partition
-  mass $Z_s = p(\mathcal{V}_{(s+1) \bmod S}) > 0$, the KL between the
-  renormalised MCL distribution $P_{\mathrm{MCL}}(t) = p(t)/Z_s \cdot
-  \mathbf{1}[t \in \mathcal{V}_{(s+1) \bmod S}]$ and the LM
-  distribution $p$ is
-  $D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p) = \log(1/Z_s)$. Under
-  hash uniformity, $\mathbb{E}[Z_s] = 1/S$, and Jensen's inequality
-  (log concave) gives the position-wise lower bound
-  \begin{equation}
-    \mathbb{E}[D_{\mathrm{KL}}] \geq \log S,
-  \end{equation}
-  with equality when $Z_s$ is constant in the key. Hence
-  $\mathbb{E}[D_{\mathrm{KL}}]_{\mathrm{tok}} \geq \rho \log S$.
-  Algorithm~\ref{alg:embed} deploys argmax inside $\mathcal{V}_{s'}$
-  rather than the renormalised distribution, so its per-position KL
-  $-\log p(t^\star) \geq \log(1/Z_s)$ inherits the same lower bound.
-\end{theorem}
-
-The bound is tight at high-entropy positions, where $Z_s \approx 1/S$
-across keys, and loose at low-entropy positions, where $Z_s$ varies
-sharply. This is the structural reason low-entropy gating is
-Pareto-dominated in Section~\ref{subsec:pareto}: routing the
-watermark through near-deterministic positions amplifies the
-per-position quality cost.
-
-\subsection{Robustness}
-
-\begin{theorem}[Universal robustness threshold]
-  \label{thm:robustness}
-  Suppose each token is independently replaced with probability
-  $\delta$ by a fresh token whose state $\sigma_k$ is uniform on
-  $\mathcal{S}$. Then
-  \begin{equation}
-    \mathbb{E}[\phi \mid \mathrm{attack}]
-      = \tfrac{1}{S} + \rho (1-\delta)^2 \tfrac{S-1}{S}.
-  \end{equation}
-  Under the midpoint threshold
-  $\tau_{\mathrm{mid}} = \tfrac{1}{S} + \tfrac{\rho}{2}\tfrac{S-1}{S}$,
-  the critical fraction at which detection fails is
-  \begin{equation}
-    \delta^\star = 1 - 1/\sqrt{2} \approx 0.293,
-  \end{equation}
-  independent of $S$, $\rho$, $n$ (under the midpoint-threshold
-  convention).
-\end{theorem}
-
-The cancellation is structural: $S$ and $\rho$ enter both the
-threshold and the post-attack mean as the same affine factor
-$\tfrac{S-1}{S}\rho$, dividing out at the critical point. The same
-calculation gives $z_{\mathrm{post}}/z_{\mathrm{pre}} = (1-\delta)^2$,
-which we verify cell-by-cell in Section~\ref{subsec:theory_data}. By
-Proposition~\ref{prop:kregular}, $\delta^\star$ is identical for
-every $k$-regular topology.
-
-\subsection{Security}
-
-\begin{theorem}[Pseudorandomness under random oracle]
-  \label{thm:security}
-  Assume $k$ has min-entropy at least $\lambda$ and $\mathcal{H}$ is
-  modelled as a random oracle. Then any polynomial-time adversary $\mathcal{A}$
-  with query budget $q$ achieves \emph{(i)} key-recovery advantage at
-  most $q \cdot 2^{-\lambda}$, and \emph{(ii)} success probability at
-  most $1/S + \mathrm{negl}(\lambda)$ on each prediction
-  $\sigma_k(t^\star)$ for $t^\star$ not previously queried (so the
-  advantage over the uniform $1/S$ baseline is $\mathrm{negl}(\lambda)$).
-  An adversary without oracle access, without LM access, and without
-  reference text cannot statistically distinguish MCL output from
-  random with non-negligible advantage; this reduces to (ii).
-\end{theorem}
-
-The guarantee is computational, not information-theoretic: it rests
-on the random-oracle abstraction and the adversary's lack of access
-to $k$, the LM, and a quality baseline. An adversary with LM access
-can exploit the perplexity gap implied by Theorem~\ref{thm:quality}
-and is not bounded by this theorem; the auditor with $k$ runs
-Algorithm~\ref{alg:detect} with the detection power of
-Theorem~\ref{thm:detection}.
-
-\subsection{Optimal detector with LM access}
-
-\begin{theorem}[Entropy-weighted detector is Neyman--Pearson optimal]
-  \label{thm:hdd}
-  Suppose the verifier has access to the LM at each position. Let
-  $X_i = \mathbf{1}[\sigma_k(t_{i+1}) \equiv \sigma_k(t_i) + 1
-  \pmod{S}]$ and $\pi_i = P(X_i = 1 \mid \mathrm{watermarked})$.
-  Treating the $\{X_i\}$ as conditionally independent given the keyed
-  state sequence (asymptotically valid under the random oracle for
-  distinct tokens), the log-likelihood ratio
-  \begin{equation}
-    \Lambda = \sum_{i=1}^{n-1}
-      \Bigl[ X_i \log(\pi_i S)
-        + (1-X_i) \log \tfrac{1-\pi_i}{1-1/S} \Bigr]
-  \end{equation}
-  is asymptotically Neyman--Pearson optimal under the product-form
-  approximation, among all size-$\alpha$ tests with the known entropy
-  profile.
-\end{theorem}
-
-The conditional-independence assumption is the same one driving the
-null variance of $\phi$ in Theorem~\ref{thm:detection}: under the
-random oracle, $X_i$ and $X_{i+1}$ have zero pairwise covariance, but
-share token $t_{i+1}$, so the joint deviates from the product by
-$O(1/n)$.
-
-\subsection{Self-healing}
-
-\begin{theorem}[Self-healing]
-  \label{thm:healing}
-  Against any adversary modifying tokens without oracle access to
-  $\sigma_k$, each modified token contributes \emph{at least} $1/S$
-  in expectation to the valid-transition count, with equality when
-  the introduced token is unqueried. The expected mass contributed
-  to $\phi$ by modified-pair positions is at least
-  \begin{equation}
-    \Sigma(\delta) = \tfrac{1}{S}\delta(2-\delta),
-  \end{equation}
-  for any oracle-blind strategy. Strategies that increase the
-  contribution beyond $\Sigma(\delta)$ raise $\phi$, helping rather
-  than hurting detection.
-\end{theorem}
-
-Combined with Theorem~\ref{thm:robustness}, this turns the uniform-attack
-$\delta^\star$ into a worst-case bound for every oracle-blind
-adversary. The deployer can quote $\delta^\star \approx 29.3\%$ as
-strategy-free.
-
-\paragraph{Summary.} Theorem~\ref{thm:detection} and
-Proposition~\ref{prop:kregular} fix the detection dial.
-Theorem~\ref{thm:quality} sets its cost (Jensen lower bound, tight
-at high entropy). Theorems~\ref{thm:robustness}
-and~\ref{thm:healing} pin the universal robustness floor.
-Theorem~\ref{thm:security} closes the keyless threat model;
-Theorem~\ref{thm:hdd} characterises optimal detection under LM access.
+A detector pseudocode summary is included as \autoref{alg:detect-app}.

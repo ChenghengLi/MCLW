@@ -2,14 +2,30 @@
 \section{Preliminaries}
 \label{sec:prelim}
 
-We fix notation used throughout the paper.
-Let $\mathcal{V}$ denote the vocabulary of an autoregressive LLM
-$\mathcal{M}$, $V = |\mathcal{V}|$. At step $i$ the LM defines a
-next-token distribution $p_i$ conditional on the prefix
-$t_1 \ldots t_{i-1}$; its entropy is
-$H_i = -\sum_t p_i(t) \log p_i(t)$. We assume throughout that the
-verifier and the deployer share a secret key $k \in \{0,1\}^*$ and use
-the same tokenizer. Let $\mathcal{H}: \{0,1\}^* \to \{0,1\}^{256}$ be
-SHA-256, modelled as a random oracle in the security analysis
-(Theorem~\ref{thm:security}). We write $[n] = \{1, \ldots, n\}$ and $z_\alpha$
-for the one-sided standard-normal quantile at level $\alpha$.
+\textbf{Notation.} Let $\mathcal{V}$ denote the vocabulary of an
+autoregressive language model, $V = |\mathcal{V}|$, and write
+$\mathbf{t} = (t_1, \ldots, t_n) \in \mathcal{V}^n$ for a token
+sequence of length $n$. The deployer and the verifier share a secret
+key $\kappa \in \{0,1\}^*$ and the same tokenizer; the verifier
+never sees the language model. Let
+$\mathcal{H} : \{0,1\}^* \to \{0,1\}^{256}$ be SHA-256, modelled as
+a random oracle in the security analysis (\autoref{thm:security}).
+We write $[m] = \{0, \ldots, m-1\}$ and $z_\alpha$ for the one-sided
+standard-normal quantile at level $\alpha$.
+
+\textbf{Threat model.} The adversary observes watermarked text and
+may paraphrase, translate, edit, splice, or delete tokens before
+publication; we model these as a per-token modification rate
+$\delta \in [0,1)$. The adversary is computationally bounded and
+has no access to $\kappa$ or to the language model at detection
+time. The verifier sees only token text and runs in $O(n)$ hash
+operations.
+
+\textbf{Detection problem and quality.} Detection is a binary
+hypothesis test on text alone---$H_0$ (non-watermarked) vs.\ $H_1$
+(watermarked under key $\kappa$)---at a fixed false-positive rate
+$\alpha$, since false positives are operationally the costly error.
+The watermark distribution must remain fluent under standard greedy
+or low-temperature decoding, which we control via the per-token KL
+divergence to the original next-token distribution and report as
+perplexity inflation (\autoref{sec:method}).

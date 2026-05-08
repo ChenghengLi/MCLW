@@ -2,65 +2,79 @@
 \section{Discussion}
 \label{sec:discussion}
 
-We discuss three things in turn: how MCL maps onto Article~50 as a
-two-parameter specification, when long-form text is the right
-deployment regime, and what limits the present scheme.
-
-\subsection{Policy operationalisation}
-
-We read Article~50 as a two-parameter specification problem:
-\emph{what false positive rate must marked content guarantee, and at
-what minimum text length?} Let $(\alpha, n_{\min})$ be this
-specification. A deployer faces three choices:
-
-\begin{enumerate}[nosep, leftmargin=*]
-  \item Watermark fraction $\rho$ (controls quality cost via
-    Theorem~\ref{thm:quality}).
-  \item State count $S$ (controls detection power via
-    Theorem~\ref{thm:detection}).
-  \item Entropy threshold $\tau_H$ (operationally sets $\rho$; higher
-    $\tau_H$ $\Rightarrow$ higher $\rho$ $\Rightarrow$ more quality cost).
-\end{enumerate}
-
-The calibration formula~\eqref{eq:calibration} reduces this to a
-single constraint on $(S, \rho)$: any $(S, \rho)$ pair with
-$S \geq S^\star(n_{\min}, \rho, \alpha)$ satisfies the specification.
-Auditing a deployment then requires measuring three quantities
-from samples (the effective $\rho$, the key-derived $S$, and the
-text-length distribution) and checking them against the
-specification. No LM access needed.
-
-\paragraph{A minimum viable Article~50 rule.} As a concrete
-illustration: set $\alpha = 10^{-6}$ and $n_{\min} = 200$. Then
-\eqref{eq:calibration} with $\rho = 0.5$ gives $S^\star = 3$. A
-regulator writing ``outputs shall be markable at false-positive rate
-$10^{-6}$ on passages of 200 tokens or more'' would, under MCL,
-translate to ``use at least 3 states at watermark fraction 0.5''.
-This is a concrete, auditable, minimum-viable rule. Stronger rules
-(higher $\alpha$, lower $n_{\min}$) push $S^\star$ up monotonically.
-
 \subsection{When to use what}
 
-For short texts ($n < 100$), detection requires large $S$ and the
-calibration sits at or above the non-gated baseline. For long texts
-($n > 300$), gated MCL at $S \in \{2, 3\}$ with $\rho \approx 0.5$
-dominates the non-gated reference: equal detection, lower perplexity
-(Theorem~\ref{thm:quality}). The governance-relevant regime, long-form
-generated content subject to Article~50, is the one where gating
-pays off.
+The calibration formula $S^\star(n_{\min}, \rho, \alpha)$ of
+\autoref{thm:detection} reduces operational deployment to three
+inputs: the minimum text length $n_{\min}$ at which marking must be
+verifiable, the target false-positive rate $\alpha$, and the
+watermark budget $\rho$ a deployer is willing to spend. For long-form
+generated content the calibration anchors comfortably at small
+$S$ with $\rho$ near $1/2$, so the marginal cost of marking is
+small and detection power is high; the head-to-head comparisons in
+\autoref{subsec:exp2-headline} show that MCL matches or exceeds
+KGW and SWEET in this regime under matched budgets. For short
+outputs $S^\star$ rises sharply with stricter $\alpha$, so deployers
+targeting tight false-positive rates on short passages should
+either tolerate the higher state count or shift the
+specification toward a longer floor. When the expected attack
+profile is dominated by paraphrase or cross-lingual rewrite
+(\autoref{subsec:exp3-translation}), the universal robustness
+threshold $\delta^\star$ of \autoref{thm:robustness} bounds the
+worst case across all gating choices, so the practical decision
+collapses to whether the deployer wants entropy gating
+(KGW/SWEET-style) or the gate-free MCL specification. SWEET, which
+we read as a high-entropy gate following~\citet{lee2023sweet}, is a
+sensible choice when the underlying model produces sharply
+peaked distributions on most positions; MCL is the more direct
+choice when no such structure is assumed.
 
 \subsection{Limitations}
 
-Detection requires a shared tokenizer, so re-tokenization attacks
-break it (a known limitation of token-level schemes). Key
-management is symmetric and offers no forward security: a leaked
-$k$ exposes past and future watermarks. Theorem~\ref{thm:robustness}'s
-$\delta^\star$ is under uniform substitution, not adversarial
-rewrite; the matched-budget data does not support a robustness
-advantage for entropy gating. Theorem~\ref{thm:quality} is a Jensen
-\emph{lower} bound on expected KL, attained at high-entropy
-positions and exceeded at low-entropy ones, which is the
-structural reason low-entropy gating is Pareto-dominated.
-Finally, MCL assumes greedy decoding at gated positions;
-temperature sampling weakens the quality bound but leaves
-detection unaffected.
+\paragraph{Single budget point in headline runs.} The headline
+matched-budget grid fixes $\rho = 0.5$ across all gates, models, and
+domains. We have an earlier $\rho$ ablation on a smaller setup, but
+re-running the sweep under the new model fleet and attack suite is
+deferred. The closed-form scaling of \autoref{thm:detection} is in
+$\rho$, so any deployer can re-instantiate $S^\star$ for a different
+budget without re-running our experiments.
+
+\paragraph{Self-perplexity quality metric.} Generation quality is
+reported as the perplexity of each model under its own logits. We do
+not report external-LM perplexity, MAUVE, or human-rater scores;
+self-perplexity is a relative comparator across gates on the same
+model and is conservative for absolute claims about quality.
+
+\paragraph{Three instruction-tuned LLMs.} The headline experiments
+use three open-weight instruction-tuned 7--8B parameter models. We
+do not run base (non-instruction-tuned) models, smaller models, or
+models above 10B. Trends across these three are consistent
+(\autoref{sec:experiments}) but the population is small.
+
+\paragraph{$k$-regular validation only at $k\in\{1,2\}$.}
+\autoref{thm:k-regular} predicts $\delta^\star$ universality for
+every $k$-regular topology; we validate $k=1$ (clockwork) and $k=2$
+(soft-cycle) empirically. $k=3$ and beyond are deferred to the
+extended version of this paper.
+
+\paragraph{DIPPER paraphrase non-determinism.} Our paraphrase attack
+uses DIPPER without an internal seed, so reruns are not bit-exact.
+We mitigate by reporting per-prompt deltas from a fixed pool of
+generations rather than aggregate point estimates of the attack
+output, but the residual variance is real.
+
+\subsection{Threats to validity}
+
+The robustness analysis underlying \autoref{thm:robustness} models
+the attack as i.i.d.\ uniform substitution at rate $\delta$, and
+predicts post-attack $z$-scores that scale as
+$(1-\delta_{\mathrm{eff}})^2$. Translation and paraphrase attacks
+are not i.i.d.\ uniform substitution: they preserve syntax,
+correlate substitutions across positions, and leak word identity
+through morphology. The empirical fit in
+\autoref{subsec:exp3-translation} is therefore best read as a
+qualitative match to the theoretical scaling, with
+$\delta_{\mathrm{eff}}$ an effective-edit-rate proxy rather than a
+strict bound. The $(1-\delta_{\mathrm{eff}})^2$ shape predicts
+ordering of attacks by severity but does not give tight
+finite-sample guarantees outside the i.i.d.\ regime.
