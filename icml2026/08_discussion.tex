@@ -61,7 +61,46 @@ extended version of this paper.
 uses DIPPER without an internal seed, so reruns are not bit-exact.
 We mitigate by reporting per-prompt deltas from a fixed pool of
 generations rather than aggregate point estimates of the attack
-output, but the residual variance is real.
+output, but the residual variance is real. The headline tables
+report only the clean / random-substitution / ZH back-translation
+columns; a fully populated DIPPER column is deferred to the extended
+version.
+
+\paragraph{Empirical FPR drift at the analytic threshold.}
+\autoref{tab:cal-sstar} shows that the empirical false-positive
+rate at the analytic Gaussian-tail threshold $z_\alpha = 2.326$ is
+1.7--6.9\,\% on non-watermarked LLM output, materially above the
+nominal 1\,\% target. The drift is largest at $S \in \{7, 11\}$,
+where the closed-form Hoeffding bound is loosest. This indicates
+that natural-language token sequences are not i.i.d.\ random over
+the SHA-256 partition; the closed form is a usable starting point
+but a deployer targeting strict 1\,\% FPR should empirically
+recalibrate the per-corpus threshold (a 20--30\,\% threshold
+inflation suffices in our setting). All headline TPR numbers in
+\autoref{tab:headline-aggregate} and \autoref{tab:headline-percell}
+are reported at the analytic threshold for cross-method consistency,
+not at an empirically calibrated 1\,\% FPR per cell.
+
+\paragraph{Tokenizer-dependent detection.} The detector is
+``model-free'' in the sense that no LM forward pass is required at
+detection time, but it does require the same tokenizer used at
+generation. A third-party auditor handed plain text alone, without
+knowledge of which model produced it, would have to enumerate
+candidate tokenizers. We treat this as a soft requirement of the
+audit interface, not a fundamental limitation, but it does narrow
+the operational claim relative to ``model-free in plain text.''
+
+\paragraph{Robustness theorem assumes uniform substitution.}
+\autoref{thm:robustness} characterises the post-attack
+$z$-statistic under i.i.d.\ uniform token substitution at rate
+$\delta$. NLLB back-translation and DIPPER paraphrase are not
+uniform substitutions: they preserve some grammatical structure and
+preferentially replace high-frequency / high-entropy tokens. Our
+empirical decay curves (\autoref{fig:translation-decay}) sit
+\emph{above} the $(1-\delta_{\mathrm{eff}})^2$ slope-1 prediction,
+i.e., MCL retains more signal than the worst-case bound would
+suggest. We frame this as a conservative theoretical guarantee
+rather than a tight prediction.
 
 \subsection{Threats to validity}
 

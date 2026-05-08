@@ -12,12 +12,18 @@ threshold convention, and both the calibration and the floor extend
 to every $k$-regular transition topology
 (\autoref{thm:detection}, \autoref{thm:robustness},
 \autoref{thm:k-regular}). Under matched-budget head-to-head
-comparison against KGW and SWEET on multiple instruction-tuned
-LLMs and across four text domains, MCL is competitive on detection
-and resists translation and paraphrase attacks at the level
-predicted by theory (\autoref{sec:experiments}).
-Three directions are immediate: extending the protocol to longer
-text regimes where small $S^\star$ becomes the operative regime;
+comparison against KGW and SWEET on three instruction-tuned LLMs
+across four text domains, MCL retains substantially more detection
+signal under translation attacks; the empirical
+post-attack $z$ ratio sits above the worst-case
+$(1-\delta_{\mathrm{eff}})^2$ scaling predicted by theory, so we
+view our robustness bound as conservative rather than tight
+(\autoref{sec:experiments}).
+Four directions are immediate: tightening the analytic FPR bound
+under non-i.i.d.\ natural-language statistics, where empirical FPR
+drifts above the 1\,\% target by 2--7$\times$ at large $S$
+(\autoref{tab:cal-sstar}); extending the protocol to longer text
+regimes where small $S^\star$ becomes the operative regime;
 validating $k$-regular topologies at $k\geq 3$; and characterising
 behaviour on base (non-instruction-tuned) LLMs whose entropy
 profile differs from the instruct-tuned fleet studied here.

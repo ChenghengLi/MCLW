@@ -102,23 +102,30 @@ domain, and prompt set.
 
 \begin{table}[t]
   \centering
-  \caption{\textbf{Headline aggregate.} TPR @ FPR$=0.01$ aggregated
-    across three instruction-tuned 7--8B LLMs (Llama-3.1-8B, Qwen-2.5-7B,
-    Mistral-7B) and four text domains (HumanEval code, factual, wiki,
-    writing) at $n=200$ tokens. \textbf{MCL} (ours): $S=5$, $\rho=0.5$,
-    $G_{H_{\mathrm{high}}}$. \textbf{KGW}: $\gamma=0.5$, $\delta=2$.
-    \textbf{SWEET}: same KGW parameters with high-entropy gate at
-    $\rho=0.5$ matched to MCL. Bold = best per column.}
+  \caption{\textbf{Headline aggregate.} Detection rate at the analytic
+    threshold $z_\alpha = 2.326$ ($\alpha = 0.01$ under the Gaussian-tail
+    null), aggregated across three instruction-tuned 7--8B LLMs
+    (Llama-3.1-8B, Qwen-2.5-7B, Mistral-7B) and four text domains
+    (HumanEval code, factual, wiki, writing) with 100 prompts per
+    (method, model, domain) cell at $n=200$ tokens. \textbf{MCL} (ours):
+    $S=5$, $\rho=0.5$, $G_{H_{\mathrm{high}}}$. \textbf{KGW}:
+    $\gamma=0.5$, $\delta=2$. \textbf{SWEET}: KGW with high-entropy gate
+    at $\rho=0.5$ matched to MCL. Median PPL is on the watermarked
+    model's own logits (see \autoref{sec:discussion} for caveats); the
+    DIPPER paraphrase column is deferred to the extended version.
+    Empirical FPR drift at this threshold is reported separately in
+    \autoref{tab:cal-sstar}. Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
   \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lcccc}
     \toprule
-    Method & Clean & Random & ZH & PPL \\
+    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
+            TPR$_{\mathrm{ZH}}$ & median PPL \\
     \midrule
-    \textbf{MCL (ours)} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 2.89 \\
-    KGW                 & 65.9  & 44.8  & 18.7  & 1.66 \\
-    SWEET               & 66.0  & 46.3  & 19.0  & 1.62 \\
+    \textbf{MCL (ours)} & \textbf{100.0\%} & \textbf{99.9\%} & \textbf{72.8\%} & 3.09 \\
+    KGW                 & 74.8\%  & 55.1\%  & 19.4\%  & \textbf{1.87} \\
+    SWEET               & 71.8\%  & 51.2\%  & 18.0\%  & 1.76 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -135,23 +142,31 @@ that holds gating policy fixed against MCL.
 
 \begin{table*}[t]
   \centering
-  \caption{\textbf{Per-(model, domain) head-to-head TPR (\%).} 100
-    prompts per cell, $n=200$ tokens. MCL retains the lead in every
-    (model, domain) cell on both clean and post-attack detection. Cells
-    with $<25$ records are omitted (some Mistral / Qwen-sweet cells are
-    in flight at submission).}
+  \caption{\textbf{Per-(model, domain) head-to-head TPR (\%) at the
+    analytic $z_\alpha=2.326$ threshold.} 100 prompts per cell, $n=200$
+    tokens. MCL leads in every clean cell (perfect detection) and in
+    every cell post-ZH-back-translation. Bold = best per column within
+    each block.}
   \label{tab:headline-percell}
+  \small
+  \setlength{\tabcolsep}{4pt}
   \begin{tabular}{ll|rrr|rrr}
     \toprule
-    & & \multicolumn{3}{c}{Clean (TPR \%)} & \multicolumn{3}{c}{ZH back-translation (TPR \%)} \\
+    & & \multicolumn{3}{c|}{Clean} & \multicolumn{3}{c}{ZH back-translation} \\
     Model & Domain & MCL & KGW & SWEET & MCL & KGW & SWEET \\
     \midrule
     Llama-3.1-8B & code     & \textbf{100} & 59 & 44 & \textbf{59} & 25 & 28 \\
-    Mistral-7B   & code     & \textbf{100} & 49 & 52 & \textbf{79} & 12 & 12 \\
-    Mistral-7B   & factual  & \textbf{100} & 86 & 85 & \textbf{70} & 37 & 29 \\
-    Mistral-7B   & wiki     & \textbf{100} & 51 & 55 & \textbf{67} & 16 & 18 \\
+    Llama-3.1-8B & factual  & \textbf{100} & 92 & 79 & \textbf{73} & 25 & 25 \\
+    Llama-3.1-8B & wiki     & \textbf{100} & 87 & 72 & \textbf{72} & 19 & 11 \\
+    Llama-3.1-8B & writing  & \textbf{100} & 99 & \textbf{100} & \textbf{78} & 21 & 20 \\
     Qwen-2.5-7B  & code     & \textbf{100} & 39 & 41 & \textbf{59} & 23 & 19 \\
     Qwen-2.5-7B  & factual  & \textbf{100} & 61 & 62 & \textbf{78} & 15 & 11 \\
+    Qwen-2.5-7B  & wiki     & \textbf{100} & 76 & 73 & \textbf{80} &  6 & 10 \\
+    Qwen-2.5-7B  & writing  & \textbf{100} & \textbf{100} & \textbf{100} & \textbf{83} & 12 & 12 \\
+    Mistral-7B   & code     & \textbf{100} & 49 & 52 & \textbf{79} & 12 & 12 \\
+    Mistral-7B   & factual  & \textbf{100} & 86 & 85 & \textbf{70} & 37 & 29 \\
+    Mistral-7B   & wiki     & \textbf{100} & 50 & 55 & \textbf{70} & 16 & 16 \\
+    Mistral-7B   & writing  & \textbf{100} & 99 & 99 & \textbf{73} & 22 & 23 \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -293,9 +308,9 @@ form derived in \autoref{app:proofs}.
     \midrule
     2  & 10.86 & 7.05  & 100\% & 2.18\% \\
     3  & 17.41 & 9.97  & 100\% & 2.00\% \\
-    5  & 25.36 & 14.11 & 100\% & 1.22\% \\
+    5  & 25.38 & 14.11 & 100\% & 1.67\% \\
     7  & 30.61 & 17.28 & 100\% & 6.91\% \\
-    11 & 41.46 & 22.30 & 100\% & 6.06\% \\
+    11 & 41.49 & 22.30 & 100\% & 5.33\% \\
     \bottomrule
   \end{tabular}
 \end{table}

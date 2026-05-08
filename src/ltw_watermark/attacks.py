@@ -137,12 +137,13 @@ class DipperAttacker:
         order_code = 100 - order_diversity
 
         # Sentence-wise chunking as in DIPPER README.
-        try:
-            import nltk
-            nltk.data.find("tokenizers/punkt")
-        except LookupError:
-            import nltk
-            nltk.download("punkt", quiet=True)
+        # nltk-3.9+ requires BOTH punkt and punkt_tab for sent_tokenize.
+        import nltk
+        for resource in ("tokenizers/punkt", "tokenizers/punkt_tab"):
+            try:
+                nltk.data.find(resource)
+            except LookupError:
+                nltk.download(resource.split("/", 1)[1], quiet=True)
         from nltk.tokenize import sent_tokenize
 
         text = " ".join(text.split())
