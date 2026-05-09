@@ -109,9 +109,8 @@ domain, and prompt set.
     $\gamma=0.5$, $\delta_{\mathrm{KGW}}=2$. \textbf{SWEET}: KGW with
     high-entropy gate at $\rho=0.5$ matched to MCL. Median PPL is on
     the watermarked model's own logits (see \autoref{sec:discussion}
-    for caveats). The SWEET aggregate is over $9$ complete cells
-    (Qwen-2.5-7B factual/wiki/writing in flight at submission); MCL/KGW
-    cover all $12$. Empirical FPR drift at this threshold is reported
+    for caveats). All three methods cover the full $12$ (model, domain)
+    cells. Empirical FPR drift at this threshold is reported
     separately in \autoref{tab:cal-sstar}. Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
@@ -121,9 +120,9 @@ domain, and prompt set.
     Method & cells & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
             TPR$_{\mathrm{ZH}}$ & PPL ($\downarrow$) \\
     \midrule
-    \textbf{MCL (ours)} & 12/12 & \textbf{100.0\%} & \textbf{99.9\%} & \textbf{72.8\%} & 3.10 \\
-    KGW                 & 12/12 & 76.5\%  & 56.2\%  & 21.9\%  & 1.85 \\
-    SWEET               &  9/12 & 65.6\%  & 45.2\%  & 18.8\%  & \textbf{1.68} \\
+    \textbf{MCL (ours)} & 12/12 & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{72.8\%} & 3.66 \\
+    KGW                 & 12/12 & \phantom{0}74.8\% & \phantom{0}55.1\%  & 19.4\%  & 1.93 \\
+    SWEET               & 12/12 & \phantom{0}71.8\% & \phantom{0}51.2\%  & 18.0\%  & \textbf{1.80} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -152,18 +151,18 @@ that holds gating policy fixed against MCL.
     & & \multicolumn{3}{c|}{Clean} & \multicolumn{3}{c}{ZH back-translation} \\
     Model & Domain & MCL & KGW & SWEET & MCL & KGW & SWEET \\
     \midrule
-    Llama-3.1-8B & code     & \textbf{100} & 57 & 41 & \textbf{56} & 24 & 18 \\
-    Llama-3.1-8B & factual  & \textbf{100} & 93 & 80 & \textbf{75} & 30 & 22 \\
-    Llama-3.1-8B & wiki     & \textbf{100} & 91 & 69 & \textbf{76} & 19 & 11 \\
-    Llama-3.1-8B & writing  & \textbf{100} & \textbf{100} & \textbf{100} & \textbf{76} & 33 & 20 \\
-    Qwen-2.5-7B  & code     & \textbf{100} & 40 & 34 & \textbf{58} & 26 & 22 \\
-    Qwen-2.5-7B  & factual  & \textbf{100} & 100 & --- & ---  & ---  & ---  \\
-    Qwen-2.5-7B  & wiki     & \textbf{100} & 100 & --- & ---  & ---  & ---  \\
-    Qwen-2.5-7B  & writing  & \textbf{100} & 100 & --- & ---  & ---  & ---  \\
-    Mistral-7B   & code     & \textbf{100} & 54 & 44 & \textbf{78} & 15 & 10 \\
-    Mistral-7B   & factual  & \textbf{100} & 89 & 80 & \textbf{71} & 31 & 29 \\
-    Mistral-7B   & wiki     & \textbf{100} & 52 & 44 & \textbf{70} & 18 &  9 \\
-    Mistral-7B   & writing  & \textbf{100} & 96 & 97 & \textbf{73} & 25 & 29 \\
+    Llama-3.1-8B & code     & \textbf{100} & 59 & 44 & \textbf{59} & 25 & 28 \\
+    Llama-3.1-8B & factual  & \textbf{100} & 92 & 79 & \textbf{73} & 25 & 25 \\
+    Llama-3.1-8B & wiki     & \textbf{100} & 87 & 72 & \textbf{72} & 19 & 11 \\
+    Llama-3.1-8B & writing  & \textbf{100} & 99 & \textbf{100} & \textbf{78} & 21 & 20 \\
+    Qwen-2.5-7B  & code     & \textbf{100} & 39 & 41 & \textbf{59} & 23 & 19 \\
+    Qwen-2.5-7B  & factual  & \textbf{100} & 61 & 62 & \textbf{78} & 15 & 11 \\
+    Qwen-2.5-7B  & wiki     & \textbf{100} & 76 & 73 & \textbf{80} & \phantom{0}6 & 10 \\
+    Qwen-2.5-7B  & writing  & \textbf{100} & \textbf{100} & \textbf{100} & \textbf{83} & 12 & 12 \\
+    Mistral-7B   & code     & \textbf{100} & 49 & 52 & \textbf{79} & 12 & 12 \\
+    Mistral-7B   & factual  & \textbf{100} & 86 & 85 & \textbf{70} & 37 & 29 \\
+    Mistral-7B   & wiki     & \textbf{100} & 50 & 55 & \textbf{70} & 16 & 16 \\
+    Mistral-7B   & writing  & \textbf{100} & 99 & 99 & \textbf{73} & 22 & 23 \\
     \bottomrule
   \end{tabular}
 \end{table*}
@@ -201,10 +200,11 @@ overlaying the slope-1 identity.
   \label{fig:translation-decay}
 \end{figure*}
 
-If the slope-1 prediction holds, this anchors the universal
-half-life $\delta^\star = 1 - 1/\sqrt{2}$ empirically: detection
-power halves at $\delta_{\mathrm{eff}} \approx 0.293$ regardless of
-model, domain, or pivot language. The claim is stronger than
+The observed ratios sit at or above the
+$(1-\delta_{\mathrm{eff}})^2$ diagonal across pivots, models, and
+domains, anchoring the universal half-life $\delta^\star = 1 -
+1/\sqrt{2} \approx 0.293$ empirically and confirming our robustness
+bound is conservative rather than tight. The claim is stronger than
 synthetic random-substitution attacks alone can support, since
 NLLB-200 introduces semantically coherent rewrites rather than
 i.i.d.\ token noise.
@@ -289,7 +289,7 @@ form derived in \autoref{app:proofs}.
     aggregated across 3 LLMs $\times$ 4 domains $\times$ 25 prompts
     ($\approx$ 300 watermarked and 300 non-watermarked samples; some
     cells in flight at submission). $z_{\mathrm{pred}} =
-    \rho\sqrt{(S{-}1)(n{-}1)}$ from Theorem~1. Watermarked $z$
+    \rho\sqrt{(S{-}1)(n{-}1)}$ from \autoref{thm:detection}. Watermarked $z$
     overshoots theory by 50--90\,\% (signal exceeds the analytic lower
     bound). Empirical FPR exceeds the 1\,\% target due to non-i.i.d.\
     structure in natural-language token sequences --- the calibration
@@ -330,19 +330,18 @@ of the theory: \autoref{thm:detection} (calibration; Exp.~5),
 \autoref{thm:robustness} (post-attack decay; Exp.~3), and
 \autoref{thm:k-regular} (topology generalisation; Exp.~4), with
 Exp.~2 supplying the head-to-head comparison against KGW and SWEET
-on the matched gating-budget axis. The data in
-\autoref{fig:headline-tpr},
-\autoref{fig:translation-decay},
-\autoref{fig:cal-fpr},
-\autoref{tab:headline-aggregate},
-\autoref{tab:headline-percell},
-\autoref{tab:kregular}, and
-\autoref{tab:cal-sstar} support four claims: (i) MCL achieves
-perfect clean detection (100\% TPR) and dominates KGW/SWEET under
-random-substitution and translation attacks (73\% vs 19\% TPR
-post-back-translation); (ii) the post-attack $z$ ratio is consistent
-with the $(1-\delta_{\mathrm{eff}})^2$ scaling across pivots, models,
-and domains; (iii) the random baseline $p_0 = k/S$ holds empirically
-at $k{=}2$; and (iv) the analytic FPR bound is qualitatively
-actionable, with observed $S^\star$ tracking the closed form modulo
-a 20--30\% empirical-threshold inflation (\autoref{sec:discussion}).
+on the matched gating-budget axis. The four sub-experiments support four claims.
+(i) MCL achieves perfect clean detection ($100\%$ TPR) and
+dominates KGW/SWEET under random-substitution and translation
+attacks ($73\%$ vs $19\%$ TPR post-back-translation;
+\autoref{fig:headline-tpr}, \autoref{tab:headline-aggregate},
+\autoref{tab:headline-percell}).
+(ii) The post-attack $z$ ratio sits at or above the
+$(1-\delta_{\mathrm{eff}})^2$ diagonal across pivots, models, and
+domains (\autoref{fig:translation-decay}).
+(iii) The random baseline $p_0 = k/S$ holds empirically at $k{=}2$
+(\autoref{tab:kregular}).
+(iv) The analytic FPR bound gives the right $S^\star$ ordering with
+an empirical-SD recalibration handoff for strict $1\%$-FPR
+deployment (\autoref{fig:cal-fpr}, \autoref{tab:cal-sstar},
+\autoref{sec:discussion}, \autoref{app:fpr-recipes}).

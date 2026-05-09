@@ -75,20 +75,15 @@ adopt (Newey--West HAC, $k$-skip, stopword filtering, HDD-lite) are
 tabulated as failure modes alongside SD recalibration in
 \autoref{app:fpr-recipes}.
 
-\paragraph{Incomplete SWEET coverage.}
-\autoref{tab:headline-aggregate}'s SWEET aggregate is computed over
-$9$ of $12$ (model, domain) cells; three Qwen-2.5-7B SWEET cells
-(factual, wiki, writing) failed to complete in the cluster window
-and are omitted. The qualitative ordering MCL $\gg$ KGW $\geq$ SWEET
-holds in every complete cell (\autoref{tab:headline-percell}), but
-the SWEET aggregate in \autoref{tab:headline-aggregate} should be
-read as a 9-cell mean rather than a balanced 12-cell mean. SWEET is
-additionally omitted from the empirically-recalibrated head-to-head
-in \autoref{tab:headline-recalibrated} because the SWEET null
-$z$-distribution was not collected on the FPR corpus and cannot be
-reconstructed from the released artefacts; an apples-to-apples SWEET
-row at empirical FPR$=1\%$ is deferred to the extended version,
-along with a full SWEET re-run.
+\paragraph{SWEET coverage.}
+\autoref{tab:headline-aggregate} and \autoref{tab:headline-percell}
+report SWEET on the full $12$ (model, domain) cells, matching
+MCL/KGW. SWEET is, however, omitted from the
+empirically-recalibrated head-to-head in
+\autoref{tab:headline-recalibrated}: the SWEET null $z$-distribution
+was not collected on the FPR corpus and cannot be reconstructed from
+the released artefacts. An apples-to-apples SWEET row at empirical
+FPR$=1\%$ is deferred to the extended version.
 
 \paragraph{Translation-only robustness scope.} Our robustness
 evaluation covers \emph{clean}, \emph{random-substitution at

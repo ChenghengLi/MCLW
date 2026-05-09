@@ -18,11 +18,12 @@ attacks. The empirical post-attack $z$ ratio sits above the
 worst-case $(1-\delta_{\mathrm{eff}})^2$ scaling, so we read our
 robustness bound as conservative rather than tight
 (\autoref{sec:experiments}).
-Four directions are immediate: tightening the analytic FPR bound
-under non-i.i.d.\ natural-language statistics, where empirical FPR
-drifts above the 1\,\% target by 2--7$\times$ at large $S$
-(\autoref{tab:cal-sstar}); extending the protocol to longer text
-regimes where small $S^\star$ becomes the operative regime;
-validating $k$-regular topologies at $k\geq 3$; and characterising
-behaviour on base (non-instruction-tuned) LLMs whose entropy
-profile differs from the instruct-tuned fleet studied here.
+Four directions are immediate. First, tighten the \emph{analytic}
+FPR bound under non-i.i.d.\ natural-language statistics: the
+empirical-SD recalibration of \autoref{app:fpr-recipes} closes the
+deployment gap, but the closed form remains loose at large $S$
+(\autoref{tab:cal-sstar}). Second, extend the protocol to longer
+text regimes where small $S^\star$ becomes the operative regime.
+Third, validate $k$-regular topologies at $k\geq 3$. Fourth,
+characterise behaviour on base (non-instruction-tuned) LLMs whose
+entropy profile differs from the instruct-tuned fleet studied here.
