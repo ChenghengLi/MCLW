@@ -5,6 +5,83 @@
 
 We run four experiments on three instruction-tuned 7--8B LLMs across
 four domains. Per-prompt records stream to JSONL for reproducibility.
+\autoref{fig:experiment-flow} traces a single ChainMark generation
+end-to-end on a wiki-domain prompt: the model receives the user
+prompt, ChainMark masks logits at gated positions to keep only
+states $(s+1) \bmod S$, and the detector re-derives every token's
+state from the key alone and reports a $z$-score.
+
+\begin{figure}[t]
+  \centering
+  \begin{tikzpicture}[
+    x=1cm, y=1cm,
+    bubblestyle/.style={rounded corners=2.2pt, draw=black!45,
+                        line width=0.4pt, inner sep=4pt,
+                        font=\scriptsize},
+    userbubble/.style={bubblestyle, fill=blue!8, anchor=west,
+                       text width=6.4cm, align=left},
+    asstbubble/.style={bubblestyle, fill=green!8, anchor=west,
+                       text width=6.4cm, align=left},
+    detbubble/.style={bubblestyle, fill=orange!10, anchor=west,
+                      text width=6.4cm, align=left},
+    arrowstyle/.style={->, line width=0.7pt, black!65,
+                       >={Stealth[length=2.2mm,width=2mm]}},
+    rolelabel/.style={font=\scriptsize\bfseries, anchor=base east,
+                      color=black!70, inner sep=0pt},
+    sttag/.style={font=\tiny, color=black!75},
+  ]
+    % USER prompt
+    \node[rolelabel] at (-0.05, 4.40) {User};
+    \node[userbubble] (user) at (0.0, 4.05)
+      {\texttt{Explain Donald Trump in a comprehensive way.}};
+
+    \draw[arrowstyle] (3.20, 3.85) -- (3.20, 3.40);
+    \node[font=\tiny, color=black!60, anchor=west]
+      at (3.30, 3.62) {ChainMark generation: gate ($\rho{=}0.5$),\
+        mask logits to $\sigma_\kappa^{-1}\!\big((s{+}1)\bmod 5\big)$};
+
+    % ASSISTANT bubble (watermarked output)
+    \node[rolelabel] at (-0.05, 2.95) {LM (ChainMark)};
+    \node[asstbubble] (asst) at (0.0, 2.30) {%
+      \textbf{Donald}\,\textsubscript{$s_2$}\
+      \textbf{Trump}\,\textsubscript{$s_3$}\
+      (\textbf{born}\,\textsubscript{$s_4\,\bullet$}\
+      \textbf{June}\,\textsubscript{$s_0\,\bullet$}\
+      \textbf{14}\,\textsubscript{$s_1\,\bullet$},\
+      \textbf{1946}\,\textsubscript{$s_2\,\bullet$})\
+      \textbf{is}\,\textsubscript{$s_3\,\bullet$}\
+      \textbf{a}\,\textsubscript{$s_4$}\
+      \textbf{former}\,\textsubscript{$s_4$}\
+      \textbf{U.S.}\,\textsubscript{$s_0\,\bullet$}\
+      \textbf{president}\,\textsubscript{$s_1\,\bullet$}\
+      \textbf{and}\,\textsubscript{$s_2\,\bullet$}\
+      \textbf{businessman}\,\textsubscript{$s_3\,\bullet$}\,\dots\\[1pt]
+      {\tiny ($\bullet$ = gated step where ChainMark forced
+      $s_{i+1}{=}(s_i{+}1)\!\bmod 5$; subscripts $=$
+      $\sigma_\kappa(t_i)$.)}};
+
+    \draw[arrowstyle] (3.20, 1.90) -- (3.20, 1.45);
+    \node[font=\tiny, color=black!60, anchor=west]
+      at (3.30, 1.68) {Model-free detector: re-run $\sigma_\kappa$,\
+        count valid transitions};
+
+    % DETECTOR verdict
+    \node[rolelabel] at (-0.05, 0.95) {Auditor};
+    \node[detbubble] (det) at (0.0, 0.20)
+      {\textbf{Verdict.} $\phi = 0.79\;\;(\text{vs }p_0=0.20)$,\
+       $z = 5.30 > z_{0.01}=2.326$, $p\text{-value} \approx 6\!\times\!10^{-8}$.\\
+       \textbf{watermarked} (no LM access required).};
+  \end{tikzpicture}
+  \caption{\textbf{End-to-end ChainMark trace} for a wiki-domain
+    prompt on Llama-3.1-8B-Instruct ($S{=}5$, $\rho{=}0.5$, $n{=}14$
+    tokens shown). Subscripts under each token are its state
+    $\sigma_\kappa(t)$; \textbullet\ marks the gated steps where the
+    next token's state is forced. The auditor reproduces the state
+    sequence from the key $\kappa$ alone and computes
+    $\phi$, $z$ in $O(n)$ hash operations, with no language-model
+    access.}
+  \label{fig:experiment-flow}
+\end{figure}
 
 \subsection{Setup}
 \label{subsec:exp-setup}
