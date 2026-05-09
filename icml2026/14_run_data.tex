@@ -12,11 +12,11 @@
   \centering
   \caption{\textbf{Per-pivot ChainMark translation robustness.} TPR @
     $z>2.326$ for each NLLB-200 pivot under ChainMark $S=5$, $\rho=0.5$.
-    Llama and Qwen cover four domains (factual, wiki, writing, code)
-    at $25$ prompts each ($n=100$ per row); the Mistral row covers
-    only three domains (factual, wiki, writing; $n=75$). ZH is the
-    most aggressive pivot ($\delta_{\mathrm{eff}}\approx 0.81$);
-    FR, DE, RU are gentler ($\delta_{\mathrm{eff}}\approx 0.69$).}
+    All three models now cover four domains (factual, wiki, writing,
+    code) at $25$ prompts each ($n=100$ per row, $300$ generations
+    per pivot column). ZH is the most aggressive pivot
+    ($\delta_{\mathrm{eff}}\approx 0.81$); FR, DE, RU are gentler
+    ($\delta_{\mathrm{eff}}\approx 0.69$).}
   \label{tab:translation-pivots}
   \small
   \begin{tabular}{lrrrrrr}
@@ -24,7 +24,7 @@
     Model & $n$ & clean & FR & DE & RU & ZH \\
     \midrule
     Llama-3.1-8B & $100$ & 100\% & 85\% & 78\% & 81\% & 75\% \\
-    Mistral-7B   & $\phantom{0}75$  & 100\% & 88\% & 92\% & 92\% & 75\% \\
+    Mistral-7B   & $100$ & 100\% & 86\% & 92\% & 92\% & 77\% \\
     Qwen-2.5-7B  & $100$ & 100\% & 78\% & 75\% & 78\% & 66\% \\
     \bottomrule
   \end{tabular}

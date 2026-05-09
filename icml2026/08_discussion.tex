@@ -55,12 +55,11 @@ $k\in\{1,2\}$; $k\geq 3$ is deferred. The robustness suite is translation-only: 
 \emph{not} run grammar-preserving paraphrase (e.g.\ DIPPER), so the
 strongest robustness claim is against translation and uniform
 substitution, not against adversarial paraphrasing. The translation
-evaluation itself covers $11/12$ (model, domain) cells
-(Mistral$\times$code did not complete in the cluster window; see
-\autoref{tab:translation-pivots}), and the SWEET row of the
+evaluation now covers all $12$ (model, domain) cells
+(\autoref{tab:translation-pivots}), but the SWEET row of the
 empirically recalibrated head-to-head
-(\autoref{tab:headline-recalibrated}) is omitted since the SWEET
-null $z$-distribution was not collected on the FPR corpus.
+(\autoref{tab:headline-recalibrated}) is still omitted since the
+SWEET null $z$-distribution was not collected on the FPR corpus.
 
 \paragraph{Quality and detector caveats.} Generation quality is
 self-perplexity under each model's own logits; we do not report

@@ -240,11 +240,10 @@ ablation of KGW with the gating policy held fixed against ChainMark.
 \subsection{Translation Robustness}
 \label{subsec:exp3-translation}
 
-Each ChainMark-watermarked output ($3$ models $\times$ $4$ domains $\times$
-$25$ prompts $\times$ $n{=}200$ tokens; Mistral$\times$code did not
-complete in the cluster window, see \autoref{tab:translation-pivots})
-is round-tripped through NLLB-200~\citep{nllbteam2022nllb} on four
-pivot languages (FR, DE, RU, ZH), and we compute the empirical
+Each ChainMark-watermarked output ($3$ models $\times$ $4$ domains
+$\times$ $25$ prompts $\times$ $n{=}200$ tokens, $1\,200$ generations
+total) is round-tripped through NLLB-200~\citep{nllbteam2022nllb} on
+four pivot languages (FR, DE, RU, ZH), and we compute the empirical
 $\delta_{\mathrm{eff}}$ per output via token-edit distance. Plotting
 the post-attack-to-clean $z$ ratio against $\delta_{\mathrm{eff}}$
 (\autoref{fig:translation-decay}) shows the observed ratios sit at or
