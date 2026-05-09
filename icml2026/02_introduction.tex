@@ -6,10 +6,10 @@ EU AI Act Article~50~\citep{euaiact2024} requires a machine-readable
 mark on AI-generated text by August 2026, but does not specify
 which false-positive rate, text length, or quality cost constitute a
 compliant detector. Operators therefore need a watermark whose
-detector is auditable end-to-end: a regulator or third-party
+detector is auditable end-to-end. A regulator or third-party
 verifier should be able to confirm provenance from the text, the
-secret key, and the (publicly known) tokenizer alone, without query
-access to the generating language model. The widely used logit-bias schemes do not meet this
+secret key, and the (publicly known) tokenizer alone --- without
+query access to the generating language model. The widely used logit-bias schemes do not meet this
 bar. KGW~\citep{kirchenbauer2023watermark} and its
 entropy-gated variants such as
 SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} require the
