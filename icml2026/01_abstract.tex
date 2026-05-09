@@ -2,29 +2,21 @@
 \begin{abstract}
   Regulatory regimes such as the EU AI Act mandate machine-readable
   marking of synthetic text, but existing watermark detectors rely on
-  access to the generating language model and on entropy-based
-  heuristics with no closed-form calibration to a target false-positive
-  rate.
-  We introduce \emph{Markov Chain Lock} (MCL), an active watermark that
-  partitions the vocabulary into $S$ states via keyed SHA-256 hashing
-  and forces a hard Markov transition on a fraction $\rho$ of generated
-  positions; the detector replays the partition from the same secret
-  key and is therefore model-free, running in $O(n)$ hash operations.
-  Theoretically, we derive an operator-facing formula mapping a
-  target false-positive rate, text length, and budget to the minimum
-  state count $S^\star$ (\autoref{thm:detection}). We further prove
-  a universal robustness threshold $\delta^\star = 1 - 1/\sqrt{2}
-  \approx 29.3\%$ that is independent of $(S, \rho, n)$
-  (\autoref{thm:robustness}). Both results adopt the same midpoint
-  decision convention used throughout the paper, and generalise to
-  any $k$-regular transition topology (\autoref{thm:k-regular}).
-  Empirically, we compare MCL head-to-head against KGW and SWEET
-  across multiple instruction-tuned LLMs and four text domains under
-  matched-budget translation and random-substitution attacks. We
-  then sweep the state count $S$ to anchor the calibration formula
-  on data and validate the $k$-regular generalisation at $k=2$
+  the generating LM and on heuristic thresholds with no closed-form
+  calibration. We introduce \emph{Markov Chain Lock} (MCL), an active
+  watermark that partitions the vocabulary into $S$ states via keyed
+  SHA-256 and forces a hard Markov transition on a fraction $\rho$ of
+  positions; the detector replays the partition from the same key in
+  $O(n)$ hash operations, with no LM access. We derive a closed-form
+  $S^\star(n, \rho, \alpha)$ mapping a target FPR, text length, and
+  budget to the minimum state count (\autoref{thm:detection}), prove a
+  universal robustness threshold $\delta^\star = 1 - 1/\sqrt{2}
+  \approx 29.3\%$ that is invariant in $(S,\rho,n)$
+  (\autoref{thm:robustness}), and generalise both to any $k$-regular
+  transition topology (\autoref{thm:k-regular}). Across three
+  instruction-tuned LLMs and four domains, MCL strictly dominates
+  KGW and SWEET under translation and random-substitution attacks at
+  matched budget; an empirical-SD threshold recalibration restores
+  the $1\%$ target FPR on natural-language text
   (\autoref{sec:experiments}).
-  The closed-form calibration and model-free detector together let
-  a third-party auditor verify a marked deployment from the text and
-  the (publicly known) tokenizer alone, without LM access.
 \end{abstract}

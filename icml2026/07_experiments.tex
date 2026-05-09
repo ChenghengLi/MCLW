@@ -3,146 +3,97 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We empirically (i)~compare MCL head-to-head against KGW and SWEET
-at matched budget, and (ii)~validate the three principal predictions
-of \autoref{thm:detection}, \autoref{thm:robustness}, and
-\autoref{thm:k-regular}. The fleet spans three instruct-tuned 7--8B
-models, four content domains, and three attack conditions in the
-headline grid (\emph{clean}, random-substitution, ZH
-back-translation); Exp.~3 extends to four NLLB pivots
-(FR, DE, RU, ZH).
-The campaign comprises four complementary sub-experiments.
-Exp.~2 (\autoref{subsec:exp2-headline}) is the
-head-to-head against the canonical KGW baseline and the SWEET
-high-entropy gate. Exp.~3 (\autoref{subsec:exp3-translation})
-measures robustness under machine-translation pivots. Exp.~4
-(\autoref{subsec:exp4-kregular}) sanity-checks the $k$-regular
-generalisation at $k{=}2$. Exp.~5
-(\autoref{subsec:exp5-calibration}) anchors the closed-form FPR
-calibration via a sweep over the state count $S$. All computation
-runs on the EPFL RunAI cluster; per-prompt records (logits, gate
-decisions, post-attack tokens, $z$-scores) stream to JSONL for
-reproducibility.
+We run four experiments on three instruction-tuned 7--8B LLMs across
+four domains. Per-prompt records stream to JSONL for reproducibility.
 
 \subsection{Setup}
 \label{subsec:exp-setup}
 
-\textbf{Models.} We use three instruction-tuned, openly licensed
-checkpoints in the 7--8B parameter range:
-\texttt{meta-llama/Llama-3.1-8B-Instruct},
+\textbf{Models.} Three instruction-tuned, openly licensed checkpoints
+in the 7--8B parameter range: \texttt{meta-llama/Llama-3.1-8B-Instruct},
 \texttt{Qwen/Qwen-2.5-7B-Instruct}, and
 \texttt{mistralai/Mistral-7B-Instruct-v0.3}. The same secret key
 $\kappa$ is fixed across every run.
 
-\textbf{Domains.} Four prompt domains stress different entropy
-regimes: \emph{code} (HumanEval problem stems), \emph{factual}
-(short closed-form knowledge prompts), \emph{wiki} (open-ended
-``Explain $X$\ldots'' prompts over a curated concept list), and
-\emph{writing} (creative-completion prompts). Headline experiments (Exp.~2) use 100 prompts per domain.
-Translation and calibration experiments (Exp.~3, Exp.~5) use a
-25-prompt subsample per domain to keep the design balanced under
-the larger Cartesian product. The $k$-regular sanity check (Exp.~4)
-uses 100 prompts on the wiki domain only.
+\textbf{Domains.} Four prompt domains stress different entropy regimes:
+\emph{code} (HumanEval problem stems), \emph{factual} (short closed-form
+knowledge prompts), \emph{wiki} (open-ended ``Explain $X$\ldots''
+prompts over a curated concept list), and \emph{writing}
+(creative-completion prompts).
 
-\textbf{Generation.} Temperature $T = 0.7$, top-$p = 1$, token
-budget $n = 200$ at every cell. Prompt order is determined by a
-deterministic seed so the same indices are watermarked, attacked,
-and detected across methods.
+\textbf{Generation and detection.} Temperature $T = 0.7$, top-$p = 1$,
+token budget $n = 200$ at every cell, with one deterministic seed so
+the same indices are watermarked, attacked, and detected across
+methods. Detection uses the threshold $z_\alpha$ from
+\autoref{thm:detection}, reused across methods for fair comparison.
 
 \textbf{MCL configuration.} Unless stated otherwise, MCL runs use
-$S = 5$ states, target gate budget $\rho = 0.5$, the
-high-entropy gate $G_{H_{\mathrm{high}}}$, and clockwork
-($k{=}1$) topology. \autoref{subsec:exp4-kregular} varies $k$ and
-\autoref{subsec:exp5-calibration} varies $S$.
+$S = 5$ states, target gate budget $\rho = 0.5$, the high-entropy gate
+$G_{H_{\mathrm{high}}}$, and clockwork ($k{=}1$) topology.
 
-\textbf{Detection.} The detection statistic and the threshold
-$z_\alpha$ are taken directly from \autoref{thm:detection};
-the same threshold is reused across methods for fair comparison.
-
-\subsection{Headline Comparison: MCL vs KGW vs SWEET}
-\label{subsec:exp2-headline}
-
-The headline experiment (Exp.~2) is a $3 \times 3 \times 4 \times 3$
-factorial: 3 watermarking methods $\times$ 3 models $\times$ 4
-domains $\times$ 3 attack conditions, with 100 prompts per
-(method, model, domain) cell.
-
-\textbf{Methods.} \emph{MCL} is configured at the canonical
-operating point $S{=}5$, $\rho = 0.5$, gate $G_{H_{\mathrm{high}}}$,
-clockwork ($k{=}1$). \emph{KGW}~\citep{kirchenbauer2023watermark}
-uses its standard parameters $\gamma = 0.5$ and logit bias
-$\delta_{\mathrm{KGW}} = 2$. \emph{SWEET}~\citep{lee2023sweet} retains the same
-$\gamma = 0.5$ and $\delta_{\mathrm{KGW}} = 2$, but applies the
-watermark only at positions whose token-level entropy exceeds a
-threshold calibrated to gate $\rho = 0.5$ of positions. This is
-the high-entropy gate that aligns with our $G_{H_{\mathrm{high}}}$,
-instantiated in the green/red-list scheme.
-
-\textbf{Attacks.} Each generated text is scored under three
-conditions: \emph{clean} (no attack); \emph{random-substitution} at
-effective edit distance $\delta_{\mathrm{eff}} = 0.20$; and
-\emph{back-translation} via NLLB-200 EN$\to$ZH$\to$EN. For the
-back-translation, the empirical $\delta_{\mathrm{eff}}$ is recorded
-per output via token-edit distance to the original.
-
-\textbf{Reporting.} The primary metric is true-positive rate at a
-calibrated $\mathrm{FPR} = 0.01$ (TPR@$1\%$), computed against a
-matched non-watermarked baseline drawn from the same model,
-domain, and prompt set.
+\textbf{Baselines.} \emph{KGW}~\citep{kirchenbauer2023watermark} at
+$\gamma = 0.5$, logit bias $\delta_{\mathrm{KGW}} = 2$.
+\emph{SWEET}~\citep{lee2023sweet} retains the same $\gamma = 0.5$ and
+$\delta_{\mathrm{KGW}} = 2$ but watermarks only the high-entropy
+positions, gated to $\rho = 0.5$ to match MCL's budget.
 
 \begin{figure*}[t]
   \centering
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
     \includegraphics[width=\linewidth]{pictures/fig_headline_tpr.pdf}
-    \caption{\textbf{Head-to-head TPR.}
-      MCL vs KGW ($\gamma{=}0.5, \delta_{\mathrm{KGW}}{=}2$) vs
-      SWEET (high-entropy gating at $\rho{=}0.5$), aggregated over
-      3 LLMs $\times$ 4 domains.}
+    \caption{\textbf{Head-to-head TPR.} MCL vs KGW vs SWEET, aggregated
+      over 3 LLMs $\times$ 4 domains.}
     \label{fig:headline-tpr}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
     \includegraphics[width=\linewidth]{pictures/fig_translation_decay.pdf}
     \caption{\textbf{Translation robustness.} Empirical decay ratio
-      under NLLB-200 EN$\to$\{FR,DE,RU,ZH\}$\to$EN with closed-form
+      under NLLB-200 EN$\to$\{FR,DE,RU,ZH\}$\to$EN with the closed-form
       $(1-\delta_{\mathrm{eff}})^2$ diagonal
-      (\autoref{thm:robustness}); Llama/Qwen $n=100$, Mistral $n=75$
-      (no code).}
+      (\autoref{thm:robustness}); Llama/Qwen $n{=}100$, Mistral $n{=}75$.}
     \label{fig:translation-decay}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
     \includegraphics[width=\linewidth]{pictures/fig_cal_fpr.pdf}
-    \caption{\textbf{Calibration anchor.} Empirical FPR vs state
-      count $S$ on non-watermarked completions, with the closed-form
-      Hoeffding upper bound (\autoref{thm:detection}); threshold
-      fixed at $z_\alpha$ for $\alpha{=}0.01$.}
+    \caption{\textbf{Calibration anchor.} Empirical FPR vs state count
+      $S$, with the closed-form Hoeffding upper bound
+      (\autoref{thm:detection}).}
     \label{fig:cal-fpr}
   \end{subfigure}
-  \caption{\textbf{Headline experimental results.} \textbf{(a)}~Exp.~2
-    head-to-head TPR. \textbf{(b)}~Exp.~3 translation-decay curve.
-    \textbf{(c)}~Exp.~5 calibration FPR anchor. Per-pivot translation
-    breakdown in \autoref{app:translation-pivots}.}
+  \caption{\textbf{Experimental headlines.}
+    \textbf{(a)}~head-to-head TPR (\S\ref{subsec:exp2-headline});
+    \textbf{(b)}~translation-decay curve (\S\ref{subsec:exp3-translation});
+    \textbf{(c)}~FPR calibration anchor (\S\ref{subsec:exp5-calibration}).}
   \label{fig:exp-overview}
 \end{figure*}
 
+\subsection{Matched-budget head-to-head against KGW and SWEET}
+\label{subsec:exp2-headline}
+
+A $3 \times 3 \times 4 \times 3$ factorial (3 methods $\times$ 3 models
+$\times$ 4 domains $\times$ 3 attack conditions: \emph{clean},
+\emph{random-substitution} at $\delta_{\mathrm{eff}}{=}0.20$, and
+\emph{back-translation} via NLLB-200 EN$\to$ZH$\to$EN), $100$ prompts
+per (method, model, domain) cell. \autoref{tab:headline-aggregate}
+collapses over (model, domain); \autoref{tab:headline-percell} gives
+the per-cell breakdown. MCL is the only method that survives ZH
+back-translation in every cell, at the cost of a $\approx 2\times$
+self-perplexity gap. SWEET is an entropy-gating ablation of KGW that
+holds the gating policy fixed against MCL.
+
 \begin{table}[t]
   \centering
-  \caption{\textbf{Headline aggregate.} Detection rate at the analytic
-    threshold $z_\alpha = 2.326$ ($\alpha = 0.01$ under the Gaussian-tail
-    null), aggregated across three instruction-tuned 7--8B LLMs
-    (Llama-3.1-8B, Qwen-2.5-7B, Mistral-7B) and four text domains
-    (HumanEval code, factual, wiki, writing) with 100 prompts per
-    (method, model, domain) cell at $n=200$ tokens. \textbf{MCL} (ours):
-    $S=5$, $\rho=0.5$, $G_{H_{\mathrm{high}}}$. \textbf{KGW}:
-    $\gamma=0.5$, $\delta_{\mathrm{KGW}}=2$. \textbf{SWEET}: KGW with
-    high-entropy gate at $\rho=0.5$ matched to MCL. The PPL column
-    is the median across the $12$ (model, domain) cell medians on
-    the watermarked model's own logits (see \autoref{sec:discussion}
-    for caveats). All three methods cover the full $12$ (model, domain)
-    cells. Empirical FPR drift at this threshold is reported
-    separately in \autoref{tab:cal-sstar}. Bold = best per column.}
+  \caption{\textbf{Headline aggregate} at the analytic threshold
+    $z_\alpha = 2.326$ ($\alpha = 0.01$, Gaussian-tail null), aggregated
+    over $3$ LLMs $\times$ $4$ domains $\times$ $100$ prompts at
+    $n{=}200$ tokens per cell. The PPL column is the median across the
+    $12$ cell medians on the watermarked model's own logits
+    (caveats in \autoref{sec:discussion}). Empirical FPR drift at this
+    threshold appears separately in \autoref{tab:cal-sstar}.
+    Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
   \setlength{\tabcolsep}{4pt}
@@ -158,22 +109,13 @@ domain, and prompt set.
   \end{tabular}
 \end{table}
 
-\autoref{fig:headline-tpr} and \autoref{tab:headline-aggregate}
-collapse the design over the (model, domain) axis; the per-cell
-breakdown is in \autoref{tab:headline-percell}. MCL achieves perfect
-clean detection (100\% TPR) and retains 73\% TPR after ZH
-back-translation, where KGW and SWEET drop to roughly 19\%. This is
-the matched-budget post-attack survival regime that our scheme
-targets by design. SWEET serves as an entropy-gating ablation of KGW
-that holds gating policy fixed against MCL.
-
 \begin{table*}[t]
   \centering
-  \caption{\textbf{Per-(model, domain) head-to-head TPR (\%) at the
-    analytic $z_\alpha=2.326$ threshold.} 100 prompts per cell, $n=200$
-    tokens. MCL matches or leads every clean cell (perfect detection)
-    and strictly leads every cell post-ZH-back-translation. Bold =
-    best per column within each block.}
+  \caption{\textbf{Per-(model, domain) head-to-head TPR (\%)} at
+    $z_\alpha=2.326$. $100$ prompts per cell, $n{=}200$ tokens. MCL
+    matches or leads every clean cell and strictly leads every cell
+    post-ZH-back-translation. Bold = best per column within each
+    block.}
   \label{tab:headline-percell}
   \small
   \setlength{\tabcolsep}{4pt}
@@ -198,62 +140,46 @@ that holds gating policy fixed against MCL.
   \end{tabular}
 \end{table*}
 
-\subsection{Robustness Decay under Translation}
+\subsection{Translation robustness}
 \label{subsec:exp3-translation}
 
-Exp.~3 tests the closed-form $(1-\delta)^2$ scaling of
-\autoref{thm:robustness} on real machine-translation attacks.
-Each MCL-watermarked output (3 models $\times$ 4 domains $\times$
-25 prompts $\times$ $n{=}200$ tokens; Mistral$\times$code did not
+Each MCL-watermarked output ($3$ models $\times$ $4$ domains $\times$
+$25$ prompts $\times$ $n{=}200$ tokens; Mistral$\times$code did not
 complete in the cluster window, see \autoref{tab:translation-pivots})
 is round-tripped through NLLB-200~\citep{nllbteam2022nllb} on four
-pivot languages: French, German, Russian, and Chinese. The empirical effective edit
-distance $\delta_{\mathrm{eff}}$ is computed from the token-edit
-distance between the watermarked output and its post-pivot
-counterpart, giving each generation a continuous $\delta$ value
-rather than a single nominal rate.
+pivot languages (FR, DE, RU, ZH), and we compute the empirical
+$\delta_{\mathrm{eff}}$ per output via token-edit distance. Plotting
+the post-attack-to-clean $z$ ratio against $\delta_{\mathrm{eff}}$
+(\autoref{fig:translation-decay}) shows the observed ratios sit at or
+above the closed-form $(1-\delta_{\mathrm{eff}})^2$ diagonal across
+pivots, models, and domains, which empirically anchors the universal
+half-life $\delta^\star = 1 - 1/\sqrt{2}$ from
+\autoref{thm:robustness} and confirms the bound is conservative
+rather than tight. The claim is stronger than synthetic
+random-substitution can support, since NLLB-200 produces
+semantically coherent rewrites rather than i.i.d.\ token noise.
 
-\autoref{thm:robustness} predicts that the post-attack $z$-score
-satisfies $z_{\mathrm{post}}/z_{\mathrm{clean}} = (1 -
-\delta_{\mathrm{eff}})^2$ in expectation, modulo finite-sample
-Bernoulli noise. We plot the observed ratio against the
-predicted $(1-\delta_{\mathrm{eff}})^2$ on a single set of axes,
-overlaying the slope-1 identity.
-
-% [Translation-decay figure consolidated into fig:exp-overview at top of section.]
-
-The observed ratios sit at or above the
-$(1-\delta_{\mathrm{eff}})^2$ diagonal across pivots, models, and
-domains, anchoring the universal half-life $\delta^\star = 1 -
-1/\sqrt{2} \approx 0.293$ empirically and confirming our robustness
-bound is conservative rather than tight. The claim is stronger than
-synthetic random-substitution attacks alone can support, since
-NLLB-200 introduces semantically coherent rewrites rather than
-i.i.d.\ token noise.
-
-\subsection{$k$-Regular Generalisation}
+\subsection{$k$-regular MCL at $k{=}2$}
 \label{subsec:exp4-kregular}
 
-Exp.~4 verifies the $k$-regular extension of MCL predicted by
-\autoref{thm:k-regular}. Under any $k$-regular topology,
-the random-baseline fingerprint mass is $p_0 = k/S$, the detection
-$z$-score scales as in \autoref{thm:detection} with this updated
-null mean, and the universal post-attack $\delta^\star$ is invariant
-in $k$. We instantiate $k = 2$ (each state has exactly two allowed
-successors) at $S = 5$, predicting $p_0 = 2/5 = 0.40$. The protocol
-is the wiki domain (100 prompts) for each of the three models, with
-ZH back-translation as the only attack condition --- the most
-frequent attack regime on the open web.
+Instantiating $k = 2$ (each state has two allowed successors) at
+$S = 5$ predicts $p_0 = k/S = 0.40$. We run $100$ wiki-domain prompts
+on each of the three models with ZH back-translation as the only
+attack. \autoref{tab:kregular} reports clean
+$\bar\phi_{\mathrm{cl}} \geq 0.88$ (well above the $p_0 = 0.40$
+prediction) and a clean-vs-ZH $z$-score ratio close to the
+$(1 - \delta_{\mathrm{eff}})^2$ prediction, jointly re-certifying
+\autoref{thm:k-regular} and \autoref{thm:robustness} at a non-trivial
+$k$.
 
 \begin{table}[t]
   \centering
-  \caption{\textbf{$k$-regular sanity check at $k{=}2$ (soft-cycle), $S{=}5$,
-    $\rho{=}0.5$.} Predicted random baseline $p_0 = k/S = 0.40$. Wiki
-    domain, 100 prompts. The clean $\bar\phi_{\mathrm{cl}}$ values
-    ($\geq 0.88$) sit well above $p_0$ as predicted by
-    \autoref{thm:k-regular}, and the post-attack $z$ ratio
-    re-certifies \autoref{thm:robustness} at $k{=}2$ (formal
-    statements in \autoref{app:proofs}).}
+  \caption{\textbf{$k$-regular MCL at $k{=}2$ (soft-cycle), $S{=}5$,
+    $\rho{=}0.5$.} Predicted random baseline $p_0 = 0.40$; wiki domain,
+    $100$ prompts. The clean $\bar\phi_{\mathrm{cl}}$ values
+    ($\geq 0.88$) sit well above $p_0$
+    (\autoref{thm:k-regular}); the post-attack $z$ ratio re-certifies
+    \autoref{thm:robustness} at $k{=}2$ (\autoref{app:proofs}).}
   \label{tab:kregular}
   \small
   \setlength{\tabcolsep}{3.5pt}
@@ -269,49 +195,38 @@ frequent attack regime on the open web.
   \end{tabular}
 \end{table}
 
-A close match between observed $p_0$ on unwatermarked text and the
-$k/S$ prediction certifies the random-oracle assumption underlying
-\autoref{thm:k-regular}; a clean-vs-ZH $z$-score ratio close to
-$(1 - \delta_{\mathrm{eff}})^2$ on the same generations
-re-certifies \autoref{thm:robustness} at a non-trivial $k$.
-
-\subsection{Empirical Calibration Anchor (S sweep)}
+\subsection{Calibration anchor (state-count sweep)}
 \label{subsec:exp5-calibration}
 
-Exp.~5 anchors the closed-form FPR calibration of
-\autoref{thm:detection} empirically. We sweep $S \in \{2, 3, 5,
-7, 11\}$ across the three models, with 4 domains $\times$ 25
-prompts $\times$ $n{=}200$ tokens per cell. Each cell records both
-a watermarked generation (MCL at the canonical operating point,
-varying only $S$) and a non-watermarked baseline drawn from the
-same prompt with the same model. The non-watermarked outputs feed
-the empirical FPR estimate at the analytic threshold $z_\alpha$;
-the watermarked outputs feed the TPR.
-
-\autoref{thm:detection} predicts that the null-distribution
-$z$-score satisfies a Hoeffding-style upper bound
-$\mathrm{FPR} \leq \exp(-2 z_\alpha^2)$ on i.i.d.\ random token
-sequences (proof in \autoref{app:proofs}). The minimum admissible
-state count $S^\star$ for a given target $\alpha$ is the closed
-form derived in \autoref{app:proofs}; the matching Gaussian-tail
-calibration of \autoref{thm:detection} is what we use throughout
-the body for $z_\alpha$.
-
-% [Cal-FPR figure consolidated into fig:exp-overview at top of section.]
+We sweep $S \in \{2, 3, 5, 7, 11\}$ across the three models with
+$4$ domains $\times$ $25$ prompts at $n{=}200$, recording both a
+watermarked generation (MCL at the canonical operating point, varying
+only $S$) and a non-watermarked baseline drawn from the same prompt.
+Non-watermarked outputs feed the empirical FPR estimate at the
+analytic $z_\alpha$; watermarked outputs feed the TPR.
+\autoref{tab:cal-sstar} shows watermarked $z$ overshoots the
+closed-form prediction $\rho\sqrt{(S{-}1)(n{-}1)}$ by $50$--$90\%$, so
+TPR is at $100\%$ throughout, while empirical FPR sits above the
+$\alpha=1\%$ target at $S \geq 7$ (\autoref{fig:cal-fpr},
+$1.7$--$6.9\%$). The closed form gives the right $S^\star$ ordering to
+within one state; for strict $1\%$ FPR a deployer applies the
+empirical-SD threshold recalibration of
+\autoref{thm:detection-recal} (\autoref{sec:discussion},
+\autoref{app:fpr-recipes}).
 
 \begin{table}[t]
   \centering
   \caption{\textbf{Empirical anchor of the calibration map
-    $S^\star(n,\rho,\alpha)$ from \autoref{thm:detection}.} For each $S$,
-    aggregated across 3 LLMs $\times$ 4 domains $\times$ 25 prompts
-    ($\approx$ 300 watermarked and 300 non-watermarked samples; some
-    cells in flight at submission). $z_{\mathrm{pred}} =
-    \rho\sqrt{(S{-}1)(n{-}1)}$ from \autoref{thm:detection}. Watermarked $z$
-    overshoots theory by 50--90\,\% (signal exceeds the analytic lower
-    bound). Empirical FPR exceeds the 1\,\% target due to non-i.i.d.\
-    structure in natural-language token sequences --- the calibration
-    formula gives the right ordering but a 20--30\,\% threshold
-    inflation is recommended in deployment.}
+    $S^\star(n,\rho,\alpha)$ from \autoref{thm:detection}.} For each
+    $S$, aggregated across $3$ LLMs $\times$ $4$ domains $\times$ $25$
+    prompts ($\approx 300$ watermarked + $300$ non-watermarked).
+    $z_{\mathrm{wm}}^{\mathrm{pred}} = \rho\sqrt{(S{-}1)(n{-}1)}$.
+    Watermarked $z$ overshoots theory by $50$--$90\%$;
+    non-watermarked FPR exceeds $1\%$ at large $S$ due to
+    non-i.i.d.\ structure in natural-language token sequences (the
+    closed form gives the right ordering, the empirical-SD
+    recalibration of \autoref{thm:detection-recal} closes the
+    residual gap).}
   \label{tab:cal-sstar}
   \small
   \setlength{\tabcolsep}{4.5pt}
@@ -329,16 +244,3 @@ the body for $z_\alpha$.
     \bottomrule
   \end{tabular}
 \end{table}
-
-The empirical FPR curve in \autoref{fig:cal-fpr} tracks the analytic
-shape but sits above the $\alpha=1\%$ target at $S\geq 7$
-(\autoref{tab:cal-sstar}, $1.7$--$6.9\%$). The calibration formula
-gives the right ordering and the right $S^\star$ to within one
-state. A deployer targeting strict $1\%$ FPR closes the residual
-gap with the empirical-SD threshold recalibration discussed in
-\autoref{sec:discussion} and \autoref{app:fpr-recipes}. The
-closed-form derivation lives in \autoref{app:proofs}.
-
-% [Results Summary subsection removed: claims are already made in
-% each experiment's section; the consolidated fig:exp-overview at
-% top of §07 visually summarises the same headline results.]
