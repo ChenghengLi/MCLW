@@ -56,10 +56,10 @@ state from the key alone and reports a $z$-score.
       \begin{minipage}{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}
         \raggedright
         \tk{c2}{Photosynthesis} \tk{c3}{is}
-        \tg{c4}{the}\tarr\tg{c0}{process} \tg{c1}{by}\tarr\tg{c2}{which}
-        \tg{c3}{plants} \tk{c4}{convert}
-        \tg{c0}{sunlight}\tarr\tg{c1}{into} \tg{c2}{chemical}\tarr\tg{c3}{energy}
-        \tg{c4}{and} \tk{c0}{releases} \tk{c1}{oxygen}\,\textcolor{black!50}{\dots}
+        \tg{c4}{the}\tarr\tg{c0}{process}\tarr\tg{c1}{by}\tarr\tg{c2}{which}\tarr\tg{c3}{plants}
+        \tk{c4}{convert}
+        \tg{c0}{sunlight}\tarr\tg{c1}{into}\tarr\tg{c2}{chemical}\tarr\tg{c3}{energy}\tarr\tg{c4}{and}
+        \tk{c0}{releases} \tk{c1}{oxygen}\,\textcolor{black!50}{\dots}
       \end{minipage}}\par
     \vspace{2pt}\centerline{\textcolor{auditred}{\small$\Downarrow$}}\vspace{1pt}%
 
@@ -68,19 +68,29 @@ state from the key alone and reports a $z$-score.
     \vspace{1pt}%
     \noindent\fcolorbox{auditred!55}{auditred!5}{%
       \begin{minipage}{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}
-        % Inline 11/13 valid bar: 11 green ticks + 2 grey ticks.
-        \textbf{transitions}\;%
-        \tikz[baseline=-1pt]{%
-          \foreach \i in {1,...,11}{%
-            \fill[c3!75] ({(\i-1)*4pt},0) rectangle ++(3pt,5pt);}
-          \foreach \i in {12,13}{%
-            \fill[black!25] ({(\i-1)*4pt},0) rectangle ++(3pt,5pt);}
-          \draw[black!40, line width=0.2pt]
-            (0,0) rectangle ({13*4pt-1pt},5pt);
-        }\;%
-        $\phi = \tfrac{11}{13} = 0.85$,\;
-        $z = 5.30 > z_{0.01}{=}2.326$\;$\Rightarrow$\;
-        \textcolor{auditred}{\textbf{WATERMARKED}}.
+        % Two-row layout for the verdict so each piece breathes.
+        % Row 1: visual transition tally (11 green + 2 grey ticks)
+        % aligned LEFT, with the φ ratio on the RIGHT.
+        \makebox[\linewidth][s]{%
+          \mbox{\textbf{transitions}\;%
+            \tikz[baseline=-1pt]{%
+              \foreach \i in {1,...,11}{%
+                \fill[c3!75] ({(\i-1)*4.5pt},0) rectangle ++(3.5pt,6pt);}
+              \foreach \i in {12,13}{%
+                \fill[black!25] ({(\i-1)*4.5pt},0) rectangle ++(3.5pt,6pt);}
+              \draw[black!40, line width=0.2pt]
+                (0,0) rectangle ({13*4.5pt-1pt},6pt);
+            }}%
+          \hfill%
+          \mbox{$\phi = \tfrac{11}{13} = 0.85$}%
+        }\par
+        \vspace{2pt}%
+        % Row 2: z-statistic on the LEFT, verdict tag on the RIGHT.
+        \makebox[\linewidth][s]{%
+          \mbox{$z = 5.30\;>\;z_{0.01}{=}2.326$}%
+          \hfill%
+          \mbox{\textcolor{auditred}{\textbf{$\Rightarrow$\,WATERMARKED}}}%
+        }%
       \end{minipage}}\par
     \vspace{3pt}%
 
