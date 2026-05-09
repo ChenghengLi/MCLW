@@ -69,14 +69,6 @@ state from the key alone and reports a $z$-score.
     \draw[arrowstyle] (3.35, 3.92) -- (3.35, 3.62);
 
     % --- COLOURED TOKEN STRIP ------------------------------------------
-    % Visual frame matching the user/verdict bubble width so all three
-    % rows align horizontally (left edge x=0, right edge x=6.7cm).
-    % Rectangular frame matched to user/verdict bubbles. Height set so
-    % the 3-row coloured-token strip fits without overflow at the top
-    % or clipping at the bottom.
-    \node[userbubble, fill=green!4, minimum height=2.10cm,
-          minimum width=6.7cm, anchor=north west, text width=6.4cm]
-        (outframe) at (0.0, 3.50) {\hphantom{x}};
     \node[rolelabel] at (-0.05, 3.40) {Output};
 
     % row 1
@@ -121,6 +113,16 @@ state from the key alone and reports a $z$-score.
     \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg4.east) {4};
     \node[font=\tiny, color=black!70, anchor=base west]
       at (3.05, 1.55) {\underline{token} = gated step};
+
+    % --- BACKGROUND FRAME around the entire token strip + legend ------
+    % Drawn AFTER all tile/legend nodes so `fit=` can compute the exact
+    % bounding box; placed on a back layer so it doesn't cover content.
+    \begin{scope}[on background layer]
+      \node[rounded corners=2pt, draw=black!40, line width=0.4pt,
+            fill=green!4, inner sep=4pt,
+            fit=(t1)(t9)(t10)(t15)(t16)(t23)(lg0)(lg4)]
+        (outframe) {};
+    \end{scope}
 
     % arrow tokens -> detector
     \draw[arrowstyle] (3.35, 1.25) -- (3.35, 0.95);
