@@ -51,29 +51,26 @@ state from the key alone and reports a $z$-score.
     \node[seclabel] (lab1) {1.\,User prompt};
     \node[userpanel, below=0.8mm of lab1.south west, anchor=north west]
          (user)
-         {\texttt{Explain Donald Trump in a comprehensive way.}};
+         {\texttt{Explain photosynthesis in a comprehensive way.}};
 
     % connector down
-    \node[flowarrow, below=0.2mm of user.south] (arr1) {$\downarrow$\ \emph{LM\,+\,ChainMark gate ($S{=}5$, $\rho{=}0.5$)}};
+    \node[flowarrow, below=0.2mm of user.south] (arr1)
+         {$\downarrow$\ \emph{LM + ChainMark gate ($S{=}5$, $\rho{=}0.5$)}};
 
     % ---- 2. OUTPUT TOKENS ----------------------------------------------
-    \node[seclabel, below=0.2mm of arr1.south, anchor=north west,
-          xshift=-0pt] (lab2)
-         {2.\,Watermarked output (tile colour $=$ state $\sigma_\kappa$)};
+    \node[seclabel, below=0.2mm of arr1.south, anchor=north west]
+         (lab2) {2.\,Watermarked output (tile colour $=$ state $\sigma_\kappa$)};
 
-    % The token paragraph: each token is an inline TikZ node via \tk/\tg.
-    % LaTeX wraps the line naturally; gated tokens (underlined) appear in
-    % brackets. Extra glue between tokens keeps the paragraph breathable.
+    % Compact 18-token excerpt that wraps cleanly into 2 rows at column
+    % width without overflow. Picked so the auditor verdict box still
+    % fits on the page below the panel.
     \node[outpanel, below=0.8mm of lab2.south west, anchor=north west]
          (output) {%
-      \tk{c2}{Donald}\,\tk{c3}{Trump}\,\tg{c4}{born}\,\tg{c0}{June}\,%
-      \tg{c1}{14}\,\tg{c2}{1946}\,\tg{c3}{is}\,\tk{c4}{a}\,\tk{c4}{former}\,%
-      \tg{c0}{U.S.}\,\tg{c1}{president}\,\tg{c2}{and}\,%
-      \tg{c3}{businessman}\,\tg{c4}{who}\,\tg{c0}{served}\,\tg{c1}{as}\,%
-      \tg{c2}{the}\,\tg{c3}{45th}\,\tg{c4}{president}\,\tg{c0}{from}\,%
-      \tg{c1}{2017}\,\tg{c2}{to}\,\tg{c3}{2021}\,\tk{c4}{after}\,%
-      \tk{c4}{a}\,\tg{c0}{long}\,\tg{c1}{career}\,\tg{c2}{in}\,%
-      \tg{c3}{real}\,\tg{c4}{estate}\,\tg{c0}{and}\,\tg{c1}{television}%
+      \tk{c2}{Photosynthesis}\,\tk{c3}{is}\,\tg{c4}{the}\,\tg{c0}{process}\,%
+      \tg{c1}{by}\,\tg{c2}{which}\,\tg{c3}{plants}\,\tk{c4}{convert}\,%
+      \tg{c0}{sunlight}\,\tg{c1}{into}\,\tg{c2}{chemical}\,%
+      \tg{c3}{energy}\,\tg{c4}{stored}\,\tg{c0}{in}\,\tg{c1}{glucose}\,%
+      \tg{c2}{within}\,\tg{c3}{chloroplasts}\,\tg{c4}{\dots}%
       \par\vspace{2pt}%
       \scriptsize\color{black!70}%
       \tikz[baseline=-0.6ex]\node[swatch, fill=c0!55]{};\,0\;%
@@ -81,32 +78,31 @@ state from the key alone and reports a $z$-score.
       \tikz[baseline=-0.6ex]\node[swatch, fill=c2!55]{};\,2\;%
       \tikz[baseline=-0.6ex]\node[swatch, fill=c3!55]{};\,3\;%
       \tikz[baseline=-0.6ex]\node[swatch, fill=c4!55]{};\,4\hfill%
-      \underline{token}\,$=$\,gated ($s_{i+1}{=}(s_i{+}1)\bmod 5$)%
+      \underline{token}\,$=$\,gated%
     };
 
     % connector down
     \node[flowarrow, below=0.2mm of output.south] (arr2)
-         {$\downarrow$\ \emph{auditor re-derives $\sigma_\kappa$ from $\kappa$, counts $s{\to}s{+}1$}};
+         {$\downarrow$\ \emph{auditor re-derives $\sigma_\kappa$, counts valid $s{\to}s{+}1$}};
 
     % ---- 3. VERDICT -----------------------------------------------------
     \node[seclabel, below=0.2mm of arr2.south, anchor=north west] (lab3)
          {3.\,Auditor verdict};
     \node[verdpanel, below=0.8mm of lab3.south west, anchor=north west]
          (verd) {%
-      $\phi = 27/32 = 0.84$\quad(null $p_0{=}0.20$),\quad
-      $z = 9.05$,\quad $p\!\ll\!10^{-15}$\;$\Rightarrow$\;
+      $\phi = 15/17 = 0.88$\;(null $p_0{=}0.20$),\;
+      $z = 7.04 \gg z_{0.01}=2.326$\;$\Rightarrow$\;
       \textbf{watermarked} (no LM access).%
     };
 
   \end{tikzpicture}
   \caption{\textbf{End-to-end ChainMark trace} on a wiki prompt
-    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$).
+    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$, $17$-token excerpt).
     Each token tile is coloured by its state
-    $\sigma_\kappa(t) \in \{0,1,2,3,4\}$, so the clockwork cycle
-    reads off as a colour rotation
-    \textcolor{c0!85!black}{$\bullet$}\,$\to$\,\textcolor{c1!85!black}{$\bullet$}\,$\to$\,\textcolor{c2!85!black}{$\bullet$}\,$\to$\,\textcolor{c3!85!black}{$\bullet$}\,$\to$\,\textcolor{c4!85!black}{$\bullet$}.
-    Underlined tokens are the gated steps where ChainMark forced
-    $s_{i{+}1}{=}(s_i{+}1)\bmod 5$; un-underlined tokens are
+    $\sigma_\kappa(t) \in \{0,1,2,3,4\}$, so the clockwork cycle reads
+    off as a colour rotation
+    \textcolor{c0!85!black}{$\bullet$}\,$\to$\,\textcolor{c1!85!black}{$\bullet$}\,$\to$\,\textcolor{c2!85!black}{$\bullet$}\,$\to$\,\textcolor{c3!85!black}{$\bullet$}\,$\to$\,\textcolor{c4!85!black}{$\bullet$}. Underlined tokens are the gated steps where ChainMark
+    forced $s_{i{+}1}{=}(s_i{+}1)\bmod 5$; un-underlined tokens are
     free-sampled at $T{=}0.7$. The auditor reproduces the colour
     sequence from $\kappa$ alone and reports $(\phi, z)$ in $O(n)$
     hash operations.}
