@@ -4,26 +4,19 @@ fig_cal_fpr_v3.py
 -----------------
 Calibration-anchor empirical FPR plot for the MCLW ICML 2026 paper.
 
+Redesign (v3): show per-model analytic FPR curves as separate lines so
+the reader sees model-level variation in calibration drift, while the
+recalibrated empirical-quantile curve and the Hoeffding bound stay
+pooled across the 3 LLMs (those are corpus-level statistics).
+
 For each state count S in {2, 3, 5, 7, 11}:
   * Load /home/lichen/MCLW/data/v7_min/exp5_<model>_S<S>/records.jsonl
-    for the 3 LLMs (llama-3-1-8b-instruct, mistral-7b-instruct-v0-3,
-    qwen2-5-7b-instruct).
-  * Pool z_nwm (non-watermarked z under MCL) across the 3 LLMs.
-
-Three curves:
-  (a) Empirical FPR at the analytic threshold z_alpha = 2.326 (orange).
-  (b) Empirical FPR after empirical-SD recalibration:
-        z* = mu_hat + z_alpha * sigma_hat   (Gaussian-plug-in recipe)
-      computed on the same per-S pooled non-watermarked corpus.
-      Because the upper tail of z_nwm is heavier than Gaussian for
-      large S, we additionally report the FPR under the empirical
-      99%-quantile threshold z*_q99, which is the recipe that
-      actually delivers ~alpha by construction. The plotted green
-      curve uses the recipe that the paper recommends in practice
-      (empirical quantile), since the Gaussian-plug-in recipe is
-      anti-conservative at large S on this corpus.
-  (c) Closed-form per-S Hoeffding upper bound (blue dashed).
-Plus a horizontal red dotted line at the alpha = 1% target.
+    for the 3 LLMs.
+  * Per-model analytic FPR = fraction of z_nwm > z_alpha=2.326.
+  * Pooled recalibrated FPR uses the empirical 99%-quantile threshold
+    on the pooled non-watermarked z's (recipe the paper recommends).
+  * Closed-form per-S Hoeffding upper bound.
+  * Horizontal alpha = 1% target.
 
 Output: /home/lichen/MCLW/icml2026/pictures/fig_cal_fpr.pdf
 """
@@ -48,11 +41,28 @@ MODELS = [
     "mistral-7b-instruct-v0-3",
     "qwen2-5-7b-instruct",
 ]
+MODEL_LABELS = {
+    "llama-3-1-8b-instruct":    "Llama",
+    "mistral-7b-instruct-v0-3": "Mistral",
+    "qwen2-5-7b-instruct":      "Qwen",
+}
+# Color = model. Markers = model (consistent w/ headline + decay panels).
+MODEL_COLORS = {
+    "llama-3-1-8b-instruct":    "#1f4e9d",  # deep blue
+    "mistral-7b-instruct-v0-3": "#e07b00",  # orange
+    "qwen2-5-7b-instruct":      "#2ca02c",  # green
+}
+MODEL_MARKERS = {
+    "llama-3-1-8b-instruct":    "o",
+    "mistral-7b-instruct-v0-3": "s",
+    "qwen2-5-7b-instruct":      "^",
+}
+
 S_VALUES = [2, 3, 5, 7, 11]
 
 Z_ALPHA = 2.326    # one-sided alpha = 0.01
 ALPHA_PCT = 1.0    # target FPR (%)
-RHO = 0.5          # gating fraction used in exp5 (matches summary.json rho)
+RHO = 0.5          # gating fraction used in exp5
 
 
 # ---------------------------------------------------------------- io
@@ -63,17 +73,15 @@ def load_records(model: str, S: int) -> list[dict]:
 
 
 # ---------------------------------------------------------------- aggregation
-def pool_z_nwm(S: int) -> tuple[np.ndarray, float]:
-    """Pool z_nwm across the 3 LLMs at given S; return (z_array, mean_n_tokens)."""
+def per_model_z_nwm(model: str, S: int) -> tuple[np.ndarray, float]:
     zs: list[float] = []
     n_tokens: list[int] = []
-    for m in MODELS:
-        for r in load_records(m, S):
-            z = r.get("z_nwm")
-            if z is None or (isinstance(z, float) and math.isnan(z)):
-                continue
-            zs.append(float(z))
-            n_tokens.append(int(r.get("n_tokens_nwm", 0)))
+    for r in load_records(model, S):
+        z = r.get("z_nwm")
+        if z is None or (isinstance(z, float) and math.isnan(z)):
+            continue
+        zs.append(float(z))
+        n_tokens.append(int(r.get("n_tokens_nwm", 0)))
     arr = np.asarray(zs, dtype=float)
     mean_n = float(np.mean(n_tokens)) if n_tokens else float("nan")
     return arr, mean_n
@@ -86,10 +94,6 @@ def empirical_fpr_at(z_arr: np.ndarray, threshold: float) -> float:
 
 
 def hoeffding_bound_perS(S: int, n: int, rho: float = RHO) -> float:
-    """
-    Per-S Hoeffding upper bound (in %):
-        2 * exp( -2 * floor((n-1)/2) * (rho/2)^2 * (S-1)^2 / S^2 )
-    """
     if S <= 1 or n < 2:
         return float("nan")
     m = (n - 1) // 2
@@ -102,8 +106,8 @@ def render(rows: list[dict]) -> None:
     plt.rcParams.update({
         "font.family": "serif",
         "font.size": 8,
-        "axes.labelsize": 9,
-        "axes.titlesize": 9,
+        "axes.labelsize": 8,
+        "axes.titlesize": 8,
         "legend.fontsize": 7,
         "xtick.labelsize": 7,
         "ytick.labelsize": 7,
@@ -111,46 +115,50 @@ def render(rows: list[dict]) -> None:
         "ps.fonttype": 42,
         "axes.spines.top": False,
         "axes.spines.right": False,
+        "axes.linewidth": 0.6,
+        "xtick.major.width": 0.5,
+        "ytick.major.width": 0.5,
     })
 
     fig, ax = plt.subplots(figsize=(3.2, 3.0))
 
     Ss = [r["S"] for r in rows]
-    fpr_emp = [r["fpr_analytic"] for r in rows]
     fpr_recal = [r["fpr_recal"] for r in rows]
     hoeff = [r["hoeff"] for r in rows]
 
-    # (a) Empirical FPR at analytic threshold (orange)
-    ax.plot(
-        Ss, fpr_emp,
-        marker="o", markersize=5,
-        linestyle="-", linewidth=1.3,
-        color="#e07b00",
-        label=r"Empirical (analytic $z_\alpha$)",
-        zorder=4,
-    )
+    # ---- (a) Per-model analytic FPR lines ------------------------------
+    for m in MODELS:
+        ys = [r["per_model_analytic"][m] for r in rows]
+        ax.plot(
+            Ss, ys,
+            marker=MODEL_MARKERS[m], markersize=4.5,
+            linestyle="-", linewidth=1.2,
+            color=MODEL_COLORS[m],
+            label=f"{MODEL_LABELS[m]} (analytic $z_\\alpha$)",
+            zorder=4,
+        )
 
-    # (b) Empirical FPR after empirical recalibration (green)
+    # ---- (b) Pooled recalibrated empirical-quantile FPR ----------------
     ax.plot(
         Ss, fpr_recal,
-        marker="D", markersize=4.5,
-        linestyle="-", linewidth=1.3,
-        color="#2ca02c",
-        label=r"Empirical (recalibrated $z^\star=\hat F^{-1}(1-\alpha)$)",
+        marker="x", markersize=5,
+        linestyle="-", linewidth=1.4,
+        color="#444444",
+        label=r"Recalibrated $z^\star=\hat F^{-1}(1-\alpha)$",
         zorder=5,
     )
 
-    # (c) Per-S Hoeffding bound (blue dashed)
+    # ---- (c) Per-S Hoeffding bound (dashed) ----------------------------
     ax.plot(
         Ss, hoeff,
-        marker="s", markersize=4,
         linestyle="--", linewidth=1.0,
-        color="#1f78b4",
-        label="Hoeffding bound (per-$S$)",
+        color="#777777",
+        marker="",
+        label="Hoeffding bound",
         zorder=3,
     )
 
-    # alpha = 1% target (red dotted horizontal)
+    # ---- alpha target line ---------------------------------------------
     ax.axhline(
         ALPHA_PCT,
         color="#c0392b",
@@ -168,28 +176,30 @@ def render(rows: list[dict]) -> None:
     ax.set_xlim(min(S_VALUES) - 0.5, max(S_VALUES) + 0.5)
     ax.minorticks_off()
 
-    ymax = max(
-        max(fpr_emp) if fpr_emp else 0.0,
-        max(fpr_recal) if fpr_recal else 0.0,
-        max(hoeff) if hoeff else 0.0,
-        ALPHA_PCT,
-    ) * 1.15
-    ymax = max(ymax, 8.0)
+    # y range driven by the largest per-model analytic value.
+    all_y = []
+    for r in rows:
+        all_y.extend(r["per_model_analytic"].values())
+    all_y.extend(fpr_recal)
+    all_y.extend(hoeff)
+    all_y = [v for v in all_y if not math.isnan(v)]
+    ymax = max(max(all_y) * 1.15 if all_y else 8.0, 8.0)
     ax.set_ylim(0, ymax)
 
     ax.yaxis.grid(True, linestyle=":", linewidth=0.5, color="#bbbbbb", zorder=0)
     ax.set_axisbelow(True)
 
-    # Legend OUTSIDE the plot, BELOW the axes
+    # Legend BELOW the axes.
     ax.legend(
         loc="upper center",
         bbox_to_anchor=(0.5, -0.18),
         ncol=2,
         frameon=False,
-        handlelength=1.8,
-        handletextpad=0.5,
-        columnspacing=1.2,
+        handlelength=1.6,
+        handletextpad=0.4,
+        columnspacing=1.0,
         borderaxespad=0.0,
+        fontsize=6.4,
     )
 
     fig.subplots_adjust(left=0.18, right=0.98, top=0.95, bottom=0.30)
@@ -200,47 +210,53 @@ def render(rows: list[dict]) -> None:
 
 # ---------------------------------------------------------------- main
 def main() -> None:
-    print(f"Pooling z_nwm > {Z_ALPHA} across {len(MODELS)} LLMs per S ...")
-    print(f"{'S':>3}  {'n':>5}  {'mean_tok':>9}  "
-          f"{'mu_hat':>7}  {'sd_hat':>7}  "
-          f"{'z*_gauss':>9}  {'FPR_gauss':>10}  "
-          f"{'z*_q99':>8}  {'FPR_q99':>9}  "
-          f"{'FPR_ana(%)':>11}  {'Hoeff(%)':>9}")
+    print(f"Per-model analytic FPR @ z>{Z_ALPHA}; pooled recalibration via "
+          f"empirical 99%-quantile.")
+    print(f"{'S':>3}  {'L_n':>4} {'M_n':>4} {'Q_n':>4}  "
+          f"{'L_FPR':>6} {'M_FPR':>6} {'Q_FPR':>6}  "
+          f"{'pool_n':>6}  {'recal_FPR':>9}  {'Hoeff(%)':>9}")
 
     rows: list[dict] = []
     for S in S_VALUES:
-        z_arr, mean_n = pool_z_nwm(S)
-        mu = float(np.mean(z_arr)) if z_arr.size else float("nan")
-        sd = float(np.std(z_arr, ddof=1)) if z_arr.size > 1 else float("nan")
-        z_gauss = mu + Z_ALPHA * sd
-        z_q99 = float(np.quantile(z_arr, 1.0 - 0.01)) if z_arr.size else float("nan")
-        fpr_ana = empirical_fpr_at(z_arr, Z_ALPHA)
-        fpr_gauss = empirical_fpr_at(z_arr, z_gauss)
-        fpr_q99 = empirical_fpr_at(z_arr, z_q99)
-        hoeff = hoeffding_bound_perS(S, int(round(mean_n)))
-        # Plotted recalibration line uses empirical-quantile recipe.
+        per_model_arr = {m: per_model_z_nwm(m, S) for m in MODELS}
+        pooled = np.concatenate([arr for (arr, _) in per_model_arr.values()])
+        per_model_analytic = {
+            m: empirical_fpr_at(arr, Z_ALPHA)
+            for m, (arr, _) in per_model_arr.items()
+        }
+        # Recalibration uses pooled empirical 99%-quantile.
+        z_q99 = float(np.quantile(pooled, 1.0 - 0.01)) if pooled.size else float("nan")
+        fpr_recal = empirical_fpr_at(pooled, z_q99)
+
+        mean_n_pool = float(np.mean([
+            mean_n for (_, mean_n) in per_model_arr.values()
+            if not math.isnan(mean_n)
+        ]))
+        hoeff = hoeffding_bound_perS(S, int(round(mean_n_pool)))
+
         rows.append({
-            "S": S, "n": int(z_arr.size), "mean_n_tokens": mean_n,
-            "mu": mu, "sd": sd,
-            "z_gauss": z_gauss, "fpr_gauss": fpr_gauss,
-            "z_q99": z_q99, "fpr_recal": fpr_q99,
-            "fpr_analytic": fpr_ana, "hoeff": hoeff,
+            "S": S,
+            "per_model_analytic": per_model_analytic,
+            "fpr_recal": fpr_recal,
+            "hoeff": hoeff,
         })
-        print(f"{S:>3}  {z_arr.size:>5}  {mean_n:>9.1f}  "
-              f"{mu:>7.3f}  {sd:>7.3f}  "
-              f"{z_gauss:>9.3f}  {fpr_gauss:>9.2f}   "
-              f"{z_q99:>8.3f}  {fpr_q99:>8.2f}   "
-              f"{fpr_ana:>10.2f}   {hoeff:>8.4f}")
+
+        L_arr, _ = per_model_arr["llama-3-1-8b-instruct"]
+        M_arr, _ = per_model_arr["mistral-7b-instruct-v0-3"]
+        Q_arr, _ = per_model_arr["qwen2-5-7b-instruct"]
+        # Pooled-FPR equivalent for the old aggregate row (kept for sanity)
+        fpr_pooled_analytic = empirical_fpr_at(pooled, Z_ALPHA)
+        print(
+            f"{S:>3}  {L_arr.size:>4} {M_arr.size:>4} {Q_arr.size:>4}  "
+            f"{per_model_analytic['llama-3-1-8b-instruct']:>5.2f}% "
+            f"{per_model_analytic['mistral-7b-instruct-v0-3']:>5.2f}% "
+            f"{per_model_analytic['qwen2-5-7b-instruct']:>5.2f}%  "
+            f"{pooled.size:>6}  {fpr_recal:>8.2f}%  {hoeff:>8.4f}  "
+            f"(pooled analytic={fpr_pooled_analytic:.2f}%)"
+        )
 
     render(rows)
     print(f"\nSaved: {OUT_PATH}")
-
-    # Sanity check
-    bad = [r for r in rows if not math.isnan(r["fpr_recal"]) and r["fpr_recal"] > 1.5]
-    if bad:
-        print(f"WARNING: recalibrated FPR > 1.5% for S in {[r['S'] for r in bad]}")
-    else:
-        print("OK: recalibrated FPR <= 1.5% for all S.")
 
 
 if __name__ == "__main__":
