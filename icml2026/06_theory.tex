@@ -35,6 +35,21 @@ statement and proof in \autoref{thm:detection} of
 \autoref{app:proofs}; the corresponding lookup table is
 \autoref{tab:cal}.
 
+\paragraph{Empirical-SD calibration recipe.}
+The closed-form $z_\alpha$ assumes i.i.d.\ uniform tokens over the
+SHA-256 partition; on natural-language text this drifts (empirically
+$1.7$--$6.9\%$ at the nominal $1\%$ target,
+\autoref{tab:cal-sstar}). The fix is a one-corpus recalibration:
+estimate the empirical mean and SD of $z$ on a non-watermarked
+sample of the deployed LM (or a domain-matched corpus) and use
+$z^\star = \hat\mu + z_\alpha\,\hat\sigma$ as the operating
+threshold. Under the same Gaussian-tail null this restores the
+target FPR ($1.17\%$ at $\alpha=1\%$ on our $n=3000$ pooled
+corpus) without changing $S^\star$ or touching the watermarked
+side, so TPR is unaffected. Formal recipe in
+\autoref{thm:detection-recal}; empirical evaluation in
+\autoref{app:fpr-recipes}.
+
 \paragraph{Universal robustness threshold.}
 Suppose an adversary independently replaces each token with
 probability $\delta$ by a fresh token whose state is uniform on

@@ -189,6 +189,43 @@ universal robustness threshold; we isolate it as a lemma.
   and taking the ceiling yields \eqref{eq:calibration}.
 \end{proof}
 
+\begin{proposition}[Empirical-SD recalibration recipe]
+  \label{thm:detection-recal}
+  Let $\mathbf{t}^{(1)}, \dots, \mathbf{t}^{(M)}$ be $M$
+  i.i.d.\ non-watermarked sequences from the deployed LM, and let
+  $z_1, \dots, z_M$ be their detection $z$-statistics under MCL with
+  $(S, \rho)$ fixed.  Define
+  \[
+    \hat\mu = \tfrac{1}{M}\sum_{i=1}^M z_i, \qquad
+    \hat\sigma^2 = \tfrac{1}{M-1}\sum_{i=1}^M (z_i - \hat\mu)^2,
+    \qquad z^\star = \hat\mu + z_\alpha\,\hat\sigma.
+  \]
+  If the $z_i$ are approximately Gaussian with mean $\hat\mu$ and SD
+  $\hat\sigma$ (a calibration-side assumption that holds far better
+  than the i.i.d.\ random-oracle null assumed by
+  \autoref{thm:detection}), then declaring $H_1$ when $z > z^\star$
+  has FPR $\to \alpha$ as $M\to\infty$.
+\end{proposition}
+
+\begin{proof}
+  Standardise: $(z - \hat\mu)/\hat\sigma$ is asymptotically
+  $\mathcal{N}(0,1)$ as $M\to\infty$ by the standard plug-in
+  argument (consistency of $\hat\mu, \hat\sigma$ + Slutsky), so
+  $\Pr[z > \hat\mu + z_\alpha\hat\sigma] \to \Pr[\mathcal{N}(0,1) >
+  z_\alpha] = \alpha$.  The recipe leaves the watermarked side
+  untouched: the watermarked $z$-distribution still concentrates
+  around $\rho\sqrt{(S-1)(n-1)}$ (\autoref{thm:detection}), which on
+  natural-language text empirically exceeds $z^\star$ by an order of
+  magnitude (\autoref{tab:fpr-zero}), so TPR remains at $100\%$.
+\end{proof}
+
+% PROOF REVIEW NOTE: The empirical-SD recipe is a deployment-side
+% drop-in for the analytic z_alpha threshold and is the recipe we
+% recommend in deployment (Sec discussion + app:fpr-recipes).  The
+% closed-form S* of thm:detection still governs how many states to
+% provision; this proposition only changes how the operating
+% threshold is set on the trained model's null distribution.
+
 \subsection{Universal robustness threshold}
 \label{subsec:proof-robustness}
 
