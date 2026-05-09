@@ -12,7 +12,7 @@ distinct tokens).  $\phi$ is the fingerprint score of
 indicator at step $i$, with $T = \mathbf{T}^{\mathrm{clk}}$ in the
 clockwork case.
 
-\subsection{Null variance lemma}
+\subsection{Null Variance Lemma}
 \label{subsec:proof-variance}
 
 The null variance underpins both the detection $z$-score and the
@@ -91,7 +91,7 @@ universal robustness threshold; we isolate it as a lemma.
 % (and the random-oracle-on-distinct-tokens caveat for non-adjacent
 % pairs) explicit.
 
-\subsection{Detection bound and calibration}
+\subsection{Detection Bound and Calibration}
 \label{subsec:proof-detection}
 
 \begin{theorem}[Detection bound and calibration]
@@ -237,7 +237,7 @@ universal robustness threshold; we isolate it as a lemma.
 % provision; this proposition only changes how the operating
 % threshold is set on the trained model's null distribution.
 
-\subsection{Universal robustness threshold}
+\subsection{Universal Robustness Threshold}
 \label{subsec:proof-robustness}
 
 \begin{theorem}[Universal robustness threshold]
@@ -332,7 +332,7 @@ universal robustness threshold; we isolate it as a lemma.
   the universal threshold.
 \end{proof}
 
-\subsection{$k$-regular generalisation}
+\subsection{$k$-Regular Generalisation}
 \label{subsec:proof-kregular}
 
 We now lift the clockwork results to any $k$-regular adjacency.  We
@@ -432,7 +432,7 @@ recall the definition for the appendix.
   $k < S$).  Solving gives $\delta^\star = 1 - 1/\sqrt{2}$.
 \end{proof}
 
-\subsection{Security against an oracle-blind adversary}
+\subsection{Security Against an Oracle-Blind Adversary}
 \label{subsec:proof-security}
 
 \begin{theorem}[Pseudorandomness under random oracle, oracle-blind
@@ -497,7 +497,7 @@ recall the definition for the appendix.
 % folded (a)--(d) into one parenthetical aside; we now itemise
 % them in the theorem hypothesis.
 
-\subsection{Optimal LM-aware detector}
+\subsection{Optimal LM-Aware Detector}
 \label{subsec:proof-hdd}
 
 \begin{theorem}[Entropy-weighted detector is asymptotically Neyman--Pearson optimal]
@@ -556,7 +556,7 @@ recall the definition for the appendix.
 % $0 \log 0$ convention at gated positions where the alternative
 % is deterministic.  These were implicit in the original.
 
-\subsection{Detector pseudocode}
+\subsection{Detector Pseudocode}
 \label{subsec:detector-pseudo}
 
 We restate the model-free detection algorithm for self-contained
@@ -592,7 +592,7 @@ same matrix used at generation time, so the random baseline $p_0$
 is computed directly from $T$ (clockwork: $p_0 = 1/S$;
 soft-cycle: $p_0 = 2/S$; general $k$-regular: $p_0 = k/S$).
 
-\subsection{Supplementary results: quality cost and self-healing}
+\subsection{Supplementary Results: Quality Cost and Self-Healing}
 \label{subsec:proof-supplementary}
 
 These two results were stated in earlier drafts; we retain the

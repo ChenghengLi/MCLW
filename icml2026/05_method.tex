@@ -2,7 +2,7 @@
 \section{The ChainMark Scheme}
 \label{sec:method}
 
-\subsection{State partition}
+\subsection{State Partition}
 
 For each token id $v \in \mathcal{V}$ define
 \begin{equation}
@@ -15,7 +15,7 @@ distinct tokens, so $\mathbb{E}[|\mathcal{V}_s|] = V/S$; knowledge
 of $\sigma_\kappa$ on queried tokens reveals nothing about unqueried ones
 (\autoref{thm:security}).
 
-\subsection{Transition topology}
+\subsection{Transition Topology}
 \label{subsec:topology}
 
 A successor function $\Sigma_k : [S] \to \binom{[S]}{k}$ assigns
@@ -67,7 +67,7 @@ plus an $O(V)$ logit mask (precomputed once per state).
   \end{algorithmic}
 \end{algorithm}
 
-\subsection{Watermark budget and entropy gate}
+\subsection{Watermark Budget and Entropy Gate}
 \label{subsec:gates}
 
 The mask is applied only at a subset of positions; the

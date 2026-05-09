@@ -6,7 +6,7 @@ This appendix records every setting needed to reproduce the
 head-to-head matched-budget study of \autoref{sec:experiments},
 the per-cell tables in the main results, and every figure.
 
-\subsection{Models, tokenizers, and hardware}
+\subsection{Models, Tokenizers, and Hardware}
 
 \paragraph{Model fleet.} The headline experiments use three
 instruction-tuned 7--8B parameter open-weight LLMs, each loaded via
@@ -33,7 +33,7 @@ Hugging Face Hub. The released environment expects an
 specific gated repositories in this appendix; the public code drop
 records each \texttt{repo\_id} alongside its license terms.
 
-\subsection{Domains and prompts}
+\subsection{Domains and Prompts}
 
 \paragraph{Four domains, $N = 200$ prompts each.} Each domain runs
 on $n = 200$ prompts drawn from a fixed pool, identical across
@@ -54,7 +54,7 @@ Every prompt set, with template strings, prompt indices, and a
 deterministic shuffle seed, is shipped under
 \texttt{data/v7\_min/<domain>/records.jsonl}.
 
-\subsection{ChainMark hyperparameters}
+\subsection{ChainMark Hyperparameters}
 
 \paragraph{Default cell.} $S = 5$ states, clockwork transition
 $T(s, s') = \mathbb{1}[s' \equiv s{+}1 \pmod{S}]$, watermark budget
@@ -69,7 +69,7 @@ runs the soft-cycle ($k=2$) topology at the default cell and
 compares the empirical robustness threshold against $\delta^\star$
 to validate \autoref{thm:k-regular}.
 
-\subsection{Baseline calibration}
+\subsection{Baseline Calibration}
 
 The two baselines, KGW~\citep{kirchenbauer2023watermark} and
 SWEET~\citep{lee2023sweet}, are matched to ChainMark's budget at the
@@ -83,7 +83,7 @@ runs at the same effective budget by construction, since it gates
 every position. All three schemes share the same secret key and
 the same generation pool.
 
-\subsection{Attack protocol}
+\subsection{Attack Protocol}
 
 Each watermarked generation is subjected to three independent
 attack streams; post-attack detection statistics are reported per
@@ -110,7 +110,7 @@ independent seed (43). Bootstrap resamples in
 \autoref{sec:experiments} use a per-contrast key derived
 deterministically from the cell descriptor.
 
-\subsection{Released artefacts}
+\subsection{Released Artefacts}
 \label{app:repro:paths}
 
 For each generation we record the prompt, the watermarked output,
