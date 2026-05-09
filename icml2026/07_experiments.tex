@@ -194,20 +194,25 @@ ablation of KGW with the gating policy held fixed against ChainMark.
     over $3$ LLMs $\times$ $4$ domains $\times$ $100$ prompts at
     $n{=}200$ tokens per cell. The PPL column is the median across the
     $12$ cell medians on the watermarked model's own logits
-    (caveats in \autoref{sec:discussion}). Empirical FPR drift at this
-    threshold appears separately in \autoref{tab:cal-sstar}.
+    (caveats in \autoref{sec:discussion}). FPR$_\alpha$ is the empirical
+    FPR at the analytic threshold; FPR$_{\mathrm{recal}}$ is after the
+    one-corpus empirical-quantile recalibration of
+    \autoref{thm:detection-recal} (pooled over $n{=}3000$ NWM samples,
+    target $\alpha{=}1\%$); SWEET FPR is omitted, no NWM corpus
+    collected (see \autoref{tab:headline-recalibrated}).
     Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
   \setlength{\tabcolsep}{3pt}
-  \begin{tabular}{lcccc}
+  \begin{tabular}{lcccccc}
     \toprule
     Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{rnd}}$ &
-            TPR$_{\mathrm{ZH}}$ & PPL$\downarrow$ \\
+            TPR$_{\mathrm{ZH}}$ & PPL$\downarrow$ &
+            FPR$_\alpha$$\downarrow$ & FPR$_{\mathrm{recal}}$$\downarrow$ \\
     \midrule
-    \textbf{ChainMark} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 3.66 \\
-    KGW                & \phantom{0}74.8 & 55.1 & 19.4 & 1.93 \\
-    SWEET              & \phantom{0}71.8 & 51.2 & 18.0 & \textbf{1.80} \\
+    \textbf{ChainMark} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 3.66 & 2.07 & 1.17 \\
+    KGW                & \phantom{0}74.8 & 55.1 & 19.4 & 1.93 & \textbf{2.00} & \textbf{0.90} \\
+    SWEET              & \phantom{0}71.8 & 51.2 & 18.0 & \textbf{1.80} & --- & --- \\
     \bottomrule
   \end{tabular}
 \end{table}
