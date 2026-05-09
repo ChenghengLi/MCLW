@@ -189,35 +189,28 @@ ablation of KGW with the gating policy held fixed against ChainMark.
 
 \begin{table}[t]
   \centering
-  \caption{\textbf{Headline aggregate.} TPR per attack at the
-    analytic threshold $z_\alpha = 2.326$ ($\alpha = 0.01$,
-    Gaussian-tail null) and at the empirical-quantile recalibrated
-    threshold (\autoref{thm:detection-recal}, pooled $n{=}3000$ NWM
-    samples), aggregated over $3$ LLMs $\times$ $4$ domains $\times$
-    $100$ prompts at $n{=}200$ tokens per cell. PPL is the median
-    across the $12$ cell medians on the watermarked model's own
-    logits (caveats in \autoref{sec:discussion}). SWEET row of the
-    recalibrated block is omitted (no NWM SWEET corpus collected;
+  \caption{\textbf{Headline aggregate} at the analytic threshold
+    $z_\alpha = 2.326$ ($\alpha = 0.01$, Gaussian-tail null),
+    aggregated over $3$ LLMs $\times$ $4$ domains $\times$ $100$
+    prompts at $n{=}200$ tokens per cell. PPL is the median across
+    the $12$ cell medians on the watermarked model's own logits
+    (caveats in \autoref{sec:discussion}). \emph{After empirical
+    recalibration} to $\alpha{=}1\%$ (\autoref{thm:detection-recal},
+    pooled $n{=}3000$ NWM samples), the same TPRs become
+    ChainMark $100.0/99.9/68.7$, KGW $69.0/45.4/15.3$
+    (clean / random / ZH); SWEET is omitted (no NWM SWEET corpus,
     see \autoref{tab:headline-recalibrated}). Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
   \setlength{\tabcolsep}{3pt}
-  \begin{tabular}{l|ccc|ccc|c}
+  \begin{tabular}{lcccc}
     \toprule
-    & \multicolumn{3}{c|}{TPR @ analytic $z_\alpha$}
-    & \multicolumn{3}{c|}{TPR @ recal.\ ($\alpha{=}1\%$)}
-    & \\
-    Method & clean & rnd & ZH & clean & rnd & ZH & PPL$\downarrow$ \\
+    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{rnd}}$ &
+            TPR$_{\mathrm{ZH}}$ & PPL$\downarrow$ \\
     \midrule
-    \textbf{ChainMark} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8}
-                       & \textbf{100.0} & \textbf{99.9} & \textbf{68.7}
-                       & 3.66 \\
-    KGW                & \phantom{0}74.8 & 55.1 & 19.4
-                       & \phantom{0}69.0 & 45.4 & 15.3
-                       & 1.93 \\
-    SWEET              & \phantom{0}71.8 & 51.2 & 18.0
-                       & --- & --- & ---
-                       & \textbf{1.80} \\
+    \textbf{ChainMark} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 3.66 \\
+    KGW                & \phantom{0}74.8 & 55.1 & 19.4 & 1.93 \\
+    SWEET              & \phantom{0}71.8 & 51.2 & 18.0 & \textbf{1.80} \\
     \bottomrule
   \end{tabular}
 \end{table}
