@@ -181,7 +181,7 @@ ChainMark detects $100\%$ of clean and $99.9\%$ of randomly perturbed
 generations and retains $72.8\%$ TPR after ZH back-translation, where
 KGW and SWEET drop from $\sim\!\!75\%$/$\sim\!\!72\%$ clean to
 $19.4\%$/$18.0\%$ post-attack. The gap is consistent across every
-(model, domain) cell (\autoref{tab:headline-percell}); ChainMark
+(model, domain) cell (\autoref{fig:headline-percell}); ChainMark
 matches or leads every clean cell and strictly leads every
 post-ZH cell. ChainMark pays a $\approx 2\times$ self-perplexity gap
 ($3.66$ vs $1.80$/$1.93$) for this gain. SWEET is an entropy-gating
@@ -221,7 +221,7 @@ ablation of KGW with the gating policy held fixed against ChainMark.
     panel is ZH back-translation. MCL (ChainMark) matches or leads
     every clean cell and strictly leads every cell post-ZH-back-translation.
     Cells with TPR$<$50\% are annotated with their value.}
-  \label{tab:headline-percell}
+  \label{fig:headline-percell}
 \end{figure}
 
 \subsection{Translation Robustness}
@@ -250,8 +250,11 @@ $S = 5$ predicts $p_0 = k/S = 0.40$. We run $100$ wiki-domain prompts
 on each of the three models with ZH back-translation as the only
 attack. \autoref{tab:kregular} reports clean
 $\bar\phi_{\mathrm{cl}} \geq 0.88$ (well above the $p_0 = 0.40$
-prediction) and a clean-vs-ZH $z$-score ratio close to the
-$(1 - \delta_{\mathrm{eff}})^2$ prediction, jointly re-certifying
+prediction) and a post-attack $z$-score that sits above the
+$(1 - \delta_{\mathrm{eff}})^2$ floor of \autoref{thm:robustness}
+(observed ratio $0.22$--$0.26$ vs.\ predicted $0.08$--$0.10$, i.e.\
+the bound is conservative as in \autoref{subsec:exp3-translation}),
+jointly re-certifying
 \autoref{thm:k-regular} and \autoref{thm:robustness} at a non-trivial
 $k$.
 
@@ -288,10 +291,10 @@ only $S$) and a non-watermarked baseline drawn from the same prompt.
 Non-watermarked outputs feed the empirical FPR estimate at the
 analytic $z_\alpha$; watermarked outputs feed the TPR.
 \autoref{tab:cal-sstar} shows watermarked $z$ overshoots the
-closed-form prediction $\rho\sqrt{(S{-}1)(n{-}1)}$ by $50$--$90\%$, so
+closed-form prediction $\rho\sqrt{(S{-}1)(n{-}1)}$ by $50$--$80\%$, so
 TPR is at $100\%$ throughout, while empirical FPR sits above the
 $\alpha=1\%$ target by $\sim\!\!1$ pp (\autoref{fig:cal-fpr},
-$1.7$--$2.2\%$). The closed form gives the right $S^\star$ ordering to
+$1.7$--$2.0\%$). The closed form gives the right $S^\star$ ordering to
 within one state; for strict $1\%$ FPR a deployer applies the
 empirical-SD threshold recalibration of
 \autoref{thm:detection-recal} (\autoref{sec:discussion},

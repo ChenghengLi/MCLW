@@ -35,7 +35,7 @@ MODELS = [
 ]
 DOMAINS = ["code", "factual", "wiki", "writing"]
 METHODS = ["mcl", "kgw", "sweet"]
-METHOD_LABELS = {"mcl": "MCL", "kgw": "KGW", "sweet": "SWEET"}
+METHOD_LABELS = {"mcl": "ChainMark", "kgw": "KGW", "sweet": "SWEET"}
 ATTACKS = [("z_clean", "Clean"), ("z_zh", "ZH back-translation")]
 Z_THRESHOLD = 2.326
 ANNOT_THRESHOLD = 50.0  # only annotate cells with TPR strictly below this
