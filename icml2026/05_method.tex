@@ -19,9 +19,9 @@ of $\sigma_\kappa$ on queried tokens reveals nothing about unqueried ones
 \label{subsec:topology}
 
 A successor function $\Sigma_k : [S] \to \binom{[S]}{k}$ assigns
-each state a $k$-element set of legal next states; we require
-$\Sigma_k$ to be $k$-regular in both out- and in-degree, with
-column-regularity essential for the null-variance and robustness
+each state a $k$-element set of legal next states. We require
+$\Sigma_k$ to be $k$-regular in both out- and in-degree;
+column-regularity is essential for the null-variance and robustness
 arguments (\autoref{thm:k-regular}, \autoref{lem:variance}). The
 default is the \emph{clockwork} chain at $k = 1$,
 $\Sigma_1(s) = \{(s{+}1) \bmod S\}$: deterministic, periodic of

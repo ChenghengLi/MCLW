@@ -81,10 +81,10 @@ extended version of this paper.
 
 \paragraph{Empirical SD recalibration closes the FPR gap.}
 Recomputing the detection threshold from the empirical standard
-deviation of $z$ on a non-watermarked corpus
-($z^* = \hat\mu + z_\alpha\,\hat\sigma$) brings the empirical
+deviation of $z$ on a non-watermarked corpus gives
+$z^* = \hat\mu + z_\alpha\,\hat\sigma$. This brings the empirical
 false-positive rate from $2.1\%$ down to $1.2\%$ at the $\alpha=1\%$
-target, while preserving TPR$=100\%$ on watermarked text
+target while preserving TPR$=100\%$ on watermarked text
 (\autoref{app:fpr-recipes}). The apples-to-apples
 $1\%$-FPR recalibrated head-to-head appears in
 \autoref{app:headline-recalibrated}. Beyond a positive $1\%$ FPR
@@ -127,10 +127,10 @@ rate at the analytic Gaussian-tail threshold $z_\alpha = 2.326$ is
 nominal 1\,\% target. The drift is largest at $S \in \{7, 11\}$,
 where the closed-form Gaussian-tail bound is loosest. This indicates
 that natural-language token sequences are not i.i.d.\ random over
-the SHA-256 partition; the closed form is a usable starting point
+the SHA-256 partition. The closed form is a usable starting point,
 but a deployer targeting strict 1\,\% FPR should empirically
-recalibrate the per-corpus threshold (a 20--30\,\% threshold
-inflation suffices in our setting). All headline TPR numbers in
+recalibrate the per-corpus threshold; a 20--30\,\% threshold
+inflation suffices in our setting. All headline TPR numbers in
 \autoref{tab:headline-aggregate} and \autoref{tab:headline-percell}
 are reported at the analytic threshold for cross-method consistency,
 not at an empirically calibrated 1\,\% FPR per cell.
