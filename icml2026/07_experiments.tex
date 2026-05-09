@@ -9,11 +9,12 @@ four domains. Per-prompt records stream to JSONL for reproducibility.
 \subsection{Setup}
 \label{subsec:exp-setup}
 
-\textbf{Models.} Three instruction-tuned, openly licensed checkpoints
-in the 7--8B parameter range: \texttt{meta-llama/Llama-3.1-8B-Instruct},
-\texttt{Qwen/Qwen-2.5-7B-Instruct}, and
-\texttt{mistralai/Mistral-7B-Instruct-v0.3}. The same secret key
-$\kappa$ is fixed across every run.
+\textbf{Models.} Three instruction-tuned, openly licensed
+checkpoints in the 7--8B parameter range:
+Llama-3.1-8B-Instruct~\citep{grattafiori2024llama3},
+Qwen-2.5-7B-Instruct~\citep{yang2024qwen25}, and
+Mistral-7B-Instruct-v0.3~\citep{jiang2023mistral}. The same secret
+key $\kappa$ is fixed across every run.
 
 \textbf{Domains.} Four prompt domains stress different entropy regimes:
 \emph{code} (HumanEval problem stems), \emph{factual} (short closed-form

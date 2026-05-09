@@ -67,8 +67,11 @@ universal robustness threshold; we isolate it as a lemma.
   using \emph{column}-regularity for the first identity.  Conditional
   on $\sigma_\kappa(t_{i+1})$, the indicators $X_i$ and $X_{i+1}$ depend
   on the disjoint random-oracle evaluations $\sigma_\kappa(t_i)$ and
-  $\sigma_\kappa(t_{i+2})$, so they are conditionally independent.
-  Therefore
+  $\sigma_\kappa(t_{i+2})$, so they are conditionally independent
+  whenever $t_i \neq t_{i+2}$ (the coincidence event has
+  probability $1/|\mathcal{V}|$ under iid uniform tokens and is
+  absorbed into the random-oracle approximation, parallel to the
+  non-adjacent case above).  Therefore
   \[
     \Pr[X_i = X_{i+1} = 1]
       \;=\; \mathbb{E}_{s'}\!\left[ p_0 \cdot p_0 \right]
@@ -147,11 +150,11 @@ universal robustness threshold; we isolate it as a lemma.
 
   \emph{$z$-score.}  The signed mean gap is $\rho(S-1)/S$.  Dividing
   by the null SD,
-  \[
+  \begin{align*}
     z(\rho,S,n)
-      \;=\; \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}}
-      \;=\; \rho \sqrt{(S-1)(n-1)}.
-  \]
+      &= \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}}
+       = \rho \sqrt{(S-1)(n-1)}.
+  \end{align*}
 
   \emph{FPR via Hoeffding.}  Adjacent indicators share a token and
   are not jointly i.i.d., so we split into $Z_1, Z_3, Z_5, \dots$ and
@@ -195,11 +198,11 @@ universal robustness threshold; we isolate it as a lemma.
   i.i.d.\ non-watermarked sequences from the deployed LM, and let
   $z_1, \dots, z_M$ be their detection $z$-statistics under MCL with
   $(S, \rho)$ fixed.  Define
-  \[
-    \hat\mu = \tfrac{1}{M}\sum_{i=1}^M z_i, \qquad
-    \hat\sigma^2 = \tfrac{1}{M-1}\sum_{i=1}^M (z_i - \hat\mu)^2,
-    \qquad z^\star = \hat\mu + z_\alpha\,\hat\sigma.
-  \]
+  \begin{align*}
+    \hat\mu &= \tfrac{1}{M}\sum_{i=1}^M z_i, \\
+    \hat\sigma^2 &= \tfrac{1}{M-1}\sum_{i=1}^M (z_i - \hat\mu)^2, \\
+    z^\star &= \hat\mu + z_\alpha\,\hat\sigma.
+  \end{align*}
   If the $z_i$ are approximately Gaussian with mean $\hat\mu$ and SD
   $\hat\sigma$ (a calibration-side assumption that holds far better
   than the i.i.d.\ random-oracle null assumed by
@@ -231,10 +234,15 @@ universal robustness threshold; we isolate it as a lemma.
 
 \begin{theorem}[Universal robustness threshold]
   \label{thm:robustness}
-  Suppose each token is independently replaced with probability
-  $\delta$ by a fresh token whose state $\sigma_\kappa$ is uniform on
-  $[S]$.  Then for clockwork MCL with state count $S$ and
-  gate density $\rho$,
+  Suppose an \emph{oracle-blind} adversary (without access to
+  $\sigma_\kappa$ or the random oracle) independently replaces each
+  token with probability $\delta$ by a fresh token whose state
+  $\sigma_\kappa$ is uniform on $[S]$ (so the substitutions are
+  i.i.d.\ uniform in the partition).  Standardise the post-attack
+  $z$ by the \emph{null} standard deviation
+  $\sqrt{p_0(1-p_0)/(n-1)}$ (the same scaling used pre-attack).
+  Then for clockwork MCL with state count $S$ and gate density
+  $\rho$,
   \begin{equation}
     \mathbb{E}[\phi \mid \mathrm{attack}]
       \;=\; \tfrac{1}{S} + \rho (1-\delta)^2 \tfrac{S-1}{S}.
@@ -378,12 +386,11 @@ recall the definition for the appendix.
   to give $\mathbb{E}[X_i \mid t_{i+1}\text{ fresh}] = p_0$
   (the conditional in-degree $|N^-(s')|/S$ must be $p_0$ uniformly in
   $s'$); the $(1,0)$ case symmetrically uses row-regularity.  Hence
-  \[
+  \begin{align*}
     \mathbb{E}[\phi \mid \mathrm{atk}]
-      = (1-\delta)^2 (p_0 + \rho(1-p_0))
-        + (1 - (1-\delta)^2) p_0
-      = p_0 + \rho (1-\delta)^2 (1 - p_0).
-  \]
+      &= (1-\delta)^2 (p_0 + \rho(1-p_0)) + (1 - (1-\delta)^2) p_0 \\
+      &= p_0 + \rho (1-\delta)^2 (1 - p_0).
+  \end{align*}
 \end{proof}
 
 % PROOF REVIEW NOTE: The baseline $p_0 = k/S$ assumes the SHA-256
@@ -439,8 +446,12 @@ recall the definition for the appendix.
       not been queried with the correct key, hence advantage
       $\mathrm{negl}(\lambda)$ over the uniform $1/S$ baseline;
     \item statistical distinguishing advantage at most
-      $\mathrm{negl}(\lambda)$ between $\mathbf{t}^w$ and an i.i.d.\
-      uniform null $\mathbf{t}^r$.
+      $\mathrm{negl}(\lambda)$ between $\mathbf{t}^w$ and a
+      non-watermarked LM sample $\mathbf{t}^{LM}$ from the same
+      prompt distribution, restricted to statistics that are
+      measurable in the partition structure $\sigma_\kappa$ (i.e.,
+      to tests that look at state-transition patterns rather than
+      raw token-id statistics).
   \end{enumerate}
 \end{theorem}
 
@@ -453,16 +464,20 @@ recall the definition for the appendix.
   would imply distinguishing the random-oracle output from uniform,
   contradicting (i).
 
-  For (iii): any statistic $\mathcal{D}(\mathbf{t})$ measurable in
-  the token IDs alone that achieves non-trivial advantage
-  $\varepsilon$ under the i.i.d.\ uniform null can be re-expressed
-  as a function of $\sigma_\kappa$-dependent structure (since for an
-  adversary with no LM access, the conditional distribution of
-  $\mathbf{t}^w$ given $\sigma_\kappa$ is parameter-free in everything
-  except the gate sequence and the partition).  Such a function
-  yields a state-predictor with advantage at least $\varepsilon$ on
-  some fresh token, contradicting (ii) by a hybrid argument.  Hence
-  $\varepsilon \leq \mathrm{negl}(\lambda)$.
+  For (iii): a $\sigma_\kappa$-measurable statistic
+  $\mathcal{D}(\sigma_\kappa(\mathbf{t}))$ that distinguishes
+  $\mathbf{t}^w$ from $\mathbf{t}^{LM}$ with advantage $\varepsilon$
+  must, by the random-oracle property, distinguish the watermarked
+  state sequence (which walks the chain at gated positions) from
+  a state sequence drawn uniformly on $[S]^n$ (the LM's
+  $\sigma_\kappa$-image is uniform iid by (ii)).  Such a
+  $\mathcal{D}$ yields a state-predictor with advantage at least
+  $\varepsilon$ on some fresh token, contradicting (ii) by a hybrid
+  argument; hence $\varepsilon \leq \mathrm{negl}(\lambda)$.
+  \emph{Token-id-level statistics that exploit natural-language
+  marginals (e.g., bigram frequencies) are explicitly outside this
+  guarantee: they are not $\sigma_\kappa$-measurable and trivially
+  distinguish any LM sample from i.i.d.\ uniform tokens.}
 \end{proof}
 
 % PROOF REVIEW NOTE: We have made the adversary model explicit:
