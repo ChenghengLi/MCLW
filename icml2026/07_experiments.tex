@@ -68,29 +68,10 @@ state from the key alone and reports a $z$-score.
     \vspace{1pt}%
     \noindent\fcolorbox{auditred!55}{auditred!5}{%
       \begin{minipage}{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}
-        % Two-row layout for the verdict so each piece breathes.
-        % Row 1: visual transition tally (11 green + 2 grey ticks)
-        % aligned LEFT, with the φ ratio on the RIGHT.
-        \makebox[\linewidth][s]{%
-          \mbox{\textbf{transitions}\;%
-            \tikz[baseline=-1pt]{%
-              \foreach \i in {1,...,11}{%
-                \fill[c3!75] ({(\i-1)*4.5pt},0) rectangle ++(3.5pt,6pt);}
-              \foreach \i in {12,13}{%
-                \fill[black!25] ({(\i-1)*4.5pt},0) rectangle ++(3.5pt,6pt);}
-              \draw[black!40, line width=0.2pt]
-                (0,0) rectangle ({13*4.5pt-1pt},6pt);
-            }}%
-          \hfill%
-          \mbox{$\phi = \tfrac{11}{13} = 0.85$}%
-        }\par
-        \vspace{2pt}%
-        % Row 2: z-statistic on the LEFT, verdict tag on the RIGHT.
-        \makebox[\linewidth][s]{%
-          \mbox{$z = 5.30\;>\;z_{0.01}{=}2.326$}%
-          \hfill%
-          \mbox{\textcolor{auditred}{\textbf{$\Rightarrow$\,WATERMARKED}}}%
-        }%
+        \centering
+        $\phi = \tfrac{11}{13} = 0.85$,\;
+        $z = 5.30 > z_{0.01}{=}2.326$\;$\Rightarrow$\;
+        \textcolor{auditred}{\textbf{WATERMARKED}}
       \end{minipage}}\par
     \vspace{3pt}%
 
