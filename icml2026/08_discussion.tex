@@ -12,8 +12,10 @@ watermark budget $\rho$ a deployer is willing to spend. For long-form
 generated content the calibration anchors comfortably at small
 $S$ with $\rho$ near $1/2$, so the marginal cost of marking is
 small and detection power is high. The head-to-head comparisons in
-\autoref{subsec:exp2-headline} show that MCL matches or exceeds
-KGW and SWEET in this regime under matched budgets. For short
+\autoref{subsec:exp2-headline} show that MCL substantially exceeds
+KGW and SWEET in detection power in this regime, while incurring a
+$\approx 2\times$ higher self-perplexity (3.66 vs $1.80$--$1.93$;
+\autoref{tab:headline-aggregate}, with the self-PPL caveat below). For short
 outputs $S^\star$ rises sharply with stricter $\alpha$, so deployers
 targeting tight false-positive rates on short passages should
 either tolerate the higher state count or shift the

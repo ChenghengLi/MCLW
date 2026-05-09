@@ -2,9 +2,10 @@
 \section{Theoretical Properties}
 \label{sec:theory}
 
-This section gives an intuitive tour of the five formal results that
-characterise MCL: detection, robustness, $k$-regular generalisation,
-security, and a Neyman--Pearson optimal LM-aware detector.  Formal
+This section gives an intuitive tour of three core results
+(detection, robustness, $k$-regular generalisation) plus two
+supporting properties (security against an oracle-blind adversary,
+and an LM-aware Neyman--Pearson optimal detector).  Formal
 statements and proofs are deferred to \autoref{app:proofs}; we collect
 their pointers here so the body remains a narrative.  Empirical
 anchoring of \autoref{thm:detection} appears in
@@ -44,7 +45,7 @@ Formal statement and proof in \autoref{thm:detection} of
 \paragraph{Universal robustness threshold.}
 Suppose an adversary independently replaces each token with
 probability $\delta$ by a fresh token whose state is uniform on
-$\mathcal{S}$.  Both the watermarked-pair signal and the
+$[S]$.  Both the watermarked-pair signal and the
 midpoint-threshold gap scale by the same affine factor
 $\rho(S{-}1)/S$, so the post-attack-to-pre-attack $z$ ratio collapses
 to $(1-\delta)^2$, independently of $(S, \rho, n)$.  The critical

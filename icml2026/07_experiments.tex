@@ -7,9 +7,10 @@ We empirically (i)~compare MCL head-to-head against KGW and SWEET
 at matched budget and (ii)~validate the three principal predictions
 of \autoref{thm:detection}, \autoref{thm:robustness}, and
 \autoref{thm:k-regular} on a fleet of generations spanning three
-instruct-tuned 7--8B models, four content domains, and four attack
-conditions. The campaign comprises four complementary
-sub-experiments. Exp.~2 (\autoref{subsec:exp2-headline}) is the
+instruct-tuned 7--8B models, four content domains, and three attack
+conditions (\emph{clean}, random-substitution, ZH back-translation).
+The campaign comprises four complementary sub-experiments.
+Exp.~2 (\autoref{subsec:exp2-headline}) is the
 head-to-head against the canonical KGW baseline and the SWEET
 high-entropy gate. Exp.~3 (\autoref{subsec:exp3-translation})
 measures robustness under machine-translation pivots. Exp.~4
@@ -58,9 +59,9 @@ the same threshold is reused across methods for fair comparison.
 \subsection{Headline Comparison: MCL vs KGW vs SWEET}
 \label{subsec:exp2-headline}
 
-The headline experiment (Exp.~2) is a $3 \times 3 \times 4 \times 4$
+The headline experiment (Exp.~2) is a $3 \times 3 \times 4 \times 3$
 factorial: 3 watermarking methods $\times$ 3 models $\times$ 4
-domains $\times$ 4 attack conditions, with 100 prompts per
+domains $\times$ 3 attack conditions, with 100 prompts per
 (method, model, domain) cell.
 
 \textbf{Methods.} \emph{MCL} is configured at the canonical

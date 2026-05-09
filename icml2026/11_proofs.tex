@@ -5,7 +5,7 @@
 This appendix collects the formal versions of the results previewed
 in \autoref{sec:theory}.  Throughout, $\sigma_\kappa(t) = \mathcal{H}(\kappa
 \,\Vert\, t) \bmod S$ denotes the keyed state map and is treated as a
-random oracle (uniform on $\mathcal{S}$ and independent across
+random oracle (uniform on $[S]$ and independent across
 distinct tokens).  $\phi$ is the fingerprint score of
 \autoref{def:phi}, and we write $X_i =
 \mathbf{T}_{\sigma_\kappa(t_i),\sigma_\kappa(t_{i+1})}$ for the validity
@@ -196,7 +196,7 @@ universal robustness threshold; we isolate it as a lemma.
   \label{thm:robustness}
   Suppose each token is independently replaced with probability
   $\delta$ by a fresh token whose state $\sigma_\kappa$ is uniform on
-  $\mathcal{S}$.  Then for clockwork MCL with state count $S$ and
+  $[S]$.  Then for clockwork MCL with state count $S$ and
   gate density $\rho$,
   \begin{equation}
     \mathbb{E}[\phi \mid \mathrm{attack}]
@@ -396,7 +396,7 @@ recall the definition for the appendix.
   scheme parameters $(S, T)$.  Then $\mathcal{A}$ achieves:
   \begin{enumerate}[label=(\roman*), leftmargin=1.6em, nosep]
     \item key-recovery advantage at most $q \cdot 2^{-\lambda}$ for a
-      query budget $q$ to any auxiliary oracle that depends on $k$;
+      query budget $q$ to any auxiliary oracle that depends on $\kappa$;
     \item state-prediction success at most $1/S +
       \mathrm{negl}(\lambda)$ on each fresh token $t^\star$ that has
       not been queried with the correct key, hence advantage
@@ -577,7 +577,7 @@ they are referenced from elsewhere in the paper.
   Let $\mathcal{T}_{\mathrm{q}} \subseteq \mathcal{V}$ be the set of tokens
   the adversary has queried with the correct key.  For any token
   $t' \notin \mathcal{T}_{\mathrm{q}}$ that the adversary introduces,
-  $\sigma_\kappa(t')$ is uniform on $\mathcal{S}$ by the random-oracle
+  $\sigma_\kappa(t')$ is uniform on $[S]$ by the random-oracle
   property, so each modified position contributes an indicator
   distributed as $\mathrm{Bernoulli}(1/S)$ to the validity count,
   independently of strategy.  Hence the expected mass contributed
