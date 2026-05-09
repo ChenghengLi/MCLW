@@ -24,11 +24,12 @@ controllable false-positive frontier at all.
 \paragraph{Markov Chain Lock.}
 We propose \emph{Markov Chain Lock} (MCL), an active watermark whose
 detector is model-free. A keyed SHA-256 hash partitions the
-vocabulary into $S$ equivalence classes (states); a fixed cycle over
-those states defines a Markov transition pattern; and on a fraction
-$\rho$ of generated positions the language-model logits are masked
+vocabulary into $S$ equivalence classes (states), and a fixed cycle
+over those states defines a Markov transition pattern. On a fraction
+$\rho$ of generated positions, the language-model logits are masked
 to keep only tokens whose state is the legal successor of the
-current state, so the produced text walks the chain by construction.
+current state; the produced text therefore walks the chain by
+construction.
 Detection re-derives every token's state from the key in $O(n)$ hash
 operations and counts how often consecutive tokens follow the cycle.
 Because the state map is a function of the token id and the key
@@ -38,10 +39,10 @@ First, third-party audit becomes lightweight: a regulator with the
 key can verify provenance from a string of plain text. Second, the
 detector's null-and-alternative law inverts in closed form to a
 calibration map (\autoref{thm:detection}, derived in
-\autoref{app:proofs}): a regulator who fixes a target false-positive
+\autoref{app:proofs}). A regulator who fixes a target false-positive
 rate $\alpha$ and a text-length floor $n_{\min}$ reads off the
-minimum admissible state count, while a deployer can spend more
-budget for margin but cannot evade the regulator's specification.
+minimum admissible state count; a deployer may spend more budget for
+margin but cannot evade the regulator's specification.
 \autoref{fig:mcl_teaser} summarises the construction; the formal
 treatment is in \autoref{sec:method} and \autoref{sec:theory}.
 
@@ -245,12 +246,11 @@ A second design choice — \emph{which} of the $n$ positions to
 watermark — is left as a parameter we call the gate. Existing
 schemes implicitly fix this choice: SWEET and EWD watermark only
 high-entropy positions, on the intuition that those positions
-contribute the bulk of the detection statistic. Whether that intuition
-survives once detection is decoupled from the language model is an
-empirical question, which we resolve in \autoref{sec:experiments}
-through a matched-budget head-to-head against KGW and SWEET on
-multiple instruction-tuned LLMs and four text domains, including
-translation and random-substitution attacks.
+contribute the bulk of the detection statistic. We adopt the
+high-entropy gate by default for parity with SWEET and compare MCL
+against KGW and SWEET at matched budget on multiple
+instruction-tuned LLMs and four text domains, including translation
+and random-substitution attacks (\autoref{sec:experiments}).
 
 \paragraph{Contributions.}
 \begin{enumerate}[nosep, leftmargin=*]
@@ -269,13 +269,12 @@ translation and random-substitution attacks.
     and the robustness threshold extend verbatim to any $k$-regular
     doubly-stochastic transition topology
     (\autoref{thm:k-regular}); clockwork is the $k{=}1$ instance.
-  \item \textbf{Empirical comparison and gate analysis.} We evaluate
-    MCL head-to-head against KGW and SWEET across multiple
+  \item \textbf{Empirical head-to-head comparison.} We evaluate MCL
+    against KGW and SWEET at matched budget across multiple
     instruction-tuned language models and four text domains under
     translation and random-substitution attacks
     (\autoref{sec:experiments}), and show that MCL retains
-    substantially more detection signal than the baselines under
-    matched-budget attacks
+    substantially more detection signal than the baselines
     (\autoref{subsec:exp2-headline}, \autoref{subsec:exp5-calibration}).
   \item \textbf{Empirical anchor of the calibration formula.} An
     independent state-count sweep matches the closed-form

@@ -109,12 +109,12 @@ p_0$ with pairwise-zero covariance for any $k$-regular $\Sigma_k$
 (\autoref{lem:variance}); the watermarked mean gap is
 $\rho(1 - p_0)$ (\autoref{thm:detection}, \autoref{thm:k-regular}).
 The verifier reports the standardised score
-$z = (\phi - p_0)/\sqrt{p_0(1-p_0)/(n-1)}$, declares $H_1$ when
-$z > z_\alpha$, and uses the closed-form calibration of
-\autoref{thm:detection} (proved in \autoref{app:proofs}) to choose
-$S$ given target FPR $\alpha$, budget $\rho$, and length $n$;
-robustness under per-token modification rate $\delta$ follows from
-the same identities (\autoref{thm:robustness}).
+$z = (\phi - p_0)/\sqrt{p_0(1-p_0)/(n-1)}$ and declares $H_1$ when
+$z > z_\alpha$. The closed-form calibration of \autoref{thm:detection}
+(proved in \autoref{app:proofs}) selects $S$ given target FPR
+$\alpha$, budget $\rho$, and length $n$; the same identities yield
+robustness under per-token modification rate $\delta$
+(\autoref{thm:robustness}).
 
 \begin{algorithm}[t]
   \caption{MCL Watermark Detection (model-free)}

@@ -17,13 +17,13 @@ KGW and SWEET in this regime under matched budgets. For short
 outputs $S^\star$ rises sharply with stricter $\alpha$, so deployers
 targeting tight false-positive rates on short passages should
 either tolerate the higher state count or shift the
-specification toward a longer floor. When the expected attack
-profile is dominated by cross-lingual rewrite or random
-substitution (\autoref{subsec:exp3-translation}), the universal robustness
-threshold $\delta^\star$ of \autoref{thm:robustness} bounds the
-worst case across all gating choices, so the practical decision
-collapses to whether the deployer wants entropy gating
-(KGW/SWEET-style) or the gate-free MCL specification. SWEET, which
+specification toward a longer floor. When cross-lingual rewrite or random substitution dominates the
+expected attack profile (\autoref{subsec:exp3-translation}), the
+universal robustness threshold $\delta^\star$ of
+\autoref{thm:robustness} bounds the worst case across all gating
+choices. The practical decision then collapses to a single axis:
+entropy gating (KGW/SWEET-style) versus the gate-free MCL
+specification. SWEET, which
 we read as a high-entropy gate following~\citet{lee2023sweet}, is a
 sensible choice when the underlying model produces sharply
 peaked distributions on most positions; MCL is the more direct
@@ -81,8 +81,13 @@ $9$ of $12$ (model, domain) cells; three Qwen-2.5-7B SWEET cells
 and are omitted. The qualitative ordering MCL $\gg$ KGW $\geq$ SWEET
 holds in every complete cell (\autoref{tab:headline-percell}), but
 the SWEET aggregate in \autoref{tab:headline-aggregate} should be
-read as a 9-cell mean rather than a balanced 12-cell mean. A full
-re-run is in progress for the extended version.
+read as a 9-cell mean rather than a balanced 12-cell mean. SWEET is
+additionally omitted from the empirically-recalibrated head-to-head
+in \autoref{tab:headline-recalibrated} because the SWEET null
+$z$-distribution was not collected on the FPR corpus and cannot be
+reconstructed from the released artefacts; an apples-to-apples SWEET
+row at empirical FPR$=1\%$ is deferred to the extended version,
+along with a full SWEET re-run.
 
 \paragraph{Translation-only robustness scope.} Our robustness
 evaluation covers \emph{clean}, \emph{random-substitution at
