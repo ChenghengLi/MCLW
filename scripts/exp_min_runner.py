@@ -723,6 +723,8 @@ def run_exp5(args, tok, model, device, out_dir: Path) -> None:
     n_records = 0
     with records_path.open("a" if args.append else "w") as fh:
         for d in DOMAINS:
+            if args.only_domain and d != args.only_domain:
+                continue
             prompts = prompts_per_domain.get(d, [])
             if not prompts:
                 continue

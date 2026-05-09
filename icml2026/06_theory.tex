@@ -38,7 +38,7 @@ statement and proof in \autoref{thm:detection} of
 \paragraph{Empirical-SD calibration recipe.}
 The closed-form $z_\alpha$ assumes i.i.d.\ uniform tokens over the
 SHA-256 partition; on natural-language text this drifts (empirically
-$1.7$--$2.2\%$ at the nominal $1\%$ target,
+$1.7$--$2.0\%$ at the nominal $1\%$ target,
 \autoref{tab:cal-sstar}). The fix is a one-corpus recalibration:
 estimate the empirical mean and SD of $z$ on a non-watermarked
 sample of the deployed LM (or a domain-matched corpus) and use
