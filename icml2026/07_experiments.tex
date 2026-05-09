@@ -20,131 +20,83 @@ state from the key alone and reports a $z$-score.
   \definecolor{c2}{HTML}{E8C12F}
   \definecolor{c3}{HTML}{4FAE5C}
   \definecolor{c4}{HTML}{4A8FD3}
+  % Compact token macro: \tk{state}{text} = a coloured rounded tile;
+  % \tg{state}{text} = the same but underlined to mark a gated step.
+  % All tiles share a fixed inner-ysep so rows align to a clean baseline.
+  \newcommand{\tk}[2]{\tikz[baseline=(X.base)]\node[%
+      rounded corners=1pt, draw=black!25, line width=0.2pt,%
+      inner xsep=1.5pt, inner ysep=0.8pt, font=\scriptsize,%
+      fill=#1!35] (X) {#2};}
+  \newcommand{\tg}[2]{\tikz[baseline=(X.base)]\node[%
+      rounded corners=1pt, draw=black!25, line width=0.2pt,%
+      inner xsep=1.5pt, inner ysep=0.8pt, font=\scriptsize,%
+      fill=#1!35] (X) {\underline{#2}};}
+  % Tighten token spacing inside the output paragraph.
   \begin{tikzpicture}[
-    x=1cm, y=1cm,
-    userbubble/.style={rounded corners=2pt, draw=black!40,
-                       line width=0.4pt, inner sep=3.5pt,
-                       font=\scriptsize, fill=black!4, anchor=west,
-                       text width=6.7cm, align=left},
-    boxstyle/.style={rounded corners=2pt, draw=black!55,
-                     line width=0.5pt, inner xsep=4pt, inner ysep=2pt,
-                     font=\scriptsize\bfseries, fill=white,
-                     anchor=center, align=center},
-    chainbox/.style={boxstyle, fill=green!8},
-    detbox/.style={boxstyle, fill=orange!10},
-    verdictbox/.style={rounded corners=2pt, draw=black!55, line width=0.5pt,
-                       inner sep=3.5pt, font=\scriptsize, anchor=west,
-                       text width=6.7cm, align=left, fill=orange!6},
-    arrowstyle/.style={->, line width=0.6pt, black!65,
-                       >={Stealth[length=2mm,width=1.8mm]}},
-    rolelabel/.style={font=\small\bfseries, anchor=base west,
-                      color=black!75, inner sep=0pt},
-    tokstyle/.style={rounded corners=1pt, inner xsep=1.4pt, inner ysep=1pt,
-                     draw=black!25, line width=0.25pt,
-                     font=\scriptsize, anchor=base west},
-    swatch/.style={rounded corners=0.6pt, draw=black!30, line width=0.25pt,
-                   minimum width=2.6mm, minimum height=2.6mm, inner sep=0pt},
+    node distance=1.6mm and 0pt,
+    seclabel/.style={font=\small\bfseries, color=black!75,
+                     anchor=west, inner sep=0pt},
+    panel/.style={rounded corners=2pt, draw=black!40, line width=0.4pt,
+                  inner sep=4pt, font=\scriptsize, align=left,
+                  text width=\linewidth-12pt},
+    userpanel/.style={panel, fill=black!4},
+    outpanel/.style={panel, fill=green!5},
+    verdpanel/.style={panel, fill=orange!8},
+    flowarrow/.style={font=\scriptsize, color=black!55, inner sep=1pt},
+    swatch/.style={rounded corners=0.5pt, draw=black!25, line width=0.2pt,
+                   minimum width=2.4mm, minimum height=2.4mm, inner sep=0pt},
   ]
-    \definecolor{c0}{HTML}{E15A5A}
-    \definecolor{c1}{HTML}{F0A030}
-    \definecolor{c2}{HTML}{E8C12F}
-    \definecolor{c3}{HTML}{4FAE5C}
-    \definecolor{c4}{HTML}{4A8FD3}
 
-    % --- USER prompt ---------------------------------------------------
-    % Role label sits ABOVE the bubble (anchor=base west at x=0).
-    \node[rolelabel] at (0.0, 5.50) {1.\ User prompt};
-    \node[userbubble] (user) at (0.0, 5.05)
-      {\texttt{Explain Donald Trump in a comprehensive way.}};
+    % ---- 1. USER PROMPT -------------------------------------------------
+    \node[seclabel] (lab1) {1.\,User prompt};
+    \node[userpanel, below=0.8mm of lab1.south west, anchor=north west]
+         (user)
+         {\texttt{Explain Donald Trump in a comprehensive way.}};
 
-    % arrow user -> chainmark
-    \draw[arrowstyle] (3.35, 4.80) -- (3.35, 4.45);
+    % connector down
+    \node[flowarrow, below=0.2mm of user.south] (arr1) {$\downarrow$\ \emph{LM\,+\,ChainMark gate ($S{=}5$, $\rho{=}0.5$)}};
 
-    % --- CHAINMARK box (centered horizontally with user bubble) --------
-    \node[chainbox] (chain) at (3.35, 4.20)
-      {LM + ChainMark gate
-       \mbox{\scriptsize\normalfont($\rho{=}0.5$,\
-         mask to $\sigma_\kappa^{-1}((s{+}1)\bmod 5)$)}};
+    % ---- 2. OUTPUT TOKENS ----------------------------------------------
+    \node[seclabel, below=0.2mm of arr1.south, anchor=north west,
+          xshift=-0pt] (lab2)
+         {2.\,Watermarked output (tile colour $=$ state $\sigma_\kappa$)};
 
-    % arrow chainmark -> tokens
-    \draw[arrowstyle] (3.35, 3.92) -- (3.35, 3.65);
+    % The token paragraph: each token is an inline TikZ node via \tk/\tg.
+    % LaTeX wraps the line naturally; gated tokens (underlined) appear in
+    % brackets. Extra glue between tokens keeps the paragraph breathable.
+    \node[outpanel, below=0.8mm of lab2.south west, anchor=north west]
+         (output) {%
+      \tk{c2}{Donald}\,\tk{c3}{Trump}\,\tg{c4}{born}\,\tg{c0}{June}\,%
+      \tg{c1}{14}\,\tg{c2}{1946}\,\tg{c3}{is}\,\tk{c4}{a}\,\tk{c4}{former}\,%
+      \tg{c0}{U.S.}\,\tg{c1}{president}\,\tg{c2}{and}\,%
+      \tg{c3}{businessman}\,\tg{c4}{who}\,\tg{c0}{served}\,\tg{c1}{as}\,%
+      \tg{c2}{the}\,\tg{c3}{45th}\,\tg{c4}{president}\,\tg{c0}{from}\,%
+      \tg{c1}{2017}\,\tg{c2}{to}\,\tg{c3}{2021}\,\tk{c4}{after}\,%
+      \tk{c4}{a}\,\tg{c0}{long}\,\tg{c1}{career}\,\tg{c2}{in}\,%
+      \tg{c3}{real}\,\tg{c4}{estate}\,\tg{c0}{and}\,\tg{c1}{television}%
+      \par\vspace{2pt}%
+      \scriptsize\color{black!70}%
+      \tikz[baseline=-0.6ex]\node[swatch, fill=c0!55]{};\,0\;%
+      \tikz[baseline=-0.6ex]\node[swatch, fill=c1!55]{};\,1\;%
+      \tikz[baseline=-0.6ex]\node[swatch, fill=c2!55]{};\,2\;%
+      \tikz[baseline=-0.6ex]\node[swatch, fill=c3!55]{};\,3\;%
+      \tikz[baseline=-0.6ex]\node[swatch, fill=c4!55]{};\,4\hfill%
+      \underline{token}\,$=$\,gated ($s_{i+1}{=}(s_i{+}1)\bmod 5$)%
+    };
 
-    % --- COLOURED TOKEN STRIP ------------------------------------------
-    % Role label sits ABOVE the output frame (above the first token row).
-    \node[rolelabel] at (0.0, 3.50)
-      {2.\ Output (token tile colour $=$ state $\sigma_\kappa$)};
+    % connector down
+    \node[flowarrow, below=0.2mm of output.south] (arr2)
+         {$\downarrow$\ \emph{auditor re-derives $\sigma_\kappa$ from $\kappa$, counts $s{\to}s{+}1$}};
 
-    % row 1
-    \node[tokstyle, fill=c2!35] (t1) at (0.00, 3.20) {Donald};
-    \node[tokstyle, fill=c3!35, right=0.6mm of t1.base east, anchor=base west] (t2)  {Trump};
-    \node[tokstyle, fill=c4!35, right=0.6mm of t2.base east, anchor=base west] (t3)  {\underline{born}};
-    \node[tokstyle, fill=c0!35, right=0.6mm of t3.base east, anchor=base west] (t4)  {\underline{June}};
-    \node[tokstyle, fill=c1!35, right=0.6mm of t4.base east, anchor=base west] (t5)  {\underline{14}};
-    \node[tokstyle, fill=c2!35, right=0.6mm of t5.base east, anchor=base west] (t6)  {\underline{1946}};
-    \node[tokstyle, fill=c3!35, right=0.6mm of t6.base east, anchor=base west] (t7)  {\underline{is}};
-    \node[tokstyle, fill=c4!35, right=0.6mm of t7.base east, anchor=base west] (t8)  {a};
-    \node[tokstyle, fill=c4!35, right=0.6mm of t8.base east, anchor=base west] (t9)  {former};
-    % row 2
-    \node[tokstyle, fill=c0!35] (t10) at (0.00, 2.65) {\underline{U.S.}};
-    \node[tokstyle, fill=c1!35, right=0.6mm of t10.base east, anchor=base west] (t11) {\underline{president}};
-    \node[tokstyle, fill=c2!35, right=0.6mm of t11.base east, anchor=base west] (t12) {\underline{and}};
-    \node[tokstyle, fill=c3!35, right=0.6mm of t12.base east, anchor=base west] (t13) {\underline{businessman}};
-    \node[tokstyle, fill=c4!35, right=0.6mm of t13.base east, anchor=base west] (t14) {\underline{who}};
-    \node[tokstyle, fill=c0!35, right=0.6mm of t14.base east, anchor=base west] (t15) {\underline{served}};
-    % row 3
-    \node[tokstyle, fill=c1!35] (t16) at (0.00, 2.10) {\underline{as}};
-    \node[tokstyle, fill=c2!35, right=0.6mm of t16.base east, anchor=base west] (t17) {\underline{the}};
-    \node[tokstyle, fill=c3!35, right=0.6mm of t17.base east, anchor=base west] (t18) {\underline{45th}};
-    \node[tokstyle, fill=c4!35, right=0.6mm of t18.base east, anchor=base west] (t19) {\underline{president}};
-    \node[tokstyle, fill=c0!35, right=0.6mm of t19.base east, anchor=base west] (t20) {\underline{from}};
-    \node[tokstyle, fill=c1!35, right=0.6mm of t20.base east, anchor=base west] (t21) {\underline{2017}};
-    \node[tokstyle, fill=c2!35, right=0.6mm of t21.base east, anchor=base west] (t22) {\underline{to}};
-    \node[tokstyle, fill=c3!35, right=0.6mm of t22.base east, anchor=base west] (t23) {\underline{2021}\,\dots};
-
-    % inline state legend (below tokens)
-    \node[font=\tiny, color=black!70, anchor=base west]
-      at (0.0, 1.55) {state};
-    \node[swatch, fill=c0!55, anchor=base west] (lg0) at (0.75, 1.50) {};
-    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg0.east) {0};
-    \node[swatch, fill=c1!55, anchor=base west] (lg1) at (1.20, 1.50) {};
-    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg1.east) {1};
-    \node[swatch, fill=c2!55, anchor=base west] (lg2) at (1.65, 1.50) {};
-    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg2.east) {2};
-    \node[swatch, fill=c3!55, anchor=base west] (lg3) at (2.10, 1.50) {};
-    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg3.east) {3};
-    \node[swatch, fill=c4!55, anchor=base west] (lg4) at (2.55, 1.50) {};
-    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg4.east) {4};
-    \node[font=\tiny, color=black!70, anchor=base west]
-      at (3.05, 1.55) {\underline{token} = gated step};
-
-    % --- BACKGROUND FRAME around the entire token strip + legend ------
-    % Drawn AFTER all tile/legend nodes so `fit=` can compute the exact
-    % bounding box; placed on a back layer so it doesn't cover content.
-    \begin{scope}[on background layer]
-      \node[rounded corners=2pt, draw=black!40, line width=0.4pt,
-            fill=green!4, inner sep=4pt,
-            fit=(t1)(t9)(t10)(t15)(t16)(t23)(lg0)(lg4)]
-        (outframe) {};
-    \end{scope}
-
-    % arrow tokens -> detector
-    \draw[arrowstyle] (3.35, 1.25) -- (3.35, 0.95);
-
-    % --- DETECTOR ------------------------------------------------------
-    \node[detbox] (det) at (3.35, 0.70)
-      {Auditor: re-derive $\sigma_\kappa$, count valid
-       $s\!\to\!s{+}1$};
-
-    % arrow detector -> verdict
-    \draw[arrowstyle] (3.35, 0.42) -- (3.35, 0.12);
-
-    % --- VERDICT -------------------------------------------------------
-    % Role label sits ABOVE the verdict bubble.
-    \node[rolelabel] at (0.0, -0.10) {3.\ Auditor verdict};
-    \node[verdictbox] (verd) at (0.0, -0.70)
-      {$\phi = 27/32 = 0.84$ (null $p_0{=}0.20$),\
-       \mbox{$z = 9.05 > z_{0.01}{=}2.326$}\,$\Rightarrow$\
-       \textbf{watermarked} \mbox{(no LM access).}};
+    % ---- 3. VERDICT -----------------------------------------------------
+    \node[seclabel, below=0.2mm of arr2.south, anchor=north west] (lab3)
+         {3.\,Auditor verdict};
+    \node[verdpanel, below=0.8mm of lab3.south west, anchor=north west]
+         (verd) {%
+      $\phi = 27/32 = 0.84$\quad(null $p_0{=}0.20$),\quad
+      $z = 9.05$,\quad $p\!\ll\!10^{-15}$\;$\Rightarrow$\;
+      \textbf{watermarked} (no LM access).%
+    };
 
   \end{tikzpicture}
   \caption{\textbf{End-to-end ChainMark trace} on a wiki prompt
