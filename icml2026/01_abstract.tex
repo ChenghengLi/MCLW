@@ -12,12 +12,12 @@
   key and is therefore model-free, running in $O(n)$ hash operations.
   Theoretically, we derive an operator-facing formula mapping a
   target false-positive rate, text length, and budget to the minimum
-  state count $S^\star$ (\autoref{thm:detection}). We further prove a
-  universal robustness threshold $\delta^\star = 1 - 1/\sqrt{2}
-  \approx 29.3\%$ that is independent of $(S, \rho, n)$ under the
-  midpoint decision convention (\autoref{thm:robustness}), and
-  generalise both results to any $k$-regular transition topology
-  (\autoref{thm:k-regular}).
+  state count $S^\star$ (\autoref{thm:detection}). We further prove
+  a universal robustness threshold $\delta^\star = 1 - 1/\sqrt{2}
+  \approx 29.3\%$ that is independent of $(S, \rho, n)$
+  (\autoref{thm:robustness}). Both results adopt the same midpoint
+  decision convention used throughout the paper, and generalise to
+  any $k$-regular transition topology (\autoref{thm:k-regular}).
   Empirically, we compare MCL head-to-head against KGW and SWEET
   across multiple instruction-tuned LLMs and four text domains under
   matched-budget translation and random-substitution attacks. We
