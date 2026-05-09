@@ -2,49 +2,49 @@
 \section{Introduction}
 \label{sec:intro}
 
-EU AI Act Article~50~\citep{euaiact2024} requires a machine-readable
-mark on AI-generated text by August 2026, but does not specify
-which false-positive rate, text length, or quality cost constitute a
-compliant detector. Operators therefore need a watermark whose
-detector is auditable end-to-end. A regulator or third-party
-verifier should be able to confirm provenance from the text, the
-secret key, and the (publicly known) tokenizer alone --- without
-query access to the generating language model. The widely used logit-bias schemes do not meet this
-bar. KGW~\citep{kirchenbauer2023watermark} and its
-entropy-gated variants such as
+EU AI Act Article~50~\citep{euaiact2024} requires machine-readable
+marking of AI-generated text by August 2026, but the technical
+substrate is unsettled. Existing watermarks have three structural
+problems for regulator-facing audit. \emph{(i)~LM-bound detection.}
+KGW~\citep{kirchenbauer2023watermark} and its entropy-gated variants
 SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} require the
-language model (or a faithful proxy) at detection time in order to
-recompute the green-list bias or to weight tokens by entropy.
-Undetectability-frontier results~\citep{christ2024undetectable}
-characterise what any scheme can achieve information-theoretically
-but yield no deployable construction, and passive
+generating LM (or a faithful proxy) at detection time --- to
+recompute the green-list bias or to weight tokens by entropy --- so
+a third-party auditor cannot verify a transcript from the key alone.
+\emph{(ii)~No closed-form calibration.} None of these schemes
+inverts a regulator-side specification (target FPR $\alpha$, text
+length $n_{\min}$, budget $\rho$) into a deployer-side configuration;
+the bias magnitude $\delta_{\mathrm{KGW}}$ is set heuristically.
+\emph{(iii)~Brittle robustness.} Empirically, KGW and SWEET drop
+from $74.8\%$/$71.8\%$ TPR clean to $19.4\%$/$18.0\%$ after
+ZH back-translation at matched budget (\autoref{tab:headline-aggregate}).
+Distortion-free schemes~\citep{aaronson2023semstamp,kuditipudi2023robust}
+preserve quality but require LM access or the key sequence at
+detection; undetectability-frontier results~\citep{christ2024undetectable}
+yield no deployable construction; passive
 detectors~\citep{mitchell2023detectgpt,tian2023gptzero} expose no
-controllable false-positive frontier at all.
+controllable FPR.
 
 \paragraph{ChainMark.}
-We propose \emph{ChainMark}, an active watermark whose
-detector is model-free. A keyed SHA-256 hash partitions the
-vocabulary into $S$ equivalence classes (states), and a fixed cycle
-over those states defines a Markov transition pattern. On a fraction
-$\rho$ of generated positions, the language-model logits are masked
-to keep only tokens whose state is the legal successor of the
-current state; the produced text therefore walks the chain by
-construction.
-Detection re-derives every token's state from the key in $O(n)$ hash
-operations and counts how often consecutive tokens follow the cycle.
-Because the state map is a function of the token id and the key
-only, no language-model forward pass, weights, or proxy LM is
-required to verify a transcript. Two operational consequences follow.
-First, third-party audit becomes lightweight: a regulator with the
-key can verify provenance from a string of plain text. Second, the
-detector's null-and-alternative law inverts in closed form to a
-calibration map (\autoref{thm:detection}, derived in
-\autoref{app:proofs}). A regulator who fixes a target false-positive
-rate $\alpha$, a text-length floor $n_{\min}$, and a watermark
-budget $\rho$ reads off the minimum admissible state count
-$S^\star(n_{\min}, \rho, \alpha)$; a deployer may spend more budget
-than the floor for additional margin but cannot evade the
-regulator's specification.
+We propose \emph{ChainMark}, an active watermark with a
+\textbf{model-free} detector and a \textbf{closed-form calibration
+formula}. A keyed SHA-256 hash partitions the vocabulary into $S$
+equivalence classes (states), and a fixed cycle over those states
+defines a Markov transition pattern; on a fraction $\rho$ of
+generated positions, the language-model logits are masked to keep
+only tokens whose state is the legal successor, so the produced
+text walks the chain by construction. Detection re-derives every
+token's state from the key in $O(n)$ hash operations and counts how
+often consecutive tokens follow the cycle --- no LM access, no proxy
+weights, no learned components. The detector's null law inverts in
+closed form to a calibration map
+$S^\star(n_{\min}, \rho, \alpha)$ (\autoref{thm:detection},
+\autoref{app:proofs}): a regulator fixes the deployment regime and
+reads off the minimum admissible state count. ChainMark also enjoys a
+\emph{universal} robustness floor $\delta^\star = 1 - 1/\sqrt{2}
+\approx 29.3\%$ (\autoref{thm:robustness}), independent of
+$(S, \rho, n)$, and empirically retains $72.8\%$ TPR after ZH
+back-translation where KGW/SWEET drop to $\sim\!\!19\%$.
 \autoref{fig:teaser} summarises the construction; the formal
 treatment is in \autoref{sec:method} and \autoref{sec:theory}.
 
