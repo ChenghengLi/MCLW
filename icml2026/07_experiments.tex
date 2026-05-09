@@ -37,8 +37,8 @@ state from the key alone and reports a $z$-score.
                        text width=6.7cm, align=left, fill=orange!6},
     arrowstyle/.style={->, line width=0.6pt, black!65,
                        >={Stealth[length=2mm,width=1.8mm]}},
-    rolelabel/.style={font=\scriptsize\bfseries, anchor=base east,
-                      color=black!70, inner sep=0pt},
+    rolelabel/.style={font=\small\bfseries, anchor=base west,
+                      color=black!75, inner sep=0pt},
     tokstyle/.style={rounded corners=1pt, inner xsep=1.4pt, inner ysep=1pt,
                      draw=black!25, line width=0.25pt,
                      font=\scriptsize, anchor=base west},
@@ -52,7 +52,8 @@ state from the key alone and reports a $z$-score.
     \definecolor{c4}{HTML}{4A8FD3}
 
     % --- USER prompt ---------------------------------------------------
-    \node[rolelabel] at (-0.05, 5.40) {User};
+    % Role label sits ABOVE the bubble (anchor=base west at x=0).
+    \node[rolelabel] at (0.0, 5.50) {1.\ User prompt};
     \node[userbubble] (user) at (0.0, 5.05)
       {\texttt{Explain Donald Trump in a comprehensive way.}};
 
@@ -66,10 +67,12 @@ state from the key alone and reports a $z$-score.
          mask to $\sigma_\kappa^{-1}((s{+}1)\bmod 5)$)}};
 
     % arrow chainmark -> tokens
-    \draw[arrowstyle] (3.35, 3.92) -- (3.35, 3.62);
+    \draw[arrowstyle] (3.35, 3.92) -- (3.35, 3.65);
 
     % --- COLOURED TOKEN STRIP ------------------------------------------
-    \node[rolelabel] at (-0.05, 3.40) {Output};
+    % Role label sits ABOVE the output frame (above the first token row).
+    \node[rolelabel] at (0.0, 3.50)
+      {2.\ Output (token tile colour $=$ state $\sigma_\kappa$)};
 
     % row 1
     \node[tokstyle, fill=c2!35] (t1) at (0.00, 3.20) {Donald};
@@ -136,7 +139,8 @@ state from the key alone and reports a $z$-score.
     \draw[arrowstyle] (3.35, 0.42) -- (3.35, 0.12);
 
     % --- VERDICT -------------------------------------------------------
-    \node[rolelabel] at (-0.05, -0.20) {Verdict};
+    % Role label sits ABOVE the verdict bubble.
+    \node[rolelabel] at (0.0, -0.10) {3.\ Auditor verdict};
     \node[verdictbox] (verd) at (0.0, -0.70)
       {$\phi = 27/32 = 0.84$ (null $p_0{=}0.20$),\
        \mbox{$z = 9.05 > z_{0.01}{=}2.326$}\,$\Rightarrow$\
