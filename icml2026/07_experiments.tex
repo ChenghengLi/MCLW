@@ -194,12 +194,9 @@ ablation of KGW with the gating policy held fixed against ChainMark.
     aggregated over $3$ LLMs $\times$ $4$ domains $\times$ $100$
     prompts at $n{=}200$ tokens per cell. PPL is the median across
     the $12$ cell medians on the watermarked model's own logits
-    (caveats in \autoref{sec:discussion}). \emph{After empirical
-    recalibration} to $\alpha{=}1\%$ (\autoref{thm:detection-recal},
-    pooled $n{=}3000$ NWM samples), the same TPRs become
-    ChainMark $100.0/99.9/68.7$, KGW $69.0/45.4/15.3$
-    (clean / random / ZH); SWEET is omitted (no NWM SWEET corpus,
-    see \autoref{tab:headline-recalibrated}). Bold = best per column.}
+    (caveats in \autoref{sec:discussion}). Empirical FPR drift at
+    this threshold appears separately in \autoref{tab:cal-sstar}.
+    Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
   \setlength{\tabcolsep}{3pt}
@@ -308,25 +305,29 @@ empirical-SD threshold recalibration of
     prompts ($\approx 300$ watermarked + $300$ non-watermarked).
     $z_{\mathrm{wm}}^{\mathrm{pred}} = \rho\sqrt{(S{-}1)(n{-}1)}$.
     Watermarked $z$ overshoots theory by $50$--$90\%$;
-    non-watermarked FPR exceeds $1\%$ at large $S$ due to
-    non-i.i.d.\ structure in natural-language token sequences (the
-    closed form gives the right ordering, the empirical-SD
-    recalibration of \autoref{thm:detection-recal} closes the
-    residual gap).}
+    non-watermarked FPR$_{\mathrm{nwm}}$ exceeds the $\alpha{=}1\%$
+    target at large $S$ due to non-i.i.d.\ structure in
+    natural-language token sequences. The last column,
+    FPR$_{\mathrm{nwm}}^{\mathrm{recal.}}$, applies the
+    empirical-quantile recalibration of \autoref{thm:detection-recal}
+    per-$S$ on the same NWM corpus and lands the FPR uniformly
+    below $\alpha{=}1\%$.}
   \label{tab:cal-sstar}
   \small
-  \setlength{\tabcolsep}{4.5pt}
-  \begin{tabular}{rrrrr}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{rrrrrr}
     \toprule
     $S$ & $\bar z_{\mathrm{wm}}^{\mathrm{obs}}$
         & $z_{\mathrm{wm}}^{\mathrm{pred}}$
-        & TPR$_{\mathrm{wm}}$ & FPR$_{\mathrm{nwm}}$ \\
+        & TPR$_{\mathrm{wm}}$
+        & FPR$_{\mathrm{nwm}}$
+        & FPR$_{\mathrm{nwm}}^{\mathrm{recal.}}$ \\
     \midrule
-    2  & 10.86 & 7.05  & 100\% & 2.18\% \\
-    3  & 17.41 & 9.97  & 100\% & 2.00\% \\
-    5  & 25.38 & 14.11 & 100\% & 1.67\% \\
-    7  & 30.61 & 17.28 & 100\% & 6.91\% \\
-    11 & 41.49 & 22.30 & 100\% & 5.33\% \\
+    2  & 10.86 & 7.05  & 100\% & 2.18\% & 0.74\% \\
+    3  & 17.41 & 9.97  & 100\% & 2.00\% & 0.67\% \\
+    5  & 25.38 & 14.11 & 100\% & 1.67\% & 0.34\% \\
+    7  & 30.61 & 17.28 & 100\% & 6.91\% & 0.73\% \\
+    11 & 41.49 & 22.30 & 100\% & 5.33\% & 0.67\% \\
     \bottomrule
   \end{tabular}
 \end{table}
