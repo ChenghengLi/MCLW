@@ -68,10 +68,11 @@ external-LM PPL, MAUVE, or human-rater scores. The detector is
 ``model-free'' in the sense of needing no LM forward pass at
 detection, but it does require the same tokenizer used at
 generation; an auditor handed plain text alone would have to
-enumerate candidate tokenizers. The security guarantee of
-\autoref{thm:security} covers an oracle-blind adversary only; an
-attacker with adaptive detector-query access is outside our threat
-model and has open query complexity.
+enumerate candidate tokenizers. Both \autoref{thm:security} and \autoref{thm:robustness} cover an
+oracle-blind adversary only; an attacker with adaptive
+detector-query access (or with $\sigma_\kappa$ access) can choose
+substitution targets to hit valid transitions and is outside our
+threat model. Query complexity for such an adversary is open.
 
 \paragraph{FPR drift and theorem scope.} The empirical FPR at the
 analytic Gaussian-tail threshold $z_\alpha=2.326$ drifts to

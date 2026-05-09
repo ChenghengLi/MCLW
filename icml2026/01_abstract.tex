@@ -3,7 +3,7 @@
   Regulatory regimes such as the EU AI Act mandate machine-readable
   marking of synthetic text, but existing watermark detectors rely on
   the generating LM and on heuristic thresholds with no closed-form
-  calibration. We introduce \emph{ChainMark} (ChainMark), an active
+  calibration. We introduce \emph{ChainMark}, an active
   watermark that partitions the vocabulary into $S$ states via keyed
   SHA-256 and forces a hard Markov transition on a fraction $\rho$ of
   positions; the detector replays the partition from the same key in
@@ -16,7 +16,7 @@
   transition topology (\autoref{thm:k-regular}). Across three
   instruction-tuned LLMs and four domains, ChainMark strictly dominates
   KGW and SWEET under translation and random-substitution attacks at
-  matched budget; an empirical-SD threshold recalibration restores
+  matched budget; a one-corpus empirical recalibration restores
   the $1\%$ target FPR on natural-language text
   (\autoref{sec:experiments}).
 \end{abstract}
