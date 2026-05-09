@@ -35,9 +35,14 @@ universal robustness threshold; we isolate it as a lemma.
 \end{lemma}
 
 \begin{proof}
-  Write $N^+(s) = \{s' : T(s,s')=1\}$ and $N^-(s') = \{s :
-  T(s,s')=1\}$; by $k$-regularity, $|N^+(s)| = |N^-(s')| = k$ for
-  every $s, s'$.
+  Write $N^+(s) = \{s' : T(s,s')=1\}$ (equivalently $\Sigma_k(s)$
+  from \autoref{sec:method}) and $N^-(s') = \{s : T(s,s')=1\}$;
+  by $k$-regularity, $|N^+(s)| = |N^-(s')| = k$ for every $s, s'$.
+  Throughout this proof we operate under the random-oracle null with
+  i.i.d.\ uniform tokens on $\mathcal V$; the empirical FPR drift
+  observed on natural-language text (\autoref{tab:cal-sstar},
+  \autoref{sec:discussion}) is the practical price of this
+  idealisation.
 
   \emph{Marginal mean.}  Conditioning on $\sigma_\kappa(t_i)$ and using
   row-regularity,
@@ -160,8 +165,8 @@ universal robustness threshold; we isolate it as a lemma.
   by the null SD,
   \begin{align*}
     z(\rho,S,n)
-      &= \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}}
-       = \rho \sqrt{(S-1)(n-1)}.
+      &= \frac{\rho(S-1)/S}{\sqrt{(1/S)(1-1/S)/(n-1)}} \\
+      &= \rho \sqrt{(S-1)(n-1)}.
   \end{align*}
 
   \emph{FPR via Hoeffding.}  Adjacent indicators share a token and
@@ -224,8 +229,10 @@ universal robustness threshold; we isolate it as a lemma.
   $z^\star_{\mathrm{emp}} = \hat F^{-1}(1{-}\alpha)$, where
   $\hat F$ is the empirical CDF of $\{z_i\}$; this delivers the
   target FPR at any $\alpha$ by Glivenko--Cantelli regardless of
-  null shape (at the cost of $\sqrt{1/M}$ Monte-Carlo noise in the
-  threshold).
+  null shape, with the
+  Dvoretzky--Kiefer--Wolfowitz inequality giving
+  $\sup_x\!|\hat F(x) - F(x)| = O_p(M^{-1/2})$ Monte-Carlo noise in
+  the threshold.
 \end{proposition}
 
 \begin{proof}
@@ -256,7 +263,9 @@ universal robustness threshold; we isolate it as a lemma.
   $\sigma_\kappa$ or the random oracle) independently replaces each
   token with probability $\delta$ by a fresh token whose state
   $\sigma_\kappa$ is uniform on $[S]$ (so the substitutions are
-  i.i.d.\ uniform in the partition).  Standardise the post-attack
+  i.i.d.\ uniform in the partition; structured paraphrase / NLLB
+  back-translation produces correlated edits and is treated
+  empirically in \autoref{subsec:exp3-translation}).  Standardise the post-attack
   $z$ by the \emph{null} standard deviation
   $\sqrt{p_0(1-p_0)/(n-1)}$ (the same scaling used pre-attack).
   Then for clockwork ChainMark with state count $S$ and gate density
@@ -526,11 +535,11 @@ recall the definition for the appendix.
     \Lambda
       \;=\; \sum_{i=1}^{n-1}\!
         \left[ X_i \log(\pi_i S)
-          + (1 - X_i) \log \tfrac{1 - \pi_i}{1 - 1/S}\right]
+          + (1 - X_i) \log \tfrac{1 - \pi_i}{1 - 1/S}\right].
   \end{equation}
-  is asymptotically Neyman--Pearson optimal under the product-form
-  approximation among all size-$\alpha$ tests with the known entropy
-  profile.
+  Then the test $\{\Lambda > c_\alpha\}$ is asymptotically
+  Neyman--Pearson optimal under the product-form approximation
+  among all size-$\alpha$ tests with the known entropy profile.
 \end{theorem}
 
 \begin{proof}

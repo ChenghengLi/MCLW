@@ -115,7 +115,10 @@ prompts over a curated concept list), and \emph{writing}
 token budget $n = 200$ at every cell, with one deterministic seed so
 the same indices are watermarked, attacked, and detected across
 methods. Detection uses the threshold $z_\alpha$ from
-\autoref{thm:detection}, reused across methods for fair comparison.
+\autoref{thm:detection}, reused across methods for cross-method
+consistency; the empirically calibrated $1\%$-FPR head-to-head
+(\autoref{app:headline-recalibrated}) confirms the resulting TPR
+ranking is not an FPR artefact.
 
 \textbf{ChainMark configuration.} Unless stated otherwise, ChainMark runs use
 $S = 5$ states, target gate budget $\rho = 0.5$, the high-entropy gate
@@ -202,8 +205,8 @@ ablation of KGW with the gating policy held fixed against ChainMark.
   \setlength{\tabcolsep}{3pt}
   \begin{tabular}{lcccc}
     \toprule
-    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{rnd}}$ &
-            TPR$_{\mathrm{ZH}}$ & PPL$\downarrow$ \\
+    Method & TPR$_{\mathrm{clean}}$\,(\%) & TPR$_{\mathrm{rnd}}$\,(\%) &
+            TPR$_{\mathrm{ZH}}$\,(\%) & PPL$\downarrow$ \\
     \midrule
     \textbf{ChainMark} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 3.66 \\
     KGW                & \phantom{0}74.8 & 55.1 & 19.4 & 1.93 \\
@@ -218,9 +221,10 @@ ablation of KGW with the gating policy held fixed against ChainMark.
   \caption{\textbf{Per-(model, domain) head-to-head TPR (\%)} at
     $z_\alpha=2.326$ ($100$ prompts per cell, $n{=}200$ tokens).
     Each row is one (model, domain) cell; left panel is clean, right
-    panel is ZH back-translation. MCL (ChainMark) matches or leads
+    panel is ZH back-translation. ChainMark matches or leads
     every clean cell and strictly leads every cell post-ZH-back-translation.
-    Cells with TPR$<$50\% are annotated with their value.}
+    Cells with TPR$<$50\% are annotated with their value in white
+    inside the cell.}
   \label{fig:headline-percell}
 \end{figure}
 
@@ -252,7 +256,7 @@ attack. \autoref{tab:kregular} reports clean
 $\bar\phi_{\mathrm{cl}} \geq 0.88$ (well above the $p_0 = 0.40$
 prediction) and a post-attack $z$-score that sits above the
 $(1 - \delta_{\mathrm{eff}})^2$ floor of \autoref{thm:robustness}
-(observed ratio $0.22$--$0.26$ vs.\ predicted $0.08$--$0.10$, i.e.\
+(observed ratio $0.23$--$0.27$ vs.\ predicted $0.07$--$0.09$, i.e.\
 the bound is conservative as in \autoref{subsec:exp3-translation}),
 jointly re-certifying
 \autoref{thm:k-regular} and \autoref{thm:robustness} at a non-trivial
@@ -307,7 +311,7 @@ empirical-SD threshold recalibration of
     $S$, aggregated across $3$ LLMs $\times$ $4$ domains $\times$ $25$
     prompts ($\approx 300$ watermarked + $300$ non-watermarked).
     $z_{\mathrm{wm}}^{\mathrm{pred}} = \rho\sqrt{(S{-}1)(n{-}1)}$.
-    Watermarked $z$ overshoots theory by $50$--$90\%$;
+    Watermarked $z$ overshoots theory by $50$--$80\%$;
     non-watermarked FPR$_{\mathrm{nwm}}$ exceeds the $\alpha{=}1\%$
     target at large $S$ due to non-i.i.d.\ structure in
     natural-language token sequences. The last two columns

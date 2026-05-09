@@ -45,8 +45,18 @@
 \renewcommand{\sectionautorefname}{Section}
 \renewcommand{\subsectionautorefname}{Subsection}
 \renewcommand{\subsubsectionautorefname}{Subsubsection}
-% hyperref doesn't auto-name algorithms; provide it explicitly.
+% hyperref doesn't auto-name algorithms / shared-counter theorem
+% siblings; provide them explicitly so \autoref renders the right
+% environment name (otherwise lemma/proposition/corollary print as
+% "theorem" because they share the [theorem] counter).
 \providecommand{\algorithmautorefname}{Algorithm}
+\providecommand{\lemmaautorefname}{Lemma}
+\providecommand{\propositionautorefname}{Proposition}
+\providecommand{\corollaryautorefname}{Corollary}
+\providecommand{\definitionautorefname}{Definition}
+\providecommand{\assumptionautorefname}{Assumption}
+\providecommand{\exampleautorefname}{Example}
+\providecommand{\remarkautorefname}{Remark}
 \usepackage{enumitem}
 
 % Cleveref name declarations for the theorem-style environments

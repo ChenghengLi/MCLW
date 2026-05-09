@@ -10,9 +10,13 @@ inputs: a minimum text length $n_{\min}$, a target false-positive
 rate $\alpha$, and a watermark budget $\rho$. For long-form content
 the calibration anchors comfortably at small $S$ with $\rho$ near
 $1/2$; the head-to-head in \autoref{subsec:exp2-headline} shows ChainMark
-substantially exceeds KGW and SWEET in detection power in this
-regime, while incurring a $\approx 2\times$ higher self-perplexity
-($3.66$ vs $1.80$--$1.93$; \autoref{tab:headline-aggregate}).
+substantially exceeds KGW and SWEET in detection power at the
+analytical $z_\alpha=2.326$ threshold (the apples-to-apples
+empirical-FPR$=1\%$ recalibration in \autoref{app:headline-recalibrated}
+preserves the lead vs.\ KGW; the SWEET row is deferred since the
+SWEET null was not collected on the FPR corpus), while incurring a
+$\approx 2\times$ higher self-perplexity ($3.66$ vs $1.80$--$1.93$;
+\autoref{tab:headline-aggregate}).
 For short outputs $S^\star$ rises sharply with stricter $\alpha$,
 so deployers should either tolerate a higher state count or shift
 to a longer floor. When cross-lingual rewrite or random substitution
@@ -27,7 +31,10 @@ choices.
 Recomputing the detection threshold from the empirical SD of $z$ on
 a non-watermarked corpus gives $z^\star = \hat\mu + z_\alpha\,\hat\sigma$,
 which brings empirical FPR from $2.1\%$ to $1.2\%$ at $\alpha=1\%$
-while preserving TPR$=100\%$ (\autoref{app:fpr-recipes}). The
+while preserving TPR$=100\%$ on the pooled $n{=}3000$ FPR corpus
+(\autoref{app:fpr-recipes}); the per-$S$ empirical-quantile drop-in
+in \autoref{tab:cal-sstar} costs at most $1.3$\,pp of TPR
+(TPR$_{\mathrm{wm}}^{\mathrm{recal.}}\!\geq 98.7\%$ across $S\!\in\!\{2,3,5\}$). The
 plug-in is calibrated at $\alpha=1\%$ but the empirical $z$-null is
 leptokurtic (excess kurtosis $\approx 1.4$); for tighter $\alpha
 \leq 0.5\%$ the empirical-quantile recipe
@@ -79,7 +86,7 @@ $1.7$--$2.0\%$ on non-watermarked LLM output
 i.i.d.\ uniform over the SHA-256 partition, so the closed-form
 Hoeffding envelope (\autoref{fig:cal-fpr}) sits below the empirical
 curve. Headline TPR numbers in
-\autoref{tab:headline-aggregate}--\autoref{tab:headline-percell}
+\autoref{tab:headline-aggregate}--\autoref{fig:headline-percell}
 are at the analytic threshold (cross-method consistency), not at
 an empirically calibrated $1\%$ FPR per cell. \autoref{thm:robustness}
 itself is derived under i.i.d.\ uniform substitution at rate
