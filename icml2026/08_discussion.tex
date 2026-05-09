@@ -20,8 +20,9 @@ outputs $S^\star$ rises sharply with stricter $\alpha$, so deployers
 targeting tight false-positive rates on short passages should
 either tolerate the higher state count or shift the
 specification toward a longer floor. When cross-lingual rewrite or random substitution dominates the
-expected attack profile (\autoref{subsec:exp3-translation}), the
-universal robustness threshold $\delta^\star$ of
+expected attack profile
+(\autoref{subsec:exp2-headline}, \autoref{subsec:exp3-translation}),
+the universal robustness threshold $\delta^\star$ of
 \autoref{thm:robustness} bounds the worst case across all gating
 choices. The practical decision then collapses to a single axis: KGW's
 green-list bias under entropy gating versus MCL's hard-state-cycle
@@ -47,6 +48,24 @@ reported as the perplexity of each model under its own logits. We do
 not report external-LM perplexity, MAUVE, or human-rater scores;
 self-perplexity is a relative comparator across gates on the same
 model and is conservative for absolute claims about quality.
+
+\paragraph{Single KGW/SWEET hyperparameter setting.} KGW and SWEET
+are evaluated at the canonical $\gamma{=}0.5$,
+$\delta_{\mathrm{KGW}}{=}2$ only; we do not sweep $\delta_{\mathrm{KGW}}$,
+so the headline TPR gap reflects baselines at their default
+operating point rather than at a per-cell optimum.
+
+\paragraph{Single sampling regime, no replicate seeds.} All cells
+use $T{=}0.7$, top-$p{=}1$, $n{=}200$ tokens with one deterministic
+prompt-order seed; we do not vary decoding temperature or text
+length and do not report run-to-run TPR confidence intervals from
+independent replicate seeds.
+
+\paragraph{Adversary excludes detector-oracle access.} Our security
+argument (\autoref{thm:security}) covers an oracle-blind adversary
+only; an attacker who can adaptively query the detector to estimate
+$z$ on candidate edits is outside our threat model, and the query
+complexity of such an adversary is open.
 
 \paragraph{Three instruction-tuned LLMs.} The headline experiments
 use three open-weight instruction-tuned 7--8B parameter models. We
@@ -89,12 +108,14 @@ FPR$=1\%$ is deferred to the extended version.
 
 \paragraph{Translation-only robustness scope.} Our robustness
 evaluation covers \emph{clean}, \emph{random-substitution at
-$\delta_{\mathrm{eff}}=0.20$}, and \emph{NLLB-200 EN$\to$ZH$\to$EN
-back-translation}. We do not include grammar-preserving paraphrase
-attacks (e.g.\ DIPPER); the strongest robustness claim we make is
-therefore against translation and uniform substitution, not against
-adversarial paraphrasing. Extending to paraphrase attacks is the
-single most important empirical extension for a full version.
+$\delta_{\mathrm{eff}}=0.20$}, and NLLB-200 back-translation through
+four pivots (FR, DE, RU, ZH;
+\autoref{tab:translation-pivots}). We do not include
+grammar-preserving paraphrase attacks (e.g.\ DIPPER); the strongest
+robustness claim we make is therefore against translation and
+uniform substitution, not against adversarial paraphrasing.
+Extending to paraphrase attacks is the single most important
+empirical extension for a full version.
 
 \paragraph{Empirical FPR drift at the analytic threshold.}
 \autoref{tab:cal-sstar} shows that the empirical false-positive

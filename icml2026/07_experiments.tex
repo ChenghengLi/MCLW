@@ -8,7 +8,9 @@ at matched budget and (ii)~validate the three principal predictions
 of \autoref{thm:detection}, \autoref{thm:robustness}, and
 \autoref{thm:k-regular} on a fleet of generations spanning three
 instruct-tuned 7--8B models, four content domains, and three attack
-conditions (\emph{clean}, random-substitution, ZH back-translation).
+conditions in the headline grid (\emph{clean}, random-substitution,
+ZH back-translation), with Exp.~3 extending to four NLLB pivots
+(FR, DE, RU, ZH).
 The campaign comprises four complementary sub-experiments.
 Exp.~2 (\autoref{subsec:exp2-headline}) is the
 head-to-head against the canonical KGW baseline and the SWEET
@@ -276,19 +278,20 @@ the empirical FPR estimate at the analytic threshold $z_\alpha$;
 the watermarked outputs feed the TPR.
 
 \autoref{thm:detection} predicts that the null-distribution
-$z$-score satisfies a Gaussian-tail upper bound of
-$\mathrm{FPR} \leq \exp(-2 z_\alpha^2)$ once $S$ is large enough
-that the gated-position fingerprint mean is well-separated from
-$1/S$ (the underlying Hoeffding step appears in \autoref{app:proofs}).
-The minimum admissible state count $S^\star$ is the closed form
-derived in \autoref{app:proofs}.
+$z$-score satisfies a Hoeffding-style upper bound
+$\mathrm{FPR} \leq \exp(-2 z_\alpha^2)$ on i.i.d.\ random token
+sequences (proof in \autoref{app:proofs}). The minimum admissible
+state count $S^\star$ for a given target $\alpha$ is the closed
+form derived in \autoref{app:proofs}; the matching Gaussian-tail
+calibration of \autoref{thm:detection} is what we use throughout
+the body for $z_\alpha$.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{pictures/fig_cal_fpr.pdf}
   \caption{\textbf{Calibration anchor.} Empirical FPR on
     non-watermarked completions as a function of state count $S$,
-    with the closed-form Gaussian-tail upper bound from
+    with the closed-form Hoeffding upper bound from
     \autoref{thm:detection}. Threshold fixed at $z_\alpha$ for
     $\alpha = 0.01$.}
   \label{fig:cal-fpr}

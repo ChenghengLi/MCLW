@@ -16,7 +16,7 @@
     at $25$ prompts each ($n=100$ per row); the Mistral row covers
     only three domains (factual, wiki, writing; $n=75$). ZH is the
     most aggressive pivot ($\delta_{\mathrm{eff}}\approx 0.81$);
-    FR/DE are gentler ($\delta_{\mathrm{eff}}\approx 0.69$).}
+    FR, DE, RU are gentler ($\delta_{\mathrm{eff}}\approx 0.69$).}
   \label{tab:translation-pivots}
   \small
   \begin{tabular}{lrrrrrr}
@@ -100,8 +100,9 @@
     $z^\star = \max_i z_{\mathrm{nwm},i} + 0.5$.} Computed on the
     held-out non-watermarked corpus ($\sim 1000$ samples per model).
     Watermarked text retains TPR$=100\%$ because clean MCL $z$
-    ($\approx 25$--$40$) is several times the maximum observed null
-    $z$. KGW and SWEET cannot achieve this regime because their
+    at the canonical $S=5$ ($\approx 25$ across the three models;
+    \autoref{tab:cal-sstar}) is several times the maximum observed
+    null $z$. KGW and SWEET cannot achieve this regime because their
     watermarked and non-watermarked $z$-distributions overlap.}
   \label{tab:fpr-zero}
   \small
