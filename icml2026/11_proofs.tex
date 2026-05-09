@@ -371,8 +371,9 @@ recall the definition for the appendix.
   Fix any $k$-regular adjacency $T$ and let $p_0 = k/S$.  Apply
   \autoref{alg:embed} and \autoref{alg:detect} with $T$ in place of
   the clockwork matrix.  Then for an i.i.d.\ random null sequence
-  $\mathbf{t}^r$ and a watermarked sequence $\mathbf{t}^w$ with gate
-  density $\rho$,
+  $\mathbf{t}^r$, a watermarked sequence $\mathbf{t}^w$ with gate
+  density $\rho$, and an oracle-blind adversary with per-token
+  replacement rate $\delta$ (as in \autoref{thm:robustness}),
   \begin{align}
     \mathbb{E}[\phi(\mathbf{t}^r)] &= p_0,
       \label{eq:kreg-null}\\
@@ -521,7 +522,7 @@ recall the definition for the appendix.
 \subsection{Optimal LM-Aware Detector}
 \label{subsec:proof-hdd}
 
-\begin{theorem}[Entropy-weighted detector is asymptotically Neyman--Pearson optimal]
+\begin{theorem}[Entropy-weighted detector is asymptotically locally most powerful]
   \label{thm:hdd}
   Suppose the verifier has access to the LM at each position, and
   let $g_i \in \{0,1\}$ denote the gate indicator at position $i$.
@@ -537,9 +538,13 @@ recall the definition for the appendix.
         \left[ X_i \log(\pi_i S)
           + (1 - X_i) \log \tfrac{1 - \pi_i}{1 - 1/S}\right].
   \end{equation}
-  Then the test $\{\Lambda > c_\alpha\}$ is asymptotically
-  Neyman--Pearson optimal under the product-form approximation
-  among all size-$\alpha$ tests with the known entropy profile.
+  Then the test $\{\Lambda > c_\alpha\}$, with $c_\alpha$ the
+  size-$\alpha$ critical value of $\Lambda$ under the null, is
+  asymptotically locally most powerful within the product hypothesis
+  class — i.e.\ it attains the Neyman--Pearson power against the
+  product-form approximation of the joint law, with the
+  $1$-dependence of $\{X_i\}$ contributing only $o(1)$ corrections
+  in the LAN regime.
 \end{theorem}
 
 \begin{proof}

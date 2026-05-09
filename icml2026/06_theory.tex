@@ -5,7 +5,7 @@
 This section gives an intuitive tour of three core results
 (detection, robustness, $k$-regular generalisation) plus two
 supporting properties (security against an oracle-blind adversary,
-and an LM-aware Neyman--Pearson optimal detector).  Formal
+and an LM-aware locally most powerful detector).  Formal
 statements and proofs are deferred to \autoref{app:proofs}; we collect
 their pointers here so the body remains a narrative.  Empirical
 anchoring of \autoref{thm:detection} appears in
@@ -89,6 +89,6 @@ text (\autoref{thm:security}; computational, not
 information-theoretic, and excluding adversaries with LM access). A
 verifier that \emph{does} have LM access can sharpen detection by
 replacing $\phi$ with an entropy-weighted log-likelihood ratio that is
-asymptotically Neyman--Pearson optimal under the random-oracle
+asymptotically locally most powerful under the random-oracle
 product-form approximation (\autoref{thm:hdd}). Detector pseudocode
 appears as \autoref{alg:detect-app}.
