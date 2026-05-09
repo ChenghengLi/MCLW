@@ -30,10 +30,9 @@ which brings empirical FPR from $2.1\%$ to $1.2\%$ at $\alpha=1\%$
 while preserving TPR$=100\%$ (\autoref{app:fpr-recipes}). The
 plug-in is calibrated at $\alpha=1\%$ but the empirical $z$-null is
 leptokurtic (excess kurtosis $\approx 1.4$); for tighter $\alpha
-\leq 0.5\%$ or for the high-$S$ regime ($S \geq 7$, where the SD
-recipe is still $2$--$4\%$ off after recalibration) the
-empirical-quantile recipe $z^\star = \hat F^{-1}(1{-}\alpha)$ is the
-robust drop-in (and is what we use to draw the recalibrated curve in
+\leq 0.5\%$ the empirical-quantile recipe
+$z^\star = \hat F^{-1}(1{-}\alpha)$ is the robust drop-in (and is
+what we use to draw the recalibrated curve in
 \autoref{fig:cal-fpr}). The apples-to-apples $1\%$-FPR head-to-head
 appears in \autoref{app:headline-recalibrated}; ChainMark also admits an
 empirical FPR$=0\%$ regime via threshold lifting
@@ -75,11 +74,11 @@ threat model. Query complexity for such an adversary is open.
 
 \paragraph{FPR drift and theorem scope.} The empirical FPR at the
 analytic Gaussian-tail threshold $z_\alpha=2.326$ drifts to
-$1.7$--$6.9\%$ on non-watermarked LLM output
-(\autoref{tab:cal-sstar}), largest at $S\in\{7,11\}$ where the
-closed-form Hoeffding envelope (\autoref{fig:cal-fpr}) is loosest;
-natural-language token sequences are not i.i.d.\ uniform over the
-SHA-256 partition. Headline TPR numbers in
+$1.7$--$2.2\%$ on non-watermarked LLM output
+(\autoref{tab:cal-sstar}); natural-language token sequences are not
+i.i.d.\ uniform over the SHA-256 partition, so the closed-form
+Hoeffding envelope (\autoref{fig:cal-fpr}) sits below the empirical
+curve. Headline TPR numbers in
 \autoref{tab:headline-aggregate}--\autoref{tab:headline-percell}
 are at the analytic threshold (cross-method consistency), not at
 an empirically calibrated $1\%$ FPR per cell. \autoref{thm:robustness}

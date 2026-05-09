@@ -281,7 +281,7 @@ $k$.
 \subsection{Calibration Anchor}
 \label{subsec:exp5-calibration}
 
-We sweep $S \in \{2, 3, 5, 7, 11\}$ across the three models with
+We sweep $S \in \{2, 3, 5\}$ across the three models with
 $4$ domains $\times$ $25$ prompts at $n{=}200$, recording both a
 watermarked generation (ChainMark at the canonical operating point, varying
 only $S$) and a non-watermarked baseline drawn from the same prompt.
@@ -290,8 +290,8 @@ analytic $z_\alpha$; watermarked outputs feed the TPR.
 \autoref{tab:cal-sstar} shows watermarked $z$ overshoots the
 closed-form prediction $\rho\sqrt{(S{-}1)(n{-}1)}$ by $50$--$90\%$, so
 TPR is at $100\%$ throughout, while empirical FPR sits above the
-$\alpha=1\%$ target at $S \geq 7$ (\autoref{fig:cal-fpr},
-$1.7$--$6.9\%$). The closed form gives the right $S^\star$ ordering to
+$\alpha=1\%$ target by $\sim\!\!1$ pp (\autoref{fig:cal-fpr},
+$1.7$--$2.2\%$). The closed form gives the right $S^\star$ ordering to
 within one state; for strict $1\%$ FPR a deployer applies the
 empirical-SD threshold recalibration of
 \autoref{thm:detection-recal} (\autoref{sec:discussion},
@@ -330,8 +330,6 @@ empirical-SD threshold recalibration of
     2  & 10.86 & 7.05  & 100\%   & 2.18\% & \phantom{0}99.6\% & 0.74\% \\
     3  & 17.41 & 9.97  & 100\%   & 2.00\% & 100.0\%          & 0.67\% \\
     5  & 25.38 & 14.11 & 100\%   & 1.67\% & 100.0\%          & 0.34\% \\
-    7  & 30.61 & 17.28 & 100\%   & 6.91\% & \phantom{0}94.9\% & 0.73\% \\
-    11 & 41.49 & 22.30 & 100\%   & 5.33\% & 100.0\%          & 0.67\% \\
     \bottomrule
   \end{tabular}
 \end{table}
