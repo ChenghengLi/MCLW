@@ -75,12 +75,11 @@ to gate $\rho = 0.5$ of positions; this is the high-entropy gate
 that aligns with our $G_{H_{\mathrm{high}}}$ but in the
 green/red-list scheme.
 
-\textbf{Attacks.} Each generated text is scored under four
+\textbf{Attacks.} Each generated text is scored under three
 conditions: \emph{clean} (no attack); \emph{random-substitution} at
-effective edit distance $\delta_{\mathrm{eff}} = 0.20$;
-\emph{back-translation} via NLLB-200 EN$\to$ZH$\to$EN; and
-\emph{paraphrase} via DIPPER~\citep{krishna2023paraphrasing}. For
-the latter two, the empirical $\delta_{\mathrm{eff}}$ is recorded
+effective edit distance $\delta_{\mathrm{eff}} = 0.20$; and
+\emph{back-translation} via NLLB-200 EN$\to$ZH$\to$EN. For the
+back-translation, the empirical $\delta_{\mathrm{eff}}$ is recorded
 per output via token-edit distance to the original.
 
 \textbf{Reporting.} The primary metric is true-positive rate at a
@@ -109,23 +108,24 @@ domain, and prompt set.
     (HumanEval code, factual, wiki, writing) with 100 prompts per
     (method, model, domain) cell at $n=200$ tokens. \textbf{MCL} (ours):
     $S=5$, $\rho=0.5$, $G_{H_{\mathrm{high}}}$. \textbf{KGW}:
-    $\gamma=0.5$, $\delta=2$. \textbf{SWEET}: KGW with high-entropy gate
-    at $\rho=0.5$ matched to MCL. Median PPL is on the watermarked
-    model's own logits (see \autoref{sec:discussion} for caveats); the
-    DIPPER paraphrase column is deferred to the extended version.
-    Empirical FPR drift at this threshold is reported separately in
-    \autoref{tab:cal-sstar}. Bold = best per column.}
+    $\gamma=0.5$, $\delta_{\mathrm{KGW}}=2$. \textbf{SWEET}: KGW with
+    high-entropy gate at $\rho=0.5$ matched to MCL. Median PPL is on
+    the watermarked model's own logits (see \autoref{sec:discussion}
+    for caveats). The SWEET aggregate is over $9$ complete cells
+    (Qwen-2.5-7B factual/wiki/writing in flight at submission); MCL/KGW
+    cover all $12$. Empirical FPR drift at this threshold is reported
+    separately in \autoref{tab:cal-sstar}. Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
   \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{lcccc}
+  \begin{tabular}{lccccc}
     \toprule
-    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
+    Method & cells & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
             TPR$_{\mathrm{ZH}}$ & median PPL \\
     \midrule
-    \textbf{MCL (ours)} & \textbf{100.0\%} & \textbf{99.9\%} & \textbf{72.8\%} & 3.09 \\
-    KGW                 & 74.8\%  & 55.1\%  & 19.4\%  & \textbf{1.87} \\
-    SWEET               & 71.8\%  & 51.2\%  & 18.0\%  & 1.76 \\
+    \textbf{MCL (ours)} & 12/12 & \textbf{100.0\%} & \textbf{99.9\%} & \textbf{72.8\%} & 3.10 \\
+    KGW                 & 12/12 & 76.5\%  & 56.2\%  & 21.9\%  & \textbf{1.85} \\
+    SWEET               &  9/12 & 65.6\%  & 45.2\%  & 18.8\%  & 1.68 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -155,18 +155,18 @@ that holds gating policy fixed against MCL.
     & & \multicolumn{3}{c|}{Clean} & \multicolumn{3}{c}{ZH back-translation} \\
     Model & Domain & MCL & KGW & SWEET & MCL & KGW & SWEET \\
     \midrule
-    Llama-3.1-8B & code     & \textbf{100} & 59 & 44 & \textbf{59} & 25 & 28 \\
-    Llama-3.1-8B & factual  & \textbf{100} & 92 & 79 & \textbf{73} & 25 & 25 \\
-    Llama-3.1-8B & wiki     & \textbf{100} & 87 & 72 & \textbf{72} & 19 & 11 \\
-    Llama-3.1-8B & writing  & \textbf{100} & 99 & \textbf{100} & \textbf{78} & 21 & 20 \\
-    Qwen-2.5-7B  & code     & \textbf{100} & 39 & 41 & \textbf{59} & 23 & 19 \\
-    Qwen-2.5-7B  & factual  & \textbf{100} & 61 & 62 & \textbf{78} & 15 & 11 \\
-    Qwen-2.5-7B  & wiki     & \textbf{100} & 76 & 73 & \textbf{80} &  6 & 10 \\
-    Qwen-2.5-7B  & writing  & \textbf{100} & \textbf{100} & \textbf{100} & \textbf{83} & 12 & 12 \\
-    Mistral-7B   & code     & \textbf{100} & 49 & 52 & \textbf{79} & 12 & 12 \\
-    Mistral-7B   & factual  & \textbf{100} & 86 & 85 & \textbf{70} & 37 & 29 \\
-    Mistral-7B   & wiki     & \textbf{100} & 50 & 55 & \textbf{70} & 16 & 16 \\
-    Mistral-7B   & writing  & \textbf{100} & 99 & 99 & \textbf{73} & 22 & 23 \\
+    Llama-3.1-8B & code     & \textbf{100} & 57 & 41 & \textbf{56} & 24 & 18 \\
+    Llama-3.1-8B & factual  & \textbf{100} & 93 & 80 & \textbf{75} & 30 & 22 \\
+    Llama-3.1-8B & wiki     & \textbf{100} & 91 & 69 & \textbf{76} & 19 & 11 \\
+    Llama-3.1-8B & writing  & \textbf{100} & \textbf{100} & \textbf{100} & \textbf{76} & 33 & 20 \\
+    Qwen-2.5-7B  & code     & \textbf{100} & 40 & 34 & \textbf{58} & 26 & 22 \\
+    Qwen-2.5-7B  & factual  & \textbf{100} & 100 & --- & ---  & ---  & ---  \\
+    Qwen-2.5-7B  & wiki     & \textbf{100} & 100 & --- & ---  & ---  & ---  \\
+    Qwen-2.5-7B  & writing  & \textbf{100} & 100 & --- & ---  & ---  & ---  \\
+    Mistral-7B   & code     & \textbf{100} & 54 & 44 & \textbf{78} & 15 & 10 \\
+    Mistral-7B   & factual  & \textbf{100} & 89 & 80 & \textbf{71} & 31 & 29 \\
+    Mistral-7B   & wiki     & \textbf{100} & 52 & 44 & \textbf{70} & 18 &  9 \\
+    Mistral-7B   & writing  & \textbf{100} & 96 & 97 & \textbf{73} & 25 & 29 \\
     \bottomrule
   \end{tabular}
 \end{table*}

@@ -97,13 +97,9 @@ cell in \autoref{sec:experiments}.
     the NLLB-200 distilled model~\citep{nllbteam2022nllb}, where
     $L \in \{\text{French}, \text{German}, \text{Russian}, \text{Chinese}\}$.
     Each language constitutes a separate cell.
-  \item \textbf{Paraphrase:} DIPPER~\citep{krishna2023paraphrasing} with
-    its default lexical and order diversity. DIPPER does not expose
-    a public RNG seed, so paraphrase outputs are not bit-exact
-    across reruns; we mitigate by reporting per-prompt deltas from a
-    fixed generation pool rather than aggregate point estimates of
-    paraphrased text.
 \end{itemize}
+We do not include grammar-preserving paraphrase attacks in this
+release; their evaluation is deferred to the extended version.
 
 \subsection{Randomisation}
 

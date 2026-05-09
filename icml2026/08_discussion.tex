@@ -57,14 +57,14 @@ every $k$-regular topology; we validate $k=1$ (clockwork) and $k=2$
 (soft-cycle) empirically. $k=3$ and beyond are deferred to the
 extended version of this paper.
 
-\paragraph{DIPPER paraphrase non-determinism.} Our paraphrase attack
-uses DIPPER without an internal seed, so reruns are not bit-exact.
-We mitigate by reporting per-prompt deltas from a fixed pool of
-generations rather than aggregate point estimates of the attack
-output, but the residual variance is real. The headline tables
-report only the clean / random-substitution / ZH back-translation
-columns; a fully populated DIPPER column is deferred to the extended
-version.
+\paragraph{Translation-only robustness scope.} Our robustness
+evaluation covers \emph{clean}, \emph{random-substitution at
+$\delta_{\mathrm{eff}}=0.20$}, and \emph{NLLB-200 EN$\to$ZH$\to$EN
+back-translation}. We do not include grammar-preserving paraphrase
+attacks (e.g.\ DIPPER); the strongest robustness claim we make is
+therefore against translation and uniform substitution, not against
+adversarial paraphrasing. Extending to paraphrase attacks is the
+single most important empirical extension for a full version.
 
 \paragraph{Empirical FPR drift at the analytic threshold.}
 \autoref{tab:cal-sstar} shows that the empirical false-positive
