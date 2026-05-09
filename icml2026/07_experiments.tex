@@ -68,8 +68,8 @@ domains $\times$ 4 attack conditions, with 100 prompts per
 operating point $S{=}5$, $\rho = 0.5$, gate $G_{H_{\mathrm{high}}}$,
 clockwork ($k{=}1$). \emph{KGW}~\citep{kirchenbauer2023watermark}
 uses its standard parameters $\gamma = 0.5$ and logit bias
-$\delta = 2$. \emph{SWEET}~\citep{lee2023sweet} retains the same
-$\gamma = 0.5$, $\delta = 2$ but applies the watermark only at
+$\delta_{\mathrm{KGW}} = 2$. \emph{SWEET}~\citep{lee2023sweet} retains the same
+$\gamma = 0.5$, $\delta_{\mathrm{KGW}} = 2$ but applies the watermark only at
 positions whose token-level entropy exceeds a threshold calibrated
 to gate $\rho = 0.5$ of positions; this is the high-entropy gate
 that aligns with our $G_{H_{\mathrm{high}}}$ but in the
@@ -92,7 +92,7 @@ domain, and prompt set.
   \includegraphics[width=0.95\linewidth]{pictures/fig_headline_tpr.pdf}
   \caption{\textbf{Head-to-head TPR comparison across attacks.}
     MCL ($S{=}5$, $\rho{=}0.5$, $G_{H_{\mathrm{high}}}$, $k{=}1$)
-    vs KGW ($\gamma{=}0.5, \delta{=}2$) vs SWEET (same KGW params,
+    vs KGW ($\gamma{=}0.5, \delta_{\mathrm{KGW}}{=}2$) vs SWEET (same KGW params,
     high-entropy gating at $\rho{=}0.5$). Aggregated over
     Llama-3.1-8B, Qwen-2.5-7B, Mistral-7B-v0.3 and four domains
     (code / factual / wiki / writing).}

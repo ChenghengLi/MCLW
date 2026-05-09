@@ -3,12 +3,12 @@
 \label{app:proofs}
 
 This appendix collects the formal versions of the results previewed
-in \autoref{sec:theory}.  Throughout, $\sigma_k(t) = \mathcal{H}(k
+in \autoref{sec:theory}.  Throughout, $\sigma_\kappa(t) = \mathcal{H}(\kappa
 \,\Vert\, t) \bmod S$ denotes the keyed state map and is treated as a
 random oracle (uniform on $\mathcal{S}$ and independent across
 distinct tokens).  $\phi$ is the fingerprint score of
 \autoref{def:phi}, and we write $X_i =
-\mathbf{T}_{\sigma_k(t_i),\sigma_k(t_{i+1})}$ for the validity
+\mathbf{T}_{\sigma_\kappa(t_i),\sigma_\kappa(t_{i+1})}$ for the validity
 indicator at step $i$, with $T = \mathbf{T}^{\mathrm{clk}}$ in the
 clockwork case.
 
@@ -24,7 +24,7 @@ universal robustness threshold; we isolate it as a lemma.
   every column has exactly $k$ ones, with $1 \leq k \leq S{-}1$, and
   set $p_0 = k/S$.  Under the random oracle null
   (i.i.d.\ uniform tokens), the indicators
-  $X_i = T_{\sigma_k(t_i), \sigma_k(t_{i+1})}$ satisfy
+  $X_i = T_{\sigma_\kappa(t_i), \sigma_\kappa(t_{i+1})}$ satisfy
   $\mathbb{E}[X_i] = p_0$ and $\mathrm{Cov}(X_i, X_j) = 0$ for all
   $i \neq j$, hence
   \begin{equation}
@@ -39,11 +39,11 @@ universal robustness threshold; we isolate it as a lemma.
   T(s,s')=1\}$; by $k$-regularity, $|N^+(s)| = |N^-(s')| = k$ for
   every $s, s'$.
 
-  \emph{Marginal mean.}  Conditioning on $\sigma_k(t_i)$ and using
+  \emph{Marginal mean.}  Conditioning on $\sigma_\kappa(t_i)$ and using
   row-regularity,
   \(
     \Pr[X_i = 1]
-      = \mathbb{E}\!\left[ |N^+(\sigma_k(t_i))| / S \right]
+      = \mathbb{E}\!\left[ |N^+(\sigma_\kappa(t_i))| / S \right]
       = k/S = p_0.
   \)
 
@@ -55,19 +55,19 @@ universal robustness threshold; we isolate it as a lemma.
   $\mathrm{Cov}(X_i, X_j) = 0$.
 
   \emph{Adjacent pairs.}  $X_i$ and $X_{i+1}$ share the token
-  $t_{i+1}$.  Conditioning on $\sigma_k(t_{i+1}) = s'$, we have
+  $t_{i+1}$.  Conditioning on $\sigma_\kappa(t_{i+1}) = s'$, we have
   \[
-    \Pr[X_i = 1 \mid \sigma_k(t_{i+1}) = s']
+    \Pr[X_i = 1 \mid \sigma_\kappa(t_{i+1}) = s']
       \;=\; |N^-(s')| / S \;=\; p_0,
   \]
   \[
-    \Pr[X_{i+1} = 1 \mid \sigma_k(t_{i+1}) = s']
+    \Pr[X_{i+1} = 1 \mid \sigma_\kappa(t_{i+1}) = s']
       \;=\; |N^+(s')| / S \;=\; p_0,
   \]
   using \emph{column}-regularity for the first identity.  Conditional
-  on $\sigma_k(t_{i+1})$, the indicators $X_i$ and $X_{i+1}$ depend
-  on the disjoint random-oracle evaluations $\sigma_k(t_i)$ and
-  $\sigma_k(t_{i+2})$, so they are conditionally independent.
+  on $\sigma_\kappa(t_{i+1})$, the indicators $X_i$ and $X_{i+1}$ depend
+  on the disjoint random-oracle evaluations $\sigma_\kappa(t_i)$ and
+  $\sigma_\kappa(t_{i+2})$, so they are conditionally independent.
   Therefore
   \[
     \Pr[X_i = X_{i+1} = 1]
@@ -125,13 +125,13 @@ universal robustness threshold; we isolate it as a lemma.
 \end{theorem}
 
 \begin{proof}
-  \emph{Null mean.}  Under the random oracle, $\sigma_k$ is uniform
+  \emph{Null mean.}  Under the random oracle, $\sigma_\kappa$ is uniform
   and independent across distinct tokens, so $X_i \sim
   \mathrm{Bernoulli}(1/S)$ marginally and
   $\mathbb{E}[\phi(\mathbf{t}^r)] = 1/S$.
 
   \emph{Watermark mean.}  At a gated position,
-  \autoref{alg:embed} sets $\sigma_k(t_{i+1}) = (\sigma_k(t_i) + 1)
+  \autoref{alg:embed} sets $\sigma_\kappa(t_{i+1}) = (\sigma_\kappa(t_i) + 1)
   \bmod S$, so $X_i = 1$ deterministically.  At an ungated position,
   $X_i \sim \mathrm{Bernoulli}(1/S)$.  With gate density $\rho$,
   \[
@@ -195,7 +195,7 @@ universal robustness threshold; we isolate it as a lemma.
 \begin{theorem}[Universal robustness threshold]
   \label{thm:robustness}
   Suppose each token is independently replaced with probability
-  $\delta$ by a fresh token whose state $\sigma_k$ is uniform on
+  $\delta$ by a fresh token whose state $\sigma_\kappa$ is uniform on
   $\mathcal{S}$.  Then for clockwork MCL with state count $S$ and
   gate density $\rho$,
   \begin{equation}
@@ -324,8 +324,8 @@ recall the definition for the appendix.
 
   \emph{Watermark mean.}  At a gated position,
   \autoref{alg:embed} restricts the argmax to $\bigcup_{s' \in
-    N^+(s)} \mathcal{V}_{s'}$, so $\sigma_k(t_{i+1}) \in
-  N^+(\sigma_k(t_i))$, i.e., $X_i = 1$.  At an ungated position, $X_i
+    N^+(s)} \mathcal{V}_{s'}$, so $\sigma_\kappa(t_{i+1}) \in
+  N^+(\sigma_\kappa(t_i))$, i.e., $X_i = 1$.  At an ungated position, $X_i
   \sim \mathrm{Bernoulli}(p_0)$.  Averaging,
   $\mathbb{E}[\phi(\mathbf{t}^w)] = \rho + (1-\rho) p_0 = p_0 +
   \rho (1-p_0)$.
@@ -350,7 +350,7 @@ recall the definition for the appendix.
 \end{proof}
 
 % PROOF REVIEW NOTE: The baseline $p_0 = k/S$ assumes the SHA-256
-% partition $\sigma_k$ is approximately uniform over the
+% partition $\sigma_\kappa$ is approximately uniform over the
 % vocabulary.  Formally we model $\mathcal{H}$ as a random oracle;
 % in deployment this rests on the avalanche property of SHA-256,
 % which guarantees that for distinct inputs the output bits are
@@ -386,7 +386,7 @@ recall the definition for the appendix.
 \begin{theorem}[Pseudorandomness under random oracle, oracle-blind
     adversary]
   \label{thm:security}
-  Assume the secret key $k$ has min-entropy at least $\lambda$ and
+  Assume the secret key $\kappa$ has min-entropy at least $\lambda$ and
   $\mathcal{H}$ is modelled as a random oracle.  Consider a
   polynomial-time adversary $\mathcal{A}$ \emph{without} access to
   the random oracle, \emph{without} access to the LM (or its
@@ -408,7 +408,7 @@ recall the definition for the appendix.
 \end{theorem}
 
 \begin{proof}
-  Without~$k$, the adversary's view of $\mathcal{H}(k \,\Vert\, t)$
+  Without~$\kappa$, the adversary's view of $\mathcal{H}(\kappa \,\Vert\, t)$
   for any $t$ is uniform on the oracle output space.  Recovery
   probability $q \cdot 2^{-\lambda}$ follows from a standard
   guessing argument over a min-entropy-$\lambda$ key.  State
@@ -419,9 +419,9 @@ recall the definition for the appendix.
   For (iii): any statistic $\mathcal{D}(\mathbf{t})$ measurable in
   the token IDs alone that achieves non-trivial advantage
   $\varepsilon$ under the i.i.d.\ uniform null can be re-expressed
-  as a function of $\sigma_k$-dependent structure (since for an
+  as a function of $\sigma_\kappa$-dependent structure (since for an
   adversary with no LM access, the conditional distribution of
-  $\mathbf{t}^w$ given $\sigma_k$ is parameter-free in everything
+  $\mathbf{t}^w$ given $\sigma_\kappa$ is parameter-free in everything
   except the gate sequence and the partition).  Such a function
   yields a state-predictor with advantage at least $\varepsilon$ on
   some fresh token, contradicting (ii) by a hybrid argument.  Hence
@@ -511,8 +511,8 @@ reading; the body version is \autoref{alg:detect}.
     \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(x)$;
       $c \leftarrow 0$;\ $n \leftarrow |\mathbf{t}|$
     \FOR{$i = 1$ {\bfseries to} $n-1$}
-      \STATE $s_i \leftarrow \mathcal{H}(k \,\Vert\, t_i) \bmod S$;\
-        $s_{i+1} \leftarrow \mathcal{H}(k \,\Vert\, t_{i+1}) \bmod S$
+      \STATE $s_i \leftarrow \mathcal{H}(\kappa \,\Vert\, t_i) \bmod S$;\
+        $s_{i+1} \leftarrow \mathcal{H}(\kappa \,\Vert\, t_{i+1}) \bmod S$
       \IF{$T[s_i, s_{i+1}] > 0$}
         \STATE $c \leftarrow c + 1$
       \ENDIF
@@ -577,7 +577,7 @@ they are referenced from elsewhere in the paper.
   Let $\mathcal{T}_k \subseteq \mathcal{V}$ be the set of tokens
   the adversary has queried with the correct key.  For any token
   $t' \notin \mathcal{T}_k$ that the adversary introduces,
-  $\sigma_k(t')$ is uniform on $\mathcal{S}$ by the random-oracle
+  $\sigma_\kappa(t')$ is uniform on $\mathcal{S}$ by the random-oracle
   property, so each modified position contributes an indicator
   distributed as $\mathrm{Bernoulli}(1/S)$ to the validity count,
   independently of strategy.  Hence the expected mass contributed
@@ -596,7 +596,7 @@ they are referenced from elsewhere in the paper.
   $1/S$ by the same column- and row-regularity argument as in
   \autoref{thm:robustness}.  Strategies in which the adversary
   introduces previously-queried tokens (whose state is in
-  $\sigma_k(\mathcal{T}_k)$) can craft pairs that hit valid
+  $\sigma_\kappa(\mathcal{T}_k)$) can craft pairs that hit valid
   transitions deterministically, raising $\phi$ above
   $\Sigma(\delta)$ --- which only helps detection.  The lower bound
   $\Sigma(\delta) \geq \delta(2-\delta)/S$ is therefore strategy-free.
@@ -605,7 +605,7 @@ they are referenced from elsewhere in the paper.
 % PROOF REVIEW NOTE: The original self-healing proof claimed
 % strategy independence without distinguishing the case where the
 % adversary's introduced tokens happen to lie in
-% $\sigma_k(\mathcal{T}_k)$.  We have made the lower-bound
+% $\sigma_\kappa(\mathcal{T}_k)$.  We have made the lower-bound
 % direction explicit (the adversary can only \emph{help} detection
 % above the random-substitution floor) and stated the equality
 % condition (every introduced token is unqueried).

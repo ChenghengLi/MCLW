@@ -67,10 +67,10 @@ approximately uniform across the vocabulary --- an assumption we
 inherit from the standard avalanche property of cryptographic hashes.
 
 \paragraph{Security against an oracle-blind adversary.}
-The state map $\sigma_k(t) = \mathcal{H}(k \,\Vert\, t) \bmod S$ uses
+The state map $\sigma_\kappa(t) = \mathcal{H}(\kappa \,\Vert\, t) \bmod S$ uses
 a hash modelled as a random oracle.  An adversary without access to
 $k$, without access to the LM, and without reference text cannot
-predict $\sigma_k(t^\star)$ on a fresh token with advantage better
+predict $\sigma_\kappa(t^\star)$ on a fresh token with advantage better
 than negligible in the key min-entropy.  Consequently the same
 adversary cannot statistically distinguish MCL output from random
 text with non-negligible advantage.  This is a computational, not

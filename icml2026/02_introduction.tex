@@ -80,7 +80,7 @@ treatment is in \autoref{sec:method} and \autoref{sec:theory}.
     \node[paneltitle] at (1.80, 4.95) {\large A.~Clockwork chain};
     \node[font=\footnotesize, color=black!75, anchor=base]
       at (1.80, 4.30)
-      {$\sigma_k(t) = \mathrm{SHA\text{-}256}(k\,\Vert\,t)\bmod S$};
+      {$\sigma_\kappa(t) = \mathrm{SHA\text{-}256}(k\,\Vert\,t)\bmod S$};
 
     \begin{scope}[shift={(1.80, 2.30)}]
       \foreach \i [evaluate=\i as \stt using {90 - \i*72},
@@ -224,7 +224,7 @@ treatment is in \autoref{sec:method} and \autoref{sec:theory}.
        {append $t_{i+1}$};
   \end{tikzpicture}
   \caption{\textbf{Markov Chain Lock at a glance.}
-    \textbf{(A)}~A keyed SHA-256 hash $\sigma_k$ partitions the
+    \textbf{(A)}~A keyed SHA-256 hash $\sigma_\kappa$ partitions the
     vocabulary into $S$ disjoint sets $\mathcal V_0, \dots,
     \mathcal V_{S-1}$ ordered into a clockwork cycle
     $s \to s{+}1 \bmod S$ (here $S{=}5$).
