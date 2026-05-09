@@ -112,14 +112,17 @@ class DipperAttacker:
         device: Optional[str] = None,
         dtype: torch.dtype = torch.bfloat16,
     ):
-        from transformers import T5ForConditionalGeneration, T5Tokenizer
+        from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
-        print(f"[DIPPER] Loading {model_name} ({dtype})...")
-        self.tokenizer = T5Tokenizer.from_pretrained(model_name)
-        self.model = T5ForConditionalGeneration.from_pretrained(
+        print(f"[DIPPER] Loading {model_name} ({dtype})...", flush=True)
+        # Use AutoTokenizer to pick the fast (tokenizers-library) variant when
+        # available, avoiding the legacy T5Tokenizer's sentencepiece dependency.
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model = AutoModelForSeq2SeqLM.from_pretrained(
             model_name, torch_dtype=dtype, device_map="auto"
         )
         self.model.eval()
+        print(f"[DIPPER] loaded ({sum(p.numel() for p in self.model.parameters())/1e9:.1f}B params)", flush=True)
 
     @torch.no_grad()
     def paraphrase(
@@ -136,18 +139,16 @@ class DipperAttacker:
         lex_code = 100 - lex_diversity
         order_code = 100 - order_diversity
 
-        # Sentence-wise chunking as in DIPPER README.
-        # nltk-3.9+ requires BOTH punkt and punkt_tab for sent_tokenize.
-        import nltk
-        for resource in ("tokenizers/punkt", "tokenizers/punkt_tab"):
-            try:
-                nltk.data.find(resource)
-            except LookupError:
-                nltk.download(resource.split("/", 1)[1], quiet=True)
-        from nltk.tokenize import sent_tokenize
-
+        # Sentence-wise chunking. We use a regex-based splitter rather than
+        # nltk.sent_tokenize because nltk-3.9+ requires the `punkt_tab`
+        # resource which is not always available offline; the regex split
+        # is good enough for paraphrase chunking and removes the dependency.
+        import re
         text = " ".join(text.split())
-        sents = sent_tokenize(text)
+        sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+        if not sents:
+            # Fall back to whole text as one chunk if no sentence terminators.
+            sents = [text] if text else []
         output = prefix
         for i in range(0, len(sents), sent_interval):
             chunk = " ".join(sents[i : i + sent_interval])
