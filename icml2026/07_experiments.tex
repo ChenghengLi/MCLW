@@ -39,8 +39,15 @@ operating point reported in the original paper at this $\gamma$).
 re-implementation: same $\gamma = 0.5$ and $\delta_{\mathrm{KGW}} = 2$
 but the green-list bias is applied only at the top-$\rho{=}0.5$
 fraction of positions by token-level entropy, so the budget aligns
-with ChainMark's $\rho$. Per-domain prompt-and-generation examples
-appear in \autoref{app:examples}.
+with ChainMark's $\rho$. Per-domain prompt-and-generation examples (with a token-level
+gating walkthrough) appear in \autoref{app:examples}. As an
+illustration, on the wiki prompt \texttt{Explain Donald Trump in a
+comprehensive way.} (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$),
+the first $14$ generated tokens visit states
+$2,3,4,0,1,2,3,4,4,4,0,1,2,3$ (one per token under
+$\sigma_\kappa$), of which $11$ pairs follow the clockwork cycle
+$s\!\to\!(s{+}1)\bmod 5$, giving $\phi{=}0.79$ and $z{\approx}5.3$
+on a $14$-token window, well above $z_{0.01}{=}2.326$.
 
 \begin{figure*}[t]
   \centering

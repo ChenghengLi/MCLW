@@ -68,3 +68,40 @@ The detector runs the same $\sigma_\kappa$ and counts valid
 transitions; reports $\phi$, the standardised $z$, and a binary
 flag at $z>z_\alpha$ (\autoref{alg:detect-app},
 \autoref{fig:refimpl}).
+
+\paragraph{Token-level walkthrough.}
+For the wiki prompt \texttt{Explain Donald Trump in a comprehensive
+way.} on Llama-3.1-8B-Instruct at $S{=}5$, $\rho{=}0.5$, an
+illustrative excerpt of the first $20$ generated tokens looks
+roughly as below. We show the (token, state) pair at each position
+and mark gated steps with $\bullet$ (the gate raised the mask;
+ChainMark forced $s_{i+1} = (s_i{+}1)\bmod 5$) versus ungated steps
+with $\circ$ (no mask; the model sampled freely):
+
+\begin{quote}\small\ttfamily
+\textbf{Donald}$_2$ $\circ$ \textbf{Trump}$_3$ $\circ$
+(\textbf{born}$_4$ $\bullet$ \textbf{June}$_0$ $\bullet$
+\textbf{14}$_1$ $\bullet$, \textbf{1946}$_2$ $\bullet$)
+\textbf{is}$_3$ $\bullet$ \textbf{a}$_4$ $\circ$ \textbf{former}$_4$
+$\circ$ \textbf{U.S.}$_0$ $\bullet$ \textbf{president}$_1$
+$\bullet$ \textbf{and}$_2$ $\bullet$ \textbf{businessman}$_3$
+$\bullet$ \dots
+\end{quote}
+
+At gated positions the next token's state is forced to be
+$(\text{prev}+1)\bmod 5$ (here $S{=}5$, so the cycle is
+$0{\to}1{\to}2{\to}3{\to}4{\to}0$); the model picks the highest-prob
+\emph{token} whose state matches that requirement. At ungated
+positions any token may follow. The gate threshold $\tau$ is
+calibrated on a pilot so the realised gate rate tracks $\rho{=}0.5$.
+
+\paragraph{Detection on this excerpt.}
+A regulator running the detector
+(\autoref{fig:refimpl}) on the same string with the same key $\kappa$
+re-derives the state sequence
+$2,3,4,0,1,2,3,4,4,4,0,1,2,3,\dots$ and
+observes $11/14$ valid transitions, i.e.\ $\phi=0.79$. With
+$p_0{=}0.20$ and $n{=}14$, $z = (0.79-0.20)/\sqrt{0.16/13} \approx
+5.3$, well above $z_{0.01}=2.326$, so the detector flags
+``watermarked''. A non-watermarked sample of the same length under
+the null distribution averages $\phi\approx 0.20$ and $z\approx 0$.
