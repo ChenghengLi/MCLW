@@ -109,7 +109,8 @@ domain, and prompt set.
     (method, model, domain) cell at $n=200$ tokens. \textbf{MCL} (ours):
     $S=5$, $\rho=0.5$, $G_{H_{\mathrm{high}}}$. \textbf{KGW}:
     $\gamma=0.5$, $\delta_{\mathrm{KGW}}=2$. \textbf{SWEET}: KGW with
-    high-entropy gate at $\rho=0.5$ matched to MCL. Median PPL is on
+    high-entropy gate at $\rho=0.5$ matched to MCL. The PPL column
+    is the median across the $12$ (model, domain) cell medians on
     the watermarked model's own logits (see \autoref{sec:discussion}
     for caveats). All three methods cover the full $12$ (model, domain)
     cells. Empirical FPR drift at this threshold is reported
@@ -198,7 +199,11 @@ overlaying the slope-1 identity.
     ZH\}$\to$EN pivots, with $\delta_{\mathrm{eff}}$ measured per
     generation. The closed-form $(1-\delta_{\mathrm{eff}})^2$
     prediction from \autoref{thm:robustness} is the diagonal.
-    Per-pivot TPR breakdown in \autoref{app:translation-pivots}.}
+    Llama and Qwen contribute $n=100$ per pivot ($4$ domains $\times
+    25$ prompts); Mistral contributes $n=75$ ($3$ domains: factual,
+    wiki, writing; the code domain did not complete in the cluster
+    window). Per-pivot TPR breakdown in
+    \autoref{app:translation-pivots}.}
   \label{fig:translation-decay}
 \end{figure*}
 
@@ -229,9 +234,11 @@ frequent attack regime on the open web.
   \centering
   \caption{\textbf{$k$-regular sanity check at $k{=}2$ (soft-cycle), $S{=}5$,
     $\rho{=}0.5$.} Predicted random baseline $p_0 = k/S = 0.40$. Wiki
-    domain, 100 prompts. Confirms the $k$-regular extension of
-    \autoref{thm:detection} (formal: \autoref{thm:k-regular},
-    \autoref{app:proofs}).}
+    domain, 100 prompts. The clean $\bar\phi_{\mathrm{cl}}$ values
+    ($\geq 0.88$) sit well above $p_0$ as predicted by
+    \autoref{thm:k-regular}, and the post-attack $z$ ratio
+    re-certifies \autoref{thm:robustness} at $k{=}2$ (formal
+    statements in \autoref{app:proofs}).}
   \label{tab:kregular}
   \small
   \setlength{\tabcolsep}{3.5pt}
@@ -267,18 +274,19 @@ the empirical FPR estimate at the analytic threshold $z_\alpha$;
 the watermarked outputs feed the TPR.
 
 \autoref{thm:detection} predicts that the null-distribution
-$z$-score satisfies a Hoeffding-style upper bound of
+$z$-score satisfies a Gaussian-tail upper bound of
 $\mathrm{FPR} \leq \exp(-2 z_\alpha^2)$ once $S$ is large enough
 that the gated-position fingerprint mean is well-separated from
-$1/S$; the minimum admissible state count $S^\star$ is the closed
-form derived in \autoref{app:proofs}.
+$1/S$ (the underlying Hoeffding step appears in \autoref{app:proofs}).
+The minimum admissible state count $S^\star$ is the closed form
+derived in \autoref{app:proofs}.
 
 \begin{figure}[t]
   \centering
   \includegraphics[width=\linewidth]{pictures/fig_cal_fpr.pdf}
   \caption{\textbf{Calibration anchor.} Empirical FPR on
     non-watermarked completions as a function of state count $S$,
-    with the closed-form Hoeffding upper bound from
+    with the closed-form Gaussian-tail upper bound from
     \autoref{thm:detection}. Threshold fixed at $z_\alpha$ for
     $\alpha = 0.01$.}
   \label{fig:cal-fpr}

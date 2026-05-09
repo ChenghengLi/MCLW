@@ -15,7 +15,7 @@
     Llama and Qwen cover four domains (factual, wiki, writing, code)
     at $25$ prompts each ($n=100$ per row); the Mistral row covers
     only three domains (factual, wiki, writing; $n=75$). ZH is the
-    most aggressive pivot ($\delta_{\mathrm{eff}}\approx 0.78$);
+    most aggressive pivot ($\delta_{\mathrm{eff}}\approx 0.81$);
     FR/DE are gentler ($\delta_{\mathrm{eff}}\approx 0.69$).}
   \label{tab:translation-pivots}
   \small
@@ -67,10 +67,11 @@
 \begin{table}[h]
   \centering
   \caption{\textbf{Empirically-calibrated head-to-head at
-    FPR$=1\%$.} Each method's threshold is the $99\%$ quantile of
-    its $z$-distribution on a non-watermarked calibration corpus
-    pooled across the three models (MCL: $z^\star=2.87$; KGW:
-    $z^\star=2.62$). MCL retains its TPR advantage at matched
+    FPR$=1\%$.} Each method's threshold is the maximum across the
+    per-model $99\%$ $z$-quantiles on a non-watermarked calibration
+    corpus (the conservative recipe; per-model nulls in MCL: Llama
+    $2.87$, Qwen $2.87$, Mistral $2.41$, so MCL $z^\star=2.87$;
+    KGW $z^\star=2.62$). MCL retains its TPR advantage at matched
     empirical FPR, confirming the analytical-threshold comparison in
     \autoref{tab:headline-aggregate} is not an FPR artefact. SWEET
     is omitted from this table: the SWEET null $z$-distribution was

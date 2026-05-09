@@ -101,7 +101,7 @@ single most important empirical extension for a full version.
 rate at the analytic Gaussian-tail threshold $z_\alpha = 2.326$ is
 1.7--6.9\,\% on non-watermarked LLM output, materially above the
 nominal 1\,\% target. The drift is largest at $S \in \{7, 11\}$,
-where the closed-form Hoeffding bound is loosest. This indicates
+where the closed-form Gaussian-tail bound is loosest. This indicates
 that natural-language token sequences are not i.i.d.\ random over
 the SHA-256 partition; the closed form is a usable starting point
 but a deployer targeting strict 1\,\% FPR should empirically
