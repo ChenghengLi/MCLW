@@ -36,6 +36,12 @@
 \usepackage{amsthm}
 
 \usepackage[capitalize,noabbrev]{cleveref}
+
+% hyperref \autoref renders "subsection 6.5" / "section 6" in
+% lowercase by default; capitalize them for academic style.
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Subsection}
+\renewcommand{\subsubsectionautorefname}{Subsubsection}
 \usepackage{enumitem}
 
 % Cleveref name declarations for the theorem-style environments
