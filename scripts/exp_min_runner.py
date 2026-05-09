@@ -469,8 +469,8 @@ def run_exp2(args, tok, model, device: str, out_dir: Path) -> None:
     with records_path.open("a" if args.append else "w") as fh_records:
         for method in methods_to_run:
             for domain, prompts in prompts_per_domain.items():
-            if args.only_domain and domain != args.only_domain:
-                continue
+                if args.only_domain and domain != args.only_domain:
+                    continue
                 if not prompts:
                     continue
                 print(f"\n[exp2] === method={method} domain={domain} N={len(prompts)} ===", flush=True)
