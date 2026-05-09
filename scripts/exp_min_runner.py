@@ -466,9 +466,11 @@ def run_exp2(args, tok, model, device: str, out_dir: Path) -> None:
     if getattr(args, "only_method", None):
         methods_to_run = (args.only_method,)
         print(f"[exp2] restricting to method={args.only_method} only", flush=True)
-    with records_path.open("w") as fh_records:
+    with records_path.open("a" if args.append else "w") as fh_records:
         for method in methods_to_run:
             for domain, prompts in prompts_per_domain.items():
+            if args.only_domain and domain != args.only_domain:
+                continue
                 if not prompts:
                     continue
                 print(f"\n[exp2] === method={method} domain={domain} N={len(prompts)} ===", flush=True)
@@ -571,8 +573,10 @@ def run_exp3(args, tok, model, device: str, out_dir: Path) -> None:
     records_path = out_dir / "records.jsonl"
     n_records = 0
 
-    with records_path.open("w") as fh:
+    with records_path.open("a" if args.append else "w") as fh:
         for domain, prompts in sub.items():
+            if args.only_domain and domain != args.only_domain:
+                continue
             if not prompts:
                 continue
             print(f"\n[exp3] domain={domain} N={len(prompts)}", flush=True)
@@ -645,7 +649,7 @@ def run_exp4(args, tok, model, device: str, out_dir: Path) -> None:
     records_path = out_dir / "records.jsonl"
     n_records = 0
 
-    with records_path.open("w") as fh:
+    with records_path.open("a" if args.append else "w") as fh:
         print(f"\n[exp4] k=2 soft_cycle, S={MCL_S}, ρ={MCL_RHO}, n_prompts={len(prompts)}", flush=True)
         for i, p in enumerate(prompts):
             base = mcl_generate(
@@ -717,7 +721,7 @@ def run_exp5(args, tok, model, device, out_dir: Path) -> None:
 
     records_path = out_dir / "records.jsonl"
     n_records = 0
-    with records_path.open("w") as fh:
+    with records_path.open("a" if args.append else "w") as fh:
         for d in DOMAINS:
             prompts = prompts_per_domain.get(d, [])
             if not prompts:
@@ -867,6 +871,12 @@ def main() -> None:
     ap.add_argument("--only-method", default=None, choices=[None, "mcl", "kgw", "sweet"],
                     help="If set (exp 2 only), restrict to this watermarking method "
                          "so jobs can be split across (method, model) cells in parallel.")
+    ap.add_argument("--only-domain", default=None,
+                    help="If set, restrict to this domain (e.g. code) so missing "
+                         "(model, domain) cells can be back-filled.")
+    ap.add_argument("--append", action="store_true",
+                    help="Append to existing records.jsonl instead of overwriting "
+                         "(use with --only-domain to back-fill a missing cell).")
     ap.add_argument("--max-tokens", type=int, default=200)
     ap.add_argument("--n-prompts", type=int, default=100,
                     help="Per-domain prompt count for exps 2 and 4")

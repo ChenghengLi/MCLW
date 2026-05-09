@@ -113,7 +113,7 @@ def render(rows: list[dict]) -> None:
         "axes.spines.right": False,
     })
 
-    fig, ax = plt.subplots(figsize=(3.4, 3.0))
+    fig, ax = plt.subplots(figsize=(3.2, 3.0))
 
     Ss = [r["S"] for r in rows]
     fpr_emp = [r["fpr_analytic"] for r in rows]

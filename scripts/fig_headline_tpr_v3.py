@@ -109,7 +109,7 @@ def render(aggregates: dict[str, dict[str, float]]) -> None:
         "ytick.major.size": 2.5,
     })
 
-    fig, ax = plt.subplots(figsize=(3.0, 3.0))
+    fig, ax = plt.subplots(figsize=(3.2, 3.0))
 
     n_attacks = len(ATTACKS)
     n_methods = len(METHODS)
