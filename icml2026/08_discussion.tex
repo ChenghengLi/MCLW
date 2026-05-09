@@ -9,7 +9,7 @@ The calibration $S^\star(n_{\min}, \rho, \alpha)$ of
 inputs: a minimum text length $n_{\min}$, a target false-positive
 rate $\alpha$, and a watermark budget $\rho$. For long-form content
 the calibration anchors comfortably at small $S$ with $\rho$ near
-$1/2$; the head-to-head in \autoref{subsec:exp2-headline} shows MCL
+$1/2$; the head-to-head in \autoref{subsec:exp2-headline} shows ChainMark
 substantially exceeds KGW and SWEET in detection power in this
 regime, while incurring a $\approx 2\times$ higher self-perplexity
 ($3.66$ vs $1.80$--$1.93$; \autoref{tab:headline-aggregate}).
@@ -35,7 +35,7 @@ recipe is still $2$--$4\%$ off after recalibration) the
 empirical-quantile recipe $z^* = \hat F^{-1}(1{-}\alpha)$ is the
 robust drop-in (and is what we use to draw the recalibrated curve in
 \autoref{fig:cal-fpr}). The apples-to-apples $1\%$-FPR head-to-head
-appears in \autoref{app:headline-recalibrated}; MCL also admits an
+appears in \autoref{app:headline-recalibrated}; ChainMark also admits an
 empirical FPR$=0\%$ regime via threshold lifting
 (\autoref{app:fpr-zero}), which KGW and SWEET cannot achieve since
 their watermarked and non-watermarked $z$ distributions overlap.
@@ -50,7 +50,7 @@ KGW/SWEET at $\gamma{=}0.5,\delta_{\mathrm{KGW}}{=}2$, and decoding
 at $T{=}0.7$, top-$p{=}1$, $n{=}200$ with one deterministic
 prompt-order seed (no replicate-seed CIs). The fleet covers three
 open-weight instruction-tuned 7--8B models; base, smaller, and
-$\geq 10$B models are deferred. We validate $k$-regular MCL at
+$\geq 10$B models are deferred. We validate $k$-regular ChainMark at
 $k\in\{1,2\}$; $k\geq 3$ is deferred. The robustness suite is translation-only: we do
 \emph{not} run grammar-preserving paraphrase (e.g.\ DIPPER), so the
 strongest robustness claim is against translation and uniform

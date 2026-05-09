@@ -1,5 +1,5 @@
 % 05_method.tex
-\section{The MCL Scheme}
+\section{The ChainMark Scheme}
 \label{sec:method}
 
 \subsection{State partition}
@@ -34,16 +34,16 @@ baseline to $2/S$ (\autoref{sec:experiments}).
 
 \subsection{Generation}
 
-At step $i$ with current state $s_i = \sigma_\kappa(t_i)$, MCL forms
+At step $i$ with current state $s_i = \sigma_\kappa(t_i)$, ChainMark forms
 the legal token set $\mathcal{V}_{s_i}^\star =
 \bigcup_{s' \in \Sigma_k(s_i)} \mathcal{V}_{s'}$ and masks the LM
 logits outside $\mathcal{V}_{s_i}^\star$ to $-\infty$. At gated
-positions MCL picks the argmax over the masked logits; at ungated
+positions ChainMark picks the argmax over the masked logits; at ungated
 positions it samples from the original distribution. Each step costs one LM forward pass
 plus an $O(V)$ logit mask (precomputed once per state).
 
 \begin{algorithm}[t]
-  \caption{MCL Watermark Embedding}
+  \caption{ChainMark Watermark Embedding}
   \label{alg:embed}
   \begin{algorithmic}
     \STATE {\bfseries Input:} prompt $p$, key $\kappa$, states $S$,
@@ -117,7 +117,7 @@ robustness under per-token modification rate $\delta$
 (\autoref{thm:robustness}).
 
 \begin{algorithm}[t]
-  \caption{MCL Watermark Detection (model-free)}
+  \caption{ChainMark Watermark Detection (model-free)}
   \label{alg:detect}
   \begin{algorithmic}
     \STATE {\bfseries Input:} text $x$, key $\kappa$, states $S$,
@@ -137,4 +137,4 @@ robustness under per-token modification rate $\delta$
 \end{algorithm}
 
 \autoref{alg:detect} runs in $O(n)$ hash operations without LM
-access, making MCL deployable as a third-party audit primitive.
+access, making ChainMark deployable as a third-party audit primitive.

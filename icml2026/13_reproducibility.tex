@@ -54,7 +54,7 @@ Every prompt set, with template strings, prompt indices, and a
 deterministic shuffle seed, is shipped under
 \texttt{data/v7\_min/<domain>/records.jsonl}.
 
-\subsection{MCL hyperparameters}
+\subsection{ChainMark hyperparameters}
 
 \paragraph{Default cell.} $S = 5$ states, clockwork transition
 $T(s, s') = \mathbb{1}[s' \equiv s{+}1 \pmod{S}]$, watermark budget
@@ -72,7 +72,7 @@ to validate \autoref{thm:k-regular}.
 \subsection{Baseline calibration}
 
 The two baselines, KGW~\citep{kirchenbauer2023watermark} and
-SWEET~\citep{lee2023sweet}, are matched to MCL's budget at the
+SWEET~\citep{lee2023sweet}, are matched to ChainMark's budget at the
 cell level. SWEET is an entropy gate that activates the watermark
 only at \emph{high}-entropy positions (the structural opposite of
 schemes that gate at low-entropy positions); we configure it so

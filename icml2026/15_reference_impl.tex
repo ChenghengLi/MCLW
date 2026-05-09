@@ -4,12 +4,12 @@
 
 The following 24-line Python listing is a self-contained,
 dependency-minimal reference implementation of
-\autoref{alg:detect} for clockwork MCL. It takes a list of integer
+\autoref{alg:detect} for clockwork ChainMark. It takes a list of integer
 token IDs, a bytes key, a state count $S$, and a significance
 threshold $\alpha$; it returns the fingerprint score $\phi$, the
 $z$-score, the one-sided $p$-value, and a binary detection flag.
 
-The listing is sufficient to independently verify any MCL-watermarked
+The listing is sufficient to independently verify any ChainMark-watermarked
 text given only the secret key, with no language-model access and no
 learned components. Extensions to arbitrary $k$-regular topologies
 (cf.~\autoref{prop:kregular}) require replacing the successor check
@@ -28,9 +28,9 @@ def sha_state(key: bytes, token_id: int, S: int) -> int:
     h = hashlib.sha256(key + token_id.to_bytes(8, "big")).digest()
     return int.from_bytes(h[:8], "big") % S
 
-def detect_mcl(token_ids, key: bytes, S: int,
+def detect_chainmark(token_ids, key: bytes, S: int,
                alpha: float = 0.01) -> dict:
-    """Clockwork MCL detector; O(n) in the number of tokens."""
+    """Clockwork ChainMark detector; O(n) in the number of tokens."""
     n = len(token_ids)
     if n < 2:
         return {"phi": 0.0, "z": 0.0, "p_value": 1.0,
@@ -46,7 +46,7 @@ def detect_mcl(token_ids, key: bytes, S: int,
     return {"phi": phi, "z": z, "p_value": p_value,
             "is_watermarked": p_value < alpha}
 \end{verbatim}
-\caption{Reference detector for clockwork MCL: 24 lines of
+\caption{Reference detector for clockwork ChainMark: 24 lines of
   dependency-minimal Python (\texttt{hashlib} + \texttt{scipy.stats}).
   Inputs are the tokenizer's token IDs, the secret key, and the state
   count; outputs are the fingerprint $\phi$, $z$-score, one-sided

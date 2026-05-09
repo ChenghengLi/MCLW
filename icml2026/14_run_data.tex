@@ -10,8 +10,8 @@
 
 \begin{table}[h]
   \centering
-  \caption{\textbf{Per-pivot MCL translation robustness.} TPR @
-    $z>2.326$ for each NLLB-200 pivot under MCL $S=5$, $\rho=0.5$.
+  \caption{\textbf{Per-pivot ChainMark translation robustness.} TPR @
+    $z>2.326$ for each NLLB-200 pivot under ChainMark $S=5$, $\rho=0.5$.
     Llama and Qwen cover four domains (factual, wiki, writing, code)
     at $25$ prompts each ($n=100$ per row); the Mistral row covers
     only three domains (factual, wiki, writing; $n=75$). ZH is the
@@ -73,9 +73,9 @@
   \caption{\textbf{Empirically-calibrated head-to-head at
     FPR$=1\%$.} Each method's threshold is the maximum across the
     per-model $99\%$ $z$-quantiles on a non-watermarked calibration
-    corpus (the conservative recipe; per-model nulls in MCL: Llama
-    $2.87$, Qwen $2.87$, Mistral $2.41$, so MCL $z^\star=2.87$;
-    KGW $z^\star=2.62$). MCL retains its TPR advantage at matched
+    corpus (the conservative recipe; per-model nulls in ChainMark: Llama
+    $2.87$, Qwen $2.87$, Mistral $2.41$, so ChainMark $z^\star=2.87$;
+    KGW $z^\star=2.62$). ChainMark retains its TPR advantage at matched
     empirical FPR, confirming the analytical-threshold comparison in
     \autoref{tab:headline-aggregate} is not an FPR artefact. SWEET
     is omitted from this table: the SWEET null $z$-distribution was
@@ -89,7 +89,7 @@
     Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
             TPR$_{\mathrm{ZH}}$ \\
     \midrule
-    \textbf{MCL $S=5$} (ours) & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{68.7\%} \\
+    \textbf{ChainMark $S=5$} (ours) & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{68.7\%} \\
     KGW $\gamma=0.5$         & \phantom{0}69.0\% & \phantom{0}45.4\% & 15.3\% \\
     \bottomrule
   \end{tabular}
@@ -103,7 +103,7 @@
   \caption{\textbf{FPR$=0\%$ by lifting the threshold to
     $z^\star = \max_i z_{\mathrm{nwm},i} + 0.5$.} Computed on the
     held-out non-watermarked corpus ($\sim 1000$ samples per model).
-    Watermarked text retains TPR$=100\%$ because clean MCL $z$
+    Watermarked text retains TPR$=100\%$ because clean ChainMark $z$
     at the canonical $S=5$ ($\approx 25$ across the three models;
     \autoref{tab:cal-sstar}) is several times the maximum observed
     null $z$. KGW and SWEET cannot achieve this regime because their

@@ -67,7 +67,7 @@ statement and proof in \autoref{thm:robustness}.
 \paragraph{$k$-regular generalisation.}
 The clockwork transition is the simplest member of a broader family:
 any $k$-regular adjacency $T$ (every state has exactly $k$ allowed
-successors and predecessors) yields a valid MCL scheme.  Replacing
+successors and predecessors) yields a valid ChainMark scheme.  Replacing
 the random baseline $1/S$ by $p_0 = k/S$ gives the same calibration
 identities, the same midpoint critical fraction $\delta^\star$, and a
 single quality-versus-detection dial in $k$.  Column-regularity is
@@ -84,7 +84,7 @@ $\sigma_\kappa(t) = \mathcal{H}(\kappa \,\Vert\, t) \bmod S$ is
 modelled as a random oracle: an adversary without access to $\kappa$,
 the LM, or reference text cannot predict $\sigma_\kappa(t^\star)$ on
 a fresh token with non-negligible advantage in the key min-entropy,
-and therefore cannot statistically distinguish MCL output from random
+and therefore cannot statistically distinguish ChainMark output from random
 text (\autoref{thm:security}; computational, not
 information-theoretic, and excluding adversaries with LM access). A
 verifier that \emph{does} have LM access can sharpen detection by

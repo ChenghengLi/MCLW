@@ -96,7 +96,7 @@ universal robustness threshold; we isolate it as a lemma.
 
 \begin{theorem}[Detection bound and calibration]
   \label{thm:detection}
-  Let $\mathbf{t}^w$ be an MCL-watermarked sequence of length $n$
+  Let $\mathbf{t}^w$ be an ChainMark-watermarked sequence of length $n$
   with watermark fraction $\rho$ and clockwork transition over $S$
   states; let $\mathbf{t}^r$ be an i.i.d.\ random sequence over
   $\mathcal{V}$.  Then
@@ -196,7 +196,7 @@ universal robustness threshold; we isolate it as a lemma.
   \label{thm:detection-recal}
   Let $\mathbf{t}^{(1)}, \dots, \mathbf{t}^{(M)}$ be $M$
   i.i.d.\ non-watermarked sequences from the deployed LM, and let
-  $z_1, \dots, z_M$ be their detection $z$-statistics under MCL with
+  $z_1, \dots, z_M$ be their detection $z$-statistics under ChainMark with
   $(S, \rho)$ fixed.  Define
   \begin{align*}
     \hat\mu &= \tfrac{1}{M}\sum_{i=1}^M z_i, \\
@@ -249,7 +249,7 @@ universal robustness threshold; we isolate it as a lemma.
   i.i.d.\ uniform in the partition).  Standardise the post-attack
   $z$ by the \emph{null} standard deviation
   $\sqrt{p_0(1-p_0)/(n-1)}$ (the same scaling used pre-attack).
-  Then for clockwork MCL with state count $S$ and gate density
+  Then for clockwork ChainMark with state count $S$ and gate density
   $\rho$,
   \begin{equation}
     \mathbb{E}[\phi \mid \mathrm{attack}]
@@ -408,12 +408,12 @@ recall the definition for the appendix.
 % which guarantees that for distinct inputs the output bits are
 % pseudo-independent and hence the modular reduction is uniform up
 % to a $1/2^{256}$ bias.  We flag this as the cryptographic
-% assumption inherited by every $k$-regular MCL scheme.
+% assumption inherited by every $k$-regular ChainMark scheme.
 
 \begin{corollary}[Universal midpoint $\delta^\star$]
   \label{cor:universal-delta}
   Under the midpoint-threshold detection convention, every
-  $k$-regular MCL scheme has critical edit fraction
+  $k$-regular ChainMark scheme has critical edit fraction
   \[
     \delta^\star \;=\; 1 - 1/\sqrt{2},
   \]
@@ -563,7 +563,7 @@ We restate the model-free detection algorithm for self-contained
 reading; the body version is \autoref{alg:detect}.
 
 \begin{algorithm}[h]
-  \caption{MCL Watermark Detection (model-free)}
+  \caption{ChainMark Watermark Detection (model-free)}
   \label{alg:detect-app}
   \begin{algorithmic}
     \STATE {\bfseries Input:} text $x$, key $\kappa$, states $S$,
@@ -603,11 +603,11 @@ they are referenced from elsewhere in the paper.
   \label{thm:quality}
   At a gated position with current state $s$ and partition mass
   $Z_s = p(\mathcal{V}_{(s+1) \bmod S}) > 0$, the KL between the
-  renormalised MCL distribution
-  $P_{\mathrm{MCL}}(t) = p(t)/Z_s \cdot
+  renormalised ChainMark distribution
+  $P_{\mathrm{ChainMark}}(t) = p(t)/Z_s \cdot
     \mathbf{1}[t \in \mathcal{V}_{(s+1) \bmod S}]$
   and the LM distribution $p$ is
-  \(D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p) = \log(1/Z_s).\)
+  \(D_{\mathrm{KL}}(P_{\mathrm{ChainMark}} \,\|\, p) = \log(1/Z_s).\)
   Under hash uniformity, $\mathbb{E}[Z_s] = 1/S$, and Jensen's
   inequality gives
   \begin{equation}
@@ -620,7 +620,7 @@ they are referenced from elsewhere in the paper.
 
 \begin{proof}
   Direct computation:
-  \(D_{\mathrm{KL}}(P_{\mathrm{MCL}} \,\|\, p)
+  \(D_{\mathrm{KL}}(P_{\mathrm{ChainMark}} \,\|\, p)
     = \sum_{t \in \mathcal{V}_{(s+1) \bmod S}} (p(t)/Z_s)
         \log(1/Z_s)
     = \log(1/Z_s).\)

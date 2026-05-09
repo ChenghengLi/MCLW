@@ -16,7 +16,7 @@ watermarking~\citep{kirchenbauer2023watermark} biases next-token
 logits toward a hashed green list and detects via a $z$-test on
 green-token frequency. The scheme requires temperature sampling
 and degrades under paraphrase, and offers no analytic inversion
-from a regulatory parameter back to a bias magnitude. MCL's
+from a regulatory parameter back to a bias magnitude. ChainMark's
 fingerprint $\phi$ is structurally a Bernoulli($1/S$) $z$-test,
 so the calibration formula~\eqref{eq:calibration} is the analogue
 KGW lacks.
@@ -27,9 +27,9 @@ KGW lacks.
 are \emph{distortion-free}: they preserve the LM marginal in
 expectation over the key. \citet{christ2024undetectable} prove
 cryptographic indistinguishability under sufficient entropy. These
-schemes beat MCL on quality strictly (zero expected KL versus MCL's
+schemes beat ChainMark on quality strictly (zero expected KL versus ChainMark's
 $\geq \rho \log S$). The trade is that they require either LM
-access or the key sequence at detection time; MCL is the
+access or the key sequence at detection time; ChainMark is the
 distorting alternative that buys model-free third-party audit and
 the closed-form $(\alpha, n, \rho) \mapsto S^\star$ map.
 
@@ -39,7 +39,7 @@ watermarking signal to \emph{high-entropy} positions, but at
 different layers. SWEET applies a binary gate at generation time
 (restricting where the green-list bias is added); EWD weights
 positions by entropy at detection time, approximating the
-log-likelihood ratio of \autoref{thm:hdd}. MCL is
+log-likelihood ratio of \autoref{thm:hdd}. ChainMark is
 gate-agnostic in its mathematical specification: high-entropy,
 low-entropy, and surprisal-gap gates are all admissible. For the
 empirical comparison in \autoref{sec:experiments} we adopt the
@@ -53,7 +53,7 @@ Transparency~\citep{eucodepractice2025} require machine-readable
 marking of AI-generated content; the OECD Hiroshima
 Process~\citep{oecdhiroshima2024} provides a parallel international
 framework. These instruments leave the detection regime
-(FPR, quality floor, robustness) implicit. MCL's contribution, beyond
+(FPR, quality floor, robustness) implicit. ChainMark's contribution, beyond
 the watermarking scheme itself, is that it surfaces these parameters
 analytically, producing a policy-to-configuration map auditable by
 third parties (\autoref{sec:discussion}).

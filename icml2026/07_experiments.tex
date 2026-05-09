@@ -28,7 +28,7 @@ the same indices are watermarked, attacked, and detected across
 methods. Detection uses the threshold $z_\alpha$ from
 \autoref{thm:detection}, reused across methods for fair comparison.
 
-\textbf{MCL configuration.} Unless stated otherwise, MCL runs use
+\textbf{ChainMark configuration.} Unless stated otherwise, ChainMark runs use
 $S = 5$ states, target gate budget $\rho = 0.5$, the high-entropy gate
 $G_{H_{\mathrm{high}}}$, and clockwork ($k{=}1$) topology.
 
@@ -36,14 +36,14 @@ $G_{H_{\mathrm{high}}}$, and clockwork ($k{=}1$) topology.
 $\gamma = 0.5$, logit bias $\delta_{\mathrm{KGW}} = 2$.
 \emph{SWEET}~\citep{lee2023sweet} retains the same $\gamma = 0.5$ and
 $\delta_{\mathrm{KGW}} = 2$ but watermarks only the high-entropy
-positions, gated to $\rho = 0.5$ to match MCL's budget.
+positions, gated to $\rho = 0.5$ to match ChainMark's budget.
 
 \begin{figure*}[t]
   \centering
   \begin{subfigure}[t]{0.32\linewidth}
     \centering
     \includegraphics[width=\linewidth]{pictures/fig_headline_tpr.pdf}
-    \caption{\textbf{Head-to-head TPR.} MCL vs KGW vs SWEET, aggregated
+    \caption{\textbf{Head-to-head TPR.} ChainMark vs KGW vs SWEET, aggregated
       over 3 LLMs $\times$ 4 domains.}
     \label{fig:headline-tpr}
   \end{subfigure}\hfill
@@ -80,10 +80,10 @@ $\times$ 4 domains $\times$ 3 attack conditions: \emph{clean},
 \emph{back-translation} via NLLB-200 EN$\to$ZH$\to$EN), $100$ prompts
 per (method, model, domain) cell. \autoref{tab:headline-aggregate}
 collapses over (model, domain); \autoref{tab:headline-percell} gives
-the per-cell breakdown. MCL is the only method that survives ZH
+the per-cell breakdown. ChainMark is the only method that survives ZH
 back-translation in every cell, at the cost of a $\approx 2\times$
 self-perplexity gap. SWEET is an entropy-gating ablation of KGW that
-holds the gating policy fixed against MCL.
+holds the gating policy fixed against ChainMark.
 
 \begin{table}[t]
   \centering
@@ -103,7 +103,7 @@ holds the gating policy fixed against MCL.
     Method & cells & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
             TPR$_{\mathrm{ZH}}$ & PPL ($\downarrow$) \\
     \midrule
-    \textbf{MCL (ours)} & 12/12 & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{72.8\%} & 3.66 \\
+    \textbf{ChainMark (ours)} & 12/12 & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{72.8\%} & 3.66 \\
     KGW                 & 12/12 & \phantom{0}74.8\% & \phantom{0}55.1\%  & 19.4\%  & 1.93 \\
     SWEET               & 12/12 & \phantom{0}71.8\% & \phantom{0}51.2\%  & 18.0\%  & \textbf{1.80} \\
     \bottomrule
@@ -113,7 +113,7 @@ holds the gating policy fixed against MCL.
 \begin{table*}[t]
   \centering
   \caption{\textbf{Per-(model, domain) head-to-head TPR (\%)} at
-    $z_\alpha=2.326$. $100$ prompts per cell, $n{=}200$ tokens. MCL
+    $z_\alpha=2.326$. $100$ prompts per cell, $n{=}200$ tokens. ChainMark
     matches or leads every clean cell and strictly leads every cell
     post-ZH-back-translation. Bold = best per column within each
     block.}
@@ -123,7 +123,7 @@ holds the gating policy fixed against MCL.
   \begin{tabular}{ll|rrr|rrr}
     \toprule
     & & \multicolumn{3}{c|}{Clean} & \multicolumn{3}{c}{ZH back-translation} \\
-    Model & Domain & MCL & KGW & SWEET & MCL & KGW & SWEET \\
+    Model & Domain & ChainMark & KGW & SWEET & ChainMark & KGW & SWEET \\
     \midrule
     Llama-3.1-8B & code     & \textbf{100} & 59 & 44 & \textbf{59} & 25 & 28 \\
     Llama-3.1-8B & factual  & \textbf{100} & 92 & 79 & \textbf{73} & 25 & 25 \\
@@ -144,7 +144,7 @@ holds the gating policy fixed against MCL.
 \subsection{Translation robustness}
 \label{subsec:exp3-translation}
 
-Each MCL-watermarked output ($3$ models $\times$ $4$ domains $\times$
+Each ChainMark-watermarked output ($3$ models $\times$ $4$ domains $\times$
 $25$ prompts $\times$ $n{=}200$ tokens; Mistral$\times$code did not
 complete in the cluster window, see \autoref{tab:translation-pivots})
 is round-tripped through NLLB-200~\citep{nllbteam2022nllb} on four
@@ -160,7 +160,7 @@ rather than tight. The claim is stronger than synthetic
 random-substitution can support, since NLLB-200 produces
 semantically coherent rewrites rather than i.i.d.\ token noise.
 
-\subsection{$k$-regular MCL at $k{=}2$}
+\subsection{$k$-regular ChainMark at $k{=}2$}
 \label{subsec:exp4-kregular}
 
 Instantiating $k = 2$ (each state has two allowed successors) at
@@ -175,7 +175,7 @@ $k$.
 
 \begin{table}[t]
   \centering
-  \caption{\textbf{$k$-regular MCL at $k{=}2$ (soft-cycle), $S{=}5$,
+  \caption{\textbf{$k$-regular ChainMark at $k{=}2$ (soft-cycle), $S{=}5$,
     $\rho{=}0.5$.} Predicted random baseline $p_0 = 0.40$; wiki domain,
     $100$ prompts. The clean $\bar\phi_{\mathrm{cl}}$ values
     ($\geq 0.88$) sit well above $p_0$
@@ -201,7 +201,7 @@ $k$.
 
 We sweep $S \in \{2, 3, 5, 7, 11\}$ across the three models with
 $4$ domains $\times$ $25$ prompts at $n{=}200$, recording both a
-watermarked generation (MCL at the canonical operating point, varying
+watermarked generation (ChainMark at the canonical operating point, varying
 only $S$) and a non-watermarked baseline drawn from the same prompt.
 Non-watermarked outputs feed the empirical FPR estimate at the
 analytic $z_\alpha$; watermarked outputs feed the TPR.

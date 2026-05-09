@@ -21,8 +21,8 @@ but yield no deployable construction, and passive
 detectors~\citep{mitchell2023detectgpt,tian2023gptzero} expose no
 controllable false-positive frontier at all.
 
-\paragraph{Markov Chain Lock.}
-We propose \emph{Markov Chain Lock} (MCL), an active watermark whose
+\paragraph{ChainMark.}
+We propose \emph{ChainMark} (ChainMark), an active watermark whose
 detector is model-free. A keyed SHA-256 hash partitions the
 vocabulary into $S$ equivalence classes (states), and a fixed cycle
 over those states defines a Markov transition pattern. On a fraction
@@ -226,7 +226,7 @@ treatment is in \autoref{sec:method} and \autoref{sec:theory}.
        node[midway, above, font=\scriptsize, color=black!60]
        {append $t_{i+1}$};
   \end{tikzpicture}
-  \caption{\textbf{Markov Chain Lock at a glance.}
+  \caption{\textbf{ChainMark at a glance.}
     \textbf{(A)}~A keyed SHA-256 hash $\sigma_\kappa$ partitions the
     vocabulary into $S$ disjoint sets $\mathcal V_0, \dots,
     \mathcal V_{S-1}$ ordered into a clockwork cycle
@@ -249,7 +249,7 @@ watermark — is left as a parameter we call the gate. Existing
 schemes implicitly fix this choice: SWEET and EWD watermark only
 high-entropy positions, on the intuition that those positions
 contribute the bulk of the detection statistic. We adopt the
-high-entropy gate by default for parity with SWEET and compare MCL
+high-entropy gate by default for parity with SWEET and compare ChainMark
 against KGW and SWEET at matched budget on multiple
 instruction-tuned LLMs across four text domains under three attack
 conditions (\emph{clean}, random substitution, and ZH
@@ -258,7 +258,7 @@ back-translation; \autoref{sec:experiments}).
 \paragraph{Contributions.}
 \begin{enumerate}[nosep, leftmargin=*]
   \item \textbf{A model-free watermarking primitive.} We introduce
-    MCL, a discrete hard-constraint watermark with cryptographic
+    ChainMark, a discrete hard-constraint watermark with cryptographic
     state partitions, clockwork transitions, and $O(n)$ model-free
     detection (\autoref{sec:method}).
   \item \textbf{Closed-form calibration.} We derive an
@@ -272,11 +272,11 @@ back-translation; \autoref{sec:experiments}).
     and the robustness threshold extend verbatim to any $k$-regular
     doubly-stochastic transition topology
     (\autoref{thm:k-regular}); clockwork is the $k{=}1$ instance.
-  \item \textbf{Empirical head-to-head comparison.} We evaluate MCL
+  \item \textbf{Empirical head-to-head comparison.} We evaluate ChainMark
     against KGW and SWEET at matched budget across multiple
     instruction-tuned language models and four text domains under
     translation and random-substitution attacks
-    (\autoref{sec:experiments}), and show that MCL retains
+    (\autoref{sec:experiments}), and show that ChainMark retains
     substantially more detection signal than the baselines
     (\autoref{subsec:exp2-headline}, \autoref{app:headline-recalibrated}).
   \item \textbf{Empirical anchor of the calibration formula.} An
@@ -287,7 +287,7 @@ back-translation; \autoref{sec:experiments}).
 \end{enumerate}
 
 \paragraph{Roadmap.}
-\autoref{sec:related} situates MCL within active and passive
+\autoref{sec:related} situates ChainMark within active and passive
 watermarking. \autoref{sec:prelim} fixes notation;
 \autoref{sec:method} specifies the construction;
 \autoref{sec:theory} states the calibration, robustness, and

@@ -40,7 +40,7 @@ OUT_PATH = Path("/home/lichen/MCLW/icml2026/pictures/fig_headline_tpr.pdf")
 
 MODELS = ["llama-3-1-8b-instruct", "mistral-7b-instruct-v0-3", "qwen2-5-7b-instruct"]
 METHODS = ["mcl", "kgw", "sweet"]
-METHOD_LABELS = {"mcl": "MCL (ours)", "kgw": "KGW", "sweet": "SWEET"}
+METHOD_LABELS = {"mcl": "ChainMark (ours)", "kgw": "KGW", "sweet": "SWEET"}
 ATTACKS = ["z_clean", "z_random", "z_zh"]
 ATTACK_LABELS = ["Clean", "Random-sub", "ZH back-trans"]
 
