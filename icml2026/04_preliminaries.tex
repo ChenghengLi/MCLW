@@ -17,8 +17,10 @@ standard-normal quantile at level $\alpha$.
 may paraphrase, translate, edit, splice, or delete tokens before
 publication; we model these as a per-token modification rate
 $\delta \in [0,1)$. The adversary is computationally bounded and
-has no access to $\kappa$ or to the language model at detection
-time. The verifier sees only token text and runs in $O(n)$ hash
+has no access to $\kappa$, to the language model, or to the
+deployed detector as a queryable oracle at detection time
+(\autoref{sec:discussion} discusses the adaptive-oracle adversary
+that lies outside this model). The verifier sees only token text and runs in $O(n)$ hash
 operations.
 
 \textbf{Detection problem and quality.} Detection is a binary

@@ -125,6 +125,14 @@ universal robustness threshold; we isolate it as a lemma.
         \right\rceil.
     \label{eq:calibration}
   \end{equation}
+  $S^\star$ is a \emph{provisioning} bound: it is derived under the
+  midpoint detector $\tau_{\mathrm{mid}}$ to give the regulator a
+  $2\times$ safety margin in the standardised mean gap. The
+  \emph{operating} detector deployed in
+  \autoref{sec:experiments} uses the tighter one-sided test
+  $\{z > z_\alpha\}$, so empirical TPR at the operating threshold
+  exceeds the conservative midpoint prediction whenever
+  $S \geq S^\star(n,\rho,\alpha)$.
 \end{theorem}
 
 \begin{proof}

@@ -73,10 +73,12 @@
   \caption{\textbf{Empirically-calibrated head-to-head at
     FPR$=1\%$.} Each method's threshold is the maximum across the
     per-model $99\%$ $z$-quantiles on a non-watermarked calibration
-    corpus (the conservative recipe; per-model nulls in ChainMark: Llama
-    $2.87$, Qwen $2.87$, Mistral $2.41$, so ChainMark $z^\star=2.87$;
-    KGW $z^\star=2.62$). ChainMark retains its TPR advantage at matched
-    empirical FPR, confirming the analytical-threshold comparison in
+    corpus (the conservative recipe; per-model nulls in ChainMark:
+    Llama $2.87$, Qwen $2.87$, Mistral $2.41$, so ChainMark
+    $z^\star=2.87$; KGW per-model: Llama $2.77$, Mistral $2.34$,
+    Qwen $2.62$, so KGW $z^\star=2.77$). ChainMark retains its TPR
+    advantage at matched empirical FPR, confirming the
+    analytical-threshold comparison in
     \autoref{tab:headline-aggregate} is not an FPR artefact. SWEET
     is omitted from this table: the SWEET null $z$-distribution was
     not collected on the FPR corpus and cannot be reproduced from
@@ -89,8 +91,8 @@
     Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
             TPR$_{\mathrm{ZH}}$ \\
     \midrule
-    \textbf{ChainMark $S=5$} (ours) & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{68.7\%} \\
-    KGW $\gamma=0.5$         & \phantom{0}69.0\% & \phantom{0}45.4\% & 15.3\% \\
+    \textbf{ChainMark $S=5$} (ours) & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{68.3\%} \\
+    KGW $\gamma=0.5$         & \phantom{0}66.8\% & \phantom{0}42.1\% & 13.0\% \\
     \bottomrule
   \end{tabular}
 \end{table}
