@@ -57,17 +57,22 @@ every $k$-regular topology; we validate $k=1$ (clockwork) and $k=2$
 (soft-cycle) empirically. $k=3$ and beyond are deferred to the
 extended version of this paper.
 
-\paragraph{Calibration-recipe alternatives.} Two operational
-recipes that close the FPR gap empirically (Fix~1: empirical
-threshold recalibration; Fix~5: HDD-lite, model-free
-inverse-frequency-weighted statistic) are tabulated in
-\autoref{app:fpr-recipes}; the apples-to-apples 1\%-FPR
-recalibrated head-to-head appears in
-\autoref{app:headline-recalibrated}. Beyond a positive 1\% FPR
+\paragraph{Empirical SD recalibration closes the FPR gap.}
+Recomputing the detection threshold from the empirical standard
+deviation of $z$ on a non-watermarked corpus
+($z^* = \hat\mu + z_\alpha\,\hat\sigma$) brings the empirical
+false-positive rate from $2.1\%$ down to $1.2\%$ at the $\alpha=1\%$
+target, while preserving TPR$=100\%$ on watermarked text
+(\autoref{app:fpr-recipes}). The apples-to-apples
+$1\%$-FPR recalibrated head-to-head appears in
+\autoref{app:headline-recalibrated}. Beyond a positive $1\%$ FPR
 target, MCL also admits an empirical FPR$=0\%$ regime via threshold
 lifting (\autoref{app:fpr-zero}); KGW and SWEET cannot achieve this
 regime because their watermarked and non-watermarked $z$
-distributions overlap.
+distributions overlap. Alternative recipes we tried but did not
+adopt (Newey--West HAC, $k$-skip, stopword filtering, HDD-lite) are
+tabulated as failure modes alongside SD recalibration in
+\autoref{app:fpr-recipes}.
 
 \paragraph{Incomplete SWEET coverage.}
 \autoref{tab:headline-aggregate}'s SWEET aggregate is computed over
