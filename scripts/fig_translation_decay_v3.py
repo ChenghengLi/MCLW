@@ -186,9 +186,9 @@ def make_plot(points, out_path: Path):
         fontsize=7,
     )
 
-    fig.tight_layout(pad=0.3)
+    fig.subplots_adjust(left=0.18, right=0.98, top=0.95, bottom=0.30)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, format="pdf", bbox_inches="tight", pad_inches=0.02)
+    fig.savefig(out_path, format="pdf")
     plt.close(fig)
 
 
