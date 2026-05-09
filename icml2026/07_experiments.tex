@@ -75,24 +75,10 @@ state from the key alone and reports a $z$-score.
       \end{minipage}}\par
     \vspace{3pt}%
 
-    % ---- 4. STATE LEGEND (visual cycle at bottom) ---------------------
-    % Five colored state tiles connected by clockwork arrows; a small
-    % return-arc at the end visualises s_4 → s_0 wrap-around.
+    % ---- 4. STATE LEGEND (compact cycle, fits column) -----------------
     \noindent\centerline{%
-      \footnotesize\color{black!60}\itshape state cycle:\;\,%
-      \normalcolor\normalfont%
-      \tk{c0}{\,$s_0$\,}\tarr%
-      \tk{c1}{\,$s_1$\,}\tarr%
-      \tk{c2}{\,$s_2$\,}\tarr%
-      \tk{c3}{\,$s_3$\,}\tarr%
-      \tk{c4}{\,$s_4$\,}\;%
-      \tikz[baseline=-2.5pt]{%
-        \draw[-{Latex[length=2.6pt,width=2.6pt]}, cmblue, line width=0.45pt]
-          (0,0.5pt) .. controls (5pt,5pt) and (10pt,5pt) ..
-          (15pt,0.5pt) -- (15pt,-0.5pt) .. controls (10pt,-4pt) and (5pt,-4pt) ..
-          (0,-0.5pt) -- cycle;
-      }%
-      \,\footnotesize\color{black!55}\,(clockwork:\,$s\!\to\!(s{+}1)\!\bmod 5$)%
+      \tk{c0}{\,$s_0$\,}\tarr\tk{c1}{\,$s_1$\,}\tarr\tk{c2}{\,$s_2$\,}\tarr\tk{c3}{\,$s_3$\,}\tarr\tk{c4}{\,$s_4$\,}\tarr\tk{c0}{\,$s_0$\,}%
+      \quad\textcolor{black!55}{\footnotesize\itshape clockwork cycle, $s\!\to\!(s{+}1)\!\bmod 5$}%
     }%
   \end{minipage}
   \caption{\textbf{End-to-end ChainMark trace} on a wiki prompt
