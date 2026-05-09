@@ -160,8 +160,10 @@ universal robustness threshold; we isolate it as a lemma.
   are not jointly i.i.d., so we split into $Z_1, Z_3, Z_5, \dots$ and
   $Z_2, Z_4, Z_6, \dots$, two disjoint subsequences of $m =
   \lfloor (n-1)/2 \rfloor$ terms, each i.i.d.\
-  $\mathrm{Bernoulli}(1/S)$.  Hoeffding on each plus a union bound
-  gives, for any $\tau > 1/S$,
+  $\mathrm{Bernoulli}(1/S)$. Since $\phi$ is the average of these
+  two subsequence means, $\phi \geq \tau$ implies that at least one
+  subsequence mean is $\geq \tau$, so by Hoeffding plus a union
+  bound, for any $\tau > 1/S$,
   \(
     \Pr[\phi \geq \tau] \leq 2 \exp(-2 m (\tau - 1/S)^2).
   \)
@@ -309,11 +311,11 @@ universal robustness threshold; we isolate it as a lemma.
 
   \emph{$z$-ratio independence.}  The mean gap above the null
   baseline $1/S$ is $\Delta = \rho(S{-}1)/S$ pre-attack and $\Delta
-  (1-\delta)^2$ post-attack.  The null SD is the same in both regimes
-  (it is a property of the null distribution, which the attack does
-  not change, and the post-attack \emph{alternative} variance is
-  bounded above by the null variance, only making the standardised
-  margin a tighter lower bound on detection).  Hence
+  (1-\delta)^2$ post-attack. We standardise both regimes by the
+  \emph{null} SD $\sqrt{p_0(1-p_0)/(n-1)}$ (the conventional
+  one-sample $z$-test scaling, used as a fixed denominator across
+  attacks); this is a definition, not an assumption that the
+  post-attack alternative variance is null-bounded.  Hence
   $z_{\mathrm{post}}/z_{\mathrm{pre}} = \Delta_{\mathrm{post}} /
   \Delta_{\mathrm{pre}} = (1-\delta)^2$, independent of $(S, \rho, n)$.
 
@@ -413,7 +415,9 @@ recall the definition for the appendix.
 \begin{corollary}[Universal midpoint $\delta^\star$]
   \label{cor:universal-delta}
   Under the midpoint-threshold detection convention, every
-  $k$-regular ChainMark scheme has critical edit fraction
+  $k$-regular ChainMark scheme with $1 \leq k < S$ (so $p_0 < 1$;
+  the degenerate case $k=S$ has every transition valid and is
+  trivially undetectable) has critical edit fraction
   \[
     \delta^\star \;=\; 1 - 1/\sqrt{2},
   \]
@@ -505,10 +509,11 @@ recall the definition for the appendix.
   Suppose the verifier has access to the LM at each position, and
   let $g_i \in \{0,1\}$ denote the gate indicator at position $i$.
   Set $\pi_i = g_i + (1 - g_i)/S$, the marginal probability of
-  $X_i = 1$ under the watermark alternative.  Treating $\{X_i\}$ as
-  conditionally independent given the keyed state sequence , 
-  asymptotically valid under the random oracle on distinct tokens
- , the log-likelihood ratio
+  $X_i = 1$ under the watermark alternative. Approximating the
+  joint law $\{X_i\}$ by the product of its marginals (asymptotically
+  valid under the random oracle on distinct tokens, with the
+  product-form CLT covariance vanishing by \autoref{lem:variance}),
+  the log-likelihood ratio under the product law is
   \begin{equation}
     \Lambda
       \;=\; \sum_{i=1}^{n-1}\!
@@ -544,9 +549,12 @@ recall the definition for the appendix.
 
   By the central limit theorem for 1-dependent sequences (and
   vanishing pairwise covariance from \autoref{lem:variance}), the
-  product-form $\Lambda$ has the same Gaussian limit as the true
-  joint LLR up to vanishing $O(1/n)$ corrections in the local
-  asymptotic normal (LAN) sense (Le Cam).  Hence the test based on
+  product-form $\Lambda$ has the same Gaussian limit as the
+  product-form joint LLR up to $o(1)$ corrections (LAN regime,
+  Le Cam); we therefore claim asymptotic local most-powerful-ness
+  among tests within the product hypothesis class, not strict
+  Neyman--Pearson optimality against the true 1-dependent joint.
+  Hence the test based on
   $\Lambda$ achieves the Neyman--Pearson power asymptotically.
 \end{proof}
 
@@ -640,13 +648,15 @@ they are referenced from elsewhere in the paper.
   $\sigma_\kappa(t')$ is uniform on $[S]$ by the random-oracle
   property, so each modified position contributes an indicator
   distributed as $\mathrm{Bernoulli}(1/S)$ to the validity count,
-  independently of strategy.  Hence the expected mass contributed
-  to $\phi$ by modified-pair positions satisfies
+  independently of strategy.  Hence under an oracle-blind adversary
+  (every introduced token unqueried), the expected mass contributed
+  to $\phi$ by modified-pair positions equals
   \begin{equation}
     \Sigma(\delta)
-      \;\geq\; \tfrac{1}{S}\, \delta(2 - \delta),
+      \;=\; \tfrac{1}{S}\, \delta(2 - \delta);
   \end{equation}
-  with equality when every introduced token is unqueried.
+  this is a lower bound when ranging over query-aided strategies that
+  may bias replacement tokens toward $\sigma_\kappa(\mathcal{T}_{\mathrm{q}})$.
 \end{theorem}
 
 \begin{proof}
