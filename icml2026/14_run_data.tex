@@ -1,0 +1,134 @@
+% 14_run_data.tex — additional run data + open questions
+\section{Additional Run Data and Open Extensions}
+\label{app:run-data}
+
+
+% Auto-generated from data/v7_min/exp{3,5,6}/records.jsonl
+
+\subsection{Translation per-pivot breakdown}
+\label{app:translation-pivots}
+
+\begin{table}[h]
+  \centering
+  \caption{\textbf{Per-pivot MCL translation robustness.} TPR @
+    $z>2.326$ for each NLLB-200 pivot (4 domains $\times$ 25 prompts
+    per cell, MCL $S=5$, $\rho=0.5$). ZH is the most aggressive pivot
+    ($\delta_{\mathrm{eff}}\approx 0.78$); FR/DE are gentler
+    ($\delta_{\mathrm{eff}}\approx 0.69$).}
+  \label{tab:translation-pivots}
+  \small
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Model & clean & FR & DE & RU & ZH \\
+    \midrule
+    Llama-3.1-8B & 100\% & 85\% & 78\% & 81\% & 75\% \\
+    Mistral-7B & 100\% & 88\% & 92\% & 92\% & 75\% \\
+    Qwen-2.5-7B & 100\% & 78\% & 75\% & 78\% & 66\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{FPR-recalibration recipes}
+\label{app:fpr-recipes}
+
+\begin{table}[h]
+  \centering
+  \caption{\textbf{FPR-recalibration recipes evaluated on $n{=}3000$
+    non-watermarked samples (1000 per model, 60/40 calibration/test
+    split).} Goal: empirical FPR $\le$ 1\% with TPR = 100\%.
+    \textbf{Fix~1} (recompute the threshold from the empirical SD of
+    $z$ on a non-watermarked corpus) and \textbf{Fix~5} (HDD-lite,
+    inverse-frequency-weighted statistic) both hit the target while
+    preserving 100\% TPR. Fix~3 ($k$-skip) collapses TPR because the
+    watermark only constrains adjacent transitions.}
+  \label{tab:fpr-recipe}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{lll}
+    \toprule
+    Method & avg FPR & avg TPR \\
+    \midrule
+    iid baseline (no fix)               & 4.23\% & 100.0\% \\
+    \textbf{Fix~1: empirical SD recal.} & \textbf{1.34\%} & \textbf{100.0\%} \\
+    Fix~2: Newey--West HAC               & 3.45\% & 100.0\% \\
+    Fix~3: $k$-skip ($k{=}3$)           & 2.46\% & 2.2\% (TPR collapse) \\
+    Fix~4: stopword filter (top-200)    & 5.18\% & 99.0\% \\
+    \textbf{Fix~5: HDD-lite (model-free)} & \textbf{2.35\%} & \textbf{100.0\%} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Apples-to-apples head-to-head at empirical FPR$=1\%$}
+\label{app:headline-recalibrated}
+
+\begin{table}[h]
+  \centering
+  \caption{\textbf{Empirically-calibrated head-to-head.} Each method's
+    threshold is the $99\%$ quantile of its $z$-distribution on a
+    non-watermarked calibration corpus (1000 samples per model). All
+    methods then run at exactly the same empirical FPR. MCL retains
+    its TPR advantage in every cell, confirming the analytical-threshold
+    comparison is not an FPR artefact.}
+  \label{tab:headline-recalibrated}
+  \small
+  \begin{tabular}{lccc}
+    \toprule
+    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
+            TPR$_{\mathrm{ZH}}$ \\
+    \midrule
+    \textbf{MCL S=5} (ours) & \textbf{100.0\%} & \textbf{99.9\%} & \textbf{69.2\%} \\
+    KGW $\gamma=0.5$        & 72.2\% & 46.7\% & 17.7\% \\
+    SWEET                   & 57.0\% & 28.7\% & 19.8\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Empirical FPR=0\% achievability}
+\label{app:fpr-zero}
+
+\begin{table}[h]
+  \centering
+  \caption{\textbf{FPR=0\% by lifting the threshold to
+    $z^* = \max_i z_{\mathrm{nwm},i} + 0.5$.} Computed on the
+    held-out non-watermarked corpus (1000 samples per model). Watermarked
+    text retains TPR=100\% because clean MCL $z$ ($\approx$25--40)
+    is $\ge 3\times$ the maximum observed null $z$. KGW/SWEET cannot
+    achieve this regime because their watermarked and non-watermarked
+    $z$-distributions overlap.}
+  \label{tab:fpr-zero}
+  \small
+  \begin{tabular}{lrrrr}
+    \toprule
+    & & \multicolumn{2}{c}{Threshold} & \\
+    Model & $\max z_{\mathrm{nwm}}$ & default $z_\alpha$ & lifted $z^*$ & TPR @ $z^*$ \\
+    \midrule
+    Llama-3.1-8B & 8.90 & 2.326 & 9.40 & 100\% \\
+    Qwen-2.5-7B  & 4.82 & 2.326 & 5.32 & 100\% \\
+    Mistral-7B   & 2.87 & 2.326 & 3.37 & 100\% \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\paragraph{Open data and deferred extensions.}
+The following experiments are deferred to the extended version of
+this paper:
+\begin{itemize}
+  \item \textbf{TODO: DIPPER paraphrase attack.} Grammar-preserving
+    paraphrase via DIPPER~\citep{krishna2023paraphrasing} on at least
+    one (model, domain) cell.
+  \item \textbf{TODO: $k$-regular validation at $k\geq 3$.}
+    \autoref{thm:k-regular} predicts $p_0 = k/S$ for any
+    $k$-regular topology; we validate $k\in\{1,2\}$ only.
+  \item \textbf{TODO: External-LM PPL or MAUVE quality metric.}
+    Self-PPL is conservative but circular; an external judge LM or
+    MAUVE would give a model-independent quality reading.
+  \item \textbf{TODO: Base (non-instruction-tuned) and $\geq 10$B
+    LLMs.} Our fleet covers only instruction-tuned 7--8B models.
+  \item \textbf{TODO: $\rho$-sweep on the new fleet.} The current
+    headline runs use $\rho=0.5$ only; the previous gate-invariance
+    ablation was on a smaller setup.
+  \item \textbf{TODO: Adversary with detector-oracle access.}
+    \autoref{thm:security} excludes adversaries who can query the
+    detector; characterising query complexity is open.
+\end{itemize}
+
