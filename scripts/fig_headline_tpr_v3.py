@@ -189,13 +189,17 @@ def render(aggregates: dict[str, dict]) -> None:
                     zorder=6 if is_mcl else 5,
                 )
 
-        # Numeric pooled-value label above each bar — small horizontal,
-        # placed at the bar tip with a 1-unit gap; falls inside the
-        # 0..108 axis cap so labels don't collide with adjacent groups.
-        for bx, v in zip(bar_centers, pooled_vals):
+        # Numeric pooled-value label above each bar — placed above the
+        # error-bar vmax (or the bar tip if there's no spread), with a
+        # 2.5-unit gap so the integer doesn't collide with the cap.
+        for bx, attack, v in zip(bar_centers, ATTACKS, pooled_vals):
+            per_model = aggregates[method][attack]["per_model"]
+            vals = np.array([per_model[m] for m in MODELS], dtype=float)
+            vals = vals[~np.isnan(vals)]
+            top = float(vals.max()) if vals.size else v
             ax.text(
                 bx,
-                v + 1.5,
+                top + 2.5,
                 f"{v:.0f}",
                 ha="center",
                 va="bottom",

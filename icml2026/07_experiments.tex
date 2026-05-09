@@ -71,10 +71,13 @@ state from the key alone and reports a $z$-score.
     % --- COLOURED TOKEN STRIP ------------------------------------------
     % Visual frame matching the user/verdict bubble width so all three
     % rows align horizontally (left edge x=0, right edge x=6.7cm).
-    \node[userbubble, fill=green!4, minimum height=1.85cm,
-          anchor=north west, text width=6.4cm]
-        (outframe) at (0.0, 3.42) {\hphantom{x}};
-    \node[rolelabel] at (-0.05, 3.30) {Output};
+    % Rectangular frame matched to user/verdict bubbles. Height set so
+    % the 3-row coloured-token strip fits without overflow at the top
+    % or clipping at the bottom.
+    \node[userbubble, fill=green!4, minimum height=2.10cm,
+          minimum width=6.7cm, anchor=north west, text width=6.4cm]
+        (outframe) at (0.0, 3.50) {\hphantom{x}};
+    \node[rolelabel] at (-0.05, 3.40) {Output};
 
     % row 1
     \node[tokstyle, fill=c2!35] (t1) at (0.00, 3.20) {Donald};
