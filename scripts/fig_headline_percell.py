@@ -146,18 +146,19 @@ def render(M: np.ndarray, row_meta: list[tuple[str, str]]) -> None:
         ax.set_yticks(np.arange(-0.5, n_rows, 1), minor=True)
         ax.tick_params(which="minor", length=0)
 
-        # Sparse annotations only where TPR < ANNOT_THRESHOLD.
+        # Annotate every cell with its TPR value. Text colour switches
+        # to white on dark cells so contrast stays readable.
         for i in range(mat.shape[0]):
             for j in range(mat.shape[1]):
                 v = mat[i, j]
                 if math.isnan(v):
                     continue
-                if v < ANNOT_THRESHOLD:
-                    ax.text(
-                        j, i, f"{int(round(v))}",
-                        ha="center", va="center",
-                        fontsize=5.6, color="#222222", zorder=3,
-                    )
+                txt_color = "white" if v >= 60 else "#222222"
+                ax.text(
+                    j, i, f"{int(round(v))}",
+                    ha="center", va="center",
+                    fontsize=5.6, color=txt_color, zorder=3,
+                )
 
         # Thin row separators between models (after rows 4 and 8).
         for k in (3.5, 7.5):

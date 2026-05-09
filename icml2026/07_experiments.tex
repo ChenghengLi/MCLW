@@ -59,7 +59,7 @@ state from the key alone and reports a $z$-score.
     % arrow user -> chainmark
     \draw[arrowstyle] (3.35, 4.80) -- (3.35, 4.45);
 
-    % --- CHAINMARK box -------------------------------------------------
+    % --- CHAINMARK box (centered horizontally with user bubble) --------
     \node[chainbox] (chain) at (3.35, 4.20)
       {LM + ChainMark gate
        \mbox{\scriptsize\normalfont($\rho{=}0.5$,\
@@ -69,8 +69,12 @@ state from the key alone and reports a $z$-score.
     \draw[arrowstyle] (3.35, 3.92) -- (3.35, 3.62);
 
     % --- COLOURED TOKEN STRIP ------------------------------------------
-    % Token = colored tile (state via fill). Underline = gated step.
-    \node[rolelabel] at (-0.05, 3.50) {Output};
+    % Visual frame matching the user/verdict bubble width so all three
+    % rows align horizontally (left edge x=0, right edge x=6.7cm).
+    \node[userbubble, fill=green!4, minimum height=1.85cm,
+          anchor=north west, text width=6.4cm]
+        (outframe) at (0.0, 3.42) {\hphantom{x}};
+    \node[rolelabel] at (-0.05, 3.30) {Output};
 
     % row 1
     \node[tokstyle, fill=c2!35] (t1) at (0.00, 3.20) {Donald};
