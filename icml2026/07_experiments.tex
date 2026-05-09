@@ -3,14 +3,15 @@
 \section{Experiments}
 \label{sec:experiments}
 
-We empirically validate the three principal predictions of
-\autoref{thm:detection}, \autoref{thm:robustness}, and
+We empirically (i)~compare MCL head-to-head against KGW and SWEET
+at matched budget and (ii)~validate the three principal predictions
+of \autoref{thm:detection}, \autoref{thm:robustness}, and
 \autoref{thm:k-regular} on a fleet of generations spanning three
 instruct-tuned 7--8B models, four content domains, and four attack
 conditions. The campaign comprises four complementary
-sub-experiments. Exp.~2 (\autoref{subsec:exp2-headline}) is a
-head-to-head comparison against the canonical KGW baseline and the
-SWEET high-entropy gate. Exp.~3 (\autoref{subsec:exp3-translation})
+sub-experiments. Exp.~2 (\autoref{subsec:exp2-headline}) is the
+head-to-head against the canonical KGW baseline and the SWEET
+high-entropy gate. Exp.~3 (\autoref{subsec:exp3-translation})
 measures robustness under machine-translation pivots. Exp.~4
 (\autoref{subsec:exp4-kregular}) sanity-checks the $k$-regular
 generalisation at $k{=}2$. Exp.~5
@@ -67,11 +68,11 @@ operating point $S{=}5$, $\rho = 0.5$, gate $G_{H_{\mathrm{high}}}$,
 clockwork ($k{=}1$). \emph{KGW}~\citep{kirchenbauer2023watermark}
 uses its standard parameters $\gamma = 0.5$ and logit bias
 $\delta_{\mathrm{KGW}} = 2$. \emph{SWEET}~\citep{lee2023sweet} retains the same
-$\gamma = 0.5$, $\delta_{\mathrm{KGW}} = 2$ but applies the watermark only at
-positions whose token-level entropy exceeds a threshold calibrated
-to gate $\rho = 0.5$ of positions; this is the high-entropy gate
-that aligns with our $G_{H_{\mathrm{high}}}$ but in the
-green/red-list scheme.
+$\gamma = 0.5$ and $\delta_{\mathrm{KGW}} = 2$, but applies the
+watermark only at positions whose token-level entropy exceeds a
+threshold calibrated to gate $\rho = 0.5$ of positions. This is
+the high-entropy gate that aligns with our $G_{H_{\mathrm{high}}}$,
+instantiated in the green/red-list scheme.
 
 \textbf{Attacks.} Each generated text is scored under three
 conditions: \emph{clean} (no attack); \emph{random-substitution} at
@@ -218,10 +219,10 @@ the random-baseline fingerprint mass is $p_0 = k/S$, the detection
 $z$-score scales as in \autoref{thm:detection} with this updated
 null mean, and the universal post-attack $\delta^\star$ is invariant
 in $k$. We instantiate $k = 2$ (each state has exactly two allowed
-successors) at $S = 5$, predicting $p_0 = 2/5 = 0.40$, on the wiki
-domain (100 prompts) for each of the three models, with a ZH
-back-translation as the only attack condition (the most frequent
-attack regime on the open web).
+successors) at $S = 5$, predicting $p_0 = 2/5 = 0.40$. The protocol
+is the wiki domain (100 prompts) for each of the three models, with
+ZH back-translation as the only attack condition --- the most
+frequent attack regime on the open web.
 
 \begin{table}[t]
   \centering

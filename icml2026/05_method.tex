@@ -34,12 +34,12 @@ baseline to $2/S$ (\autoref{sec:experiments}).
 
 \subsection{Generation}
 
-At step $i$ with current state $s_i = \sigma_\kappa(t_i)$, MCL forms the
-legal token set $\mathcal{V}_{s_i}^\star =
-\bigcup_{s' \in \Sigma_k(s_i)} \mathcal{V}_{s'}$, masks the LM
-logits outside $\mathcal{V}_{s_i}^\star$ to $-\infty$, and picks
-the argmax at gated positions or samples from the original
-distribution at ungated ones. Each step costs one LM forward pass
+At step $i$ with current state $s_i = \sigma_\kappa(t_i)$, MCL forms
+the legal token set $\mathcal{V}_{s_i}^\star =
+\bigcup_{s' \in \Sigma_k(s_i)} \mathcal{V}_{s'}$ and masks the LM
+logits outside $\mathcal{V}_{s_i}^\star$ to $-\infty$. At gated
+positions MCL picks the argmax over the masked logits; at ungated
+positions it samples from the original distribution. Each step costs one LM forward pass
 plus an $O(V)$ logit mask (precomputed once per state).
 
 \begin{algorithm}[t]
