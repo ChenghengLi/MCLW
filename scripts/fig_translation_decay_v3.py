@@ -160,27 +160,6 @@ def make_plot(scatter, per_model, out_path: Path):
                     zorder=2,
                 )
 
-    # --- Per-model OLS regression lines ----------------------------------
-    # We fit y = a + b*x on unclipped (>=0) ratios over x in [0,1] and
-    # draw within the data's observed delta_eff range so the line doesn't
-    # extrapolate into empty regions.
-    for model, mmeta in MODELS.items():
-        xs_m = np.asarray(per_model[model][0], dtype=float)
-        ys_m = np.asarray(per_model[model][1], dtype=float)
-        if xs_m.size < 2:
-            continue
-        b, a = np.polyfit(xs_m, ys_m, deg=1)
-        x_lo = max(0.0, float(xs_m.min()) - 0.02)
-        x_hi = min(1.0, float(xs_m.max()) + 0.02)
-        xs_line = np.linspace(x_lo, x_hi, 100)
-        ys_line = a + b * xs_line
-        # halo behind for visibility on busy cloud
-        ax.plot(xs_line, ys_line, color="white", linewidth=2.4, zorder=3.4,
-                solid_capstyle="round")
-        ax.plot(xs_line, ys_line, color=mmeta["color"], linewidth=1.5,
-                zorder=3.6, solid_capstyle="round",
-                label=f"{mmeta['label']} fit")
-
     # --- Axes ------------------------------------------------------------
     ax.set_xlim(0.0, 1.0)
     ax.set_ylim(0.0, Y_CLIP)

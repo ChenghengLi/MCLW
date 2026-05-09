@@ -13,94 +13,138 @@ state from the key alone and reports a $z$-score.
 
 \begin{figure}[t]
   \centering
+  % Palette shared with fig:teaser; defined here at figure scope so the
+  % caption (outside tikzpicture) can also reference c0..c4.
+  \definecolor{c0}{HTML}{E15A5A}
+  \definecolor{c1}{HTML}{F0A030}
+  \definecolor{c2}{HTML}{E8C12F}
+  \definecolor{c3}{HTML}{4FAE5C}
+  \definecolor{c4}{HTML}{4A8FD3}
   \begin{tikzpicture}[
     x=1cm, y=1cm,
-    bubblestyle/.style={rounded corners=2.2pt, draw=black!45,
-                        line width=0.4pt, inner sep=4pt,
-                        font=\scriptsize},
-    userbubble/.style={bubblestyle, fill=blue!8, anchor=west,
-                       text width=6.4cm, align=left},
-    asstbubble/.style={bubblestyle, fill=green!8, anchor=west,
-                       text width=6.4cm, align=left},
-    detbubble/.style={bubblestyle, fill=orange!10, anchor=west,
-                      text width=6.4cm, align=left},
-    arrowstyle/.style={->, line width=0.7pt, black!65,
-                       >={Stealth[length=2.2mm,width=2mm]}},
+    userbubble/.style={rounded corners=2pt, draw=black!40,
+                       line width=0.4pt, inner sep=3.5pt,
+                       font=\scriptsize, fill=black!4, anchor=west,
+                       text width=6.7cm, align=left},
+    boxstyle/.style={rounded corners=2pt, draw=black!55,
+                     line width=0.5pt, inner xsep=4pt, inner ysep=2pt,
+                     font=\scriptsize\bfseries, fill=white,
+                     anchor=center, align=center},
+    chainbox/.style={boxstyle, fill=green!8},
+    detbox/.style={boxstyle, fill=orange!10},
+    verdictbox/.style={rounded corners=2pt, draw=black!55, line width=0.5pt,
+                       inner sep=3.5pt, font=\scriptsize, anchor=west,
+                       text width=6.7cm, align=left, fill=orange!6},
+    arrowstyle/.style={->, line width=0.6pt, black!65,
+                       >={Stealth[length=2mm,width=1.8mm]}},
     rolelabel/.style={font=\scriptsize\bfseries, anchor=base east,
                       color=black!70, inner sep=0pt},
-    sttag/.style={font=\tiny, color=black!75},
+    tokstyle/.style={rounded corners=1pt, inner xsep=1.4pt, inner ysep=1pt,
+                     draw=black!25, line width=0.25pt,
+                     font=\scriptsize, anchor=base west},
+    swatch/.style={rounded corners=0.6pt, draw=black!30, line width=0.25pt,
+                   minimum width=2.6mm, minimum height=2.6mm, inner sep=0pt},
   ]
-    % USER prompt
-    \node[rolelabel] at (-0.05, 4.40) {User};
-    \node[userbubble] (user) at (0.0, 4.05)
+    \definecolor{c0}{HTML}{E15A5A}
+    \definecolor{c1}{HTML}{F0A030}
+    \definecolor{c2}{HTML}{E8C12F}
+    \definecolor{c3}{HTML}{4FAE5C}
+    \definecolor{c4}{HTML}{4A8FD3}
+
+    % --- USER prompt ---------------------------------------------------
+    \node[rolelabel] at (-0.05, 5.40) {User};
+    \node[userbubble] (user) at (0.0, 5.05)
       {\texttt{Explain Donald Trump in a comprehensive way.}};
 
-    \draw[arrowstyle] (3.20, 3.85) -- (3.20, 3.40);
-    \node[font=\tiny, color=black!60, anchor=west]
-      at (3.30, 3.62) {ChainMark generation: gate ($\rho{=}0.5$),\
-        mask logits to $\sigma_\kappa^{-1}\!\big((s{+}1)\bmod 5\big)$};
+    % arrow user -> chainmark
+    \draw[arrowstyle] (3.35, 4.80) -- (3.35, 4.45);
 
-    % ASSISTANT bubble (watermarked output)
-    \node[rolelabel] at (-0.05, 2.95) {LM (ChainMark)};
-    \node[asstbubble] (asst) at (0.0, 1.90) {%
-      \textbf{Donald}\,\textsubscript{$s_2$}\
-      \textbf{Trump}\,\textsubscript{$s_3$}\
-      (\textbf{born}\,\textsubscript{$s_4\,\bullet$}\
-      \textbf{June}\,\textsubscript{$s_0\,\bullet$}\
-      \textbf{14}\,\textsubscript{$s_1\,\bullet$},\
-      \textbf{1946}\,\textsubscript{$s_2\,\bullet$})\
-      \textbf{is}\,\textsubscript{$s_3\,\bullet$}\
-      \textbf{a}\,\textsubscript{$s_4$}\
-      \textbf{former}\,\textsubscript{$s_4$}\
-      \textbf{U.S.}\,\textsubscript{$s_0\,\bullet$}\
-      \textbf{president}\,\textsubscript{$s_1\,\bullet$}\
-      \textbf{and}\,\textsubscript{$s_2\,\bullet$}\
-      \textbf{businessman}\,\textsubscript{$s_3\,\bullet$}\
-      \textbf{who}\,\textsubscript{$s_4\,\bullet$}\
-      \textbf{served}\,\textsubscript{$s_0\,\bullet$}\
-      \textbf{as}\,\textsubscript{$s_1\,\bullet$}\
-      \textbf{the}\,\textsubscript{$s_2\,\bullet$}\
-      \textbf{45th}\,\textsubscript{$s_3\,\bullet$}\
-      \textbf{president}\,\textsubscript{$s_4\,\bullet$}\
-      \textbf{from}\,\textsubscript{$s_0\,\bullet$}\
-      \textbf{2017}\,\textsubscript{$s_1\,\bullet$}\
-      \textbf{to}\,\textsubscript{$s_2\,\bullet$}\
-      \textbf{2021}\,\textsubscript{$s_3\,\bullet$}\
-      \textbf{after}\,\textsubscript{$s_4$}\
-      \textbf{a}\,\textsubscript{$s_4$}\
-      \textbf{long}\,\textsubscript{$s_0\,\bullet$}\
-      \textbf{career}\,\textsubscript{$s_1\,\bullet$}\
-      \textbf{in}\,\textsubscript{$s_2\,\bullet$}\
-      \textbf{real}\,\textsubscript{$s_3\,\bullet$}\
-      \textbf{estate}\,\textsubscript{$s_4\,\bullet$}\
-      \textbf{and}\,\textsubscript{$s_0\,\bullet$}\
-      \textbf{television}\,\textsubscript{$s_1\,\bullet$}.\,\dots\\[1pt]
-      {\tiny ($\bullet$ = gated step where ChainMark forced
-      $s_{i+1}{=}(s_i{+}1)\!\bmod 5$; subscripts $=$
-      $\sigma_\kappa(t_i)$. Ungated tokens (no $\bullet$) are
-      free-sampled at $T{=}0.7$ and may break the cycle.)}};
+    % --- CHAINMARK box -------------------------------------------------
+    \node[chainbox] (chain) at (3.35, 4.20)
+      {LM + ChainMark gate
+       \mbox{\scriptsize\normalfont($\rho{=}0.5$,\
+         mask to $\sigma_\kappa^{-1}((s{+}1)\bmod 5)$)}};
 
-    \draw[arrowstyle] (3.20, 0.95) -- (3.20, 0.45);
-    \node[font=\tiny, color=black!60, anchor=west]
-      at (3.30, 0.70) {Model-free detector: re-run $\sigma_\kappa$,\
-        count valid transitions};
+    % arrow chainmark -> tokens
+    \draw[arrowstyle] (3.35, 3.92) -- (3.35, 3.62);
 
-    % DETECTOR verdict
-    \node[rolelabel] at (-0.05, -0.05) {Auditor};
-    \node[detbubble] (det) at (0.0, -0.80)
-      {\textbf{Verdict on the 33-token window above:}
-       $\phi = 27/32 = 0.84\;\;(\text{vs }p_0=0.20)$,\
-       $z = 9.05 > z_{0.01}=2.326$, $p\text{-value} \ll 10^{-15}$.\\
-       \textbf{watermarked} (no LM access required).};
+    % --- COLOURED TOKEN STRIP ------------------------------------------
+    % Token = colored tile (state via fill). Underline = gated step.
+    \node[rolelabel] at (-0.05, 3.50) {Output};
+
+    % row 1
+    \node[tokstyle, fill=c2!35] (t1) at (0.00, 3.20) {Donald};
+    \node[tokstyle, fill=c3!35, right=0.6mm of t1.base east, anchor=base west] (t2)  {Trump};
+    \node[tokstyle, fill=c4!35, right=0.6mm of t2.base east, anchor=base west] (t3)  {\underline{born}};
+    \node[tokstyle, fill=c0!35, right=0.6mm of t3.base east, anchor=base west] (t4)  {\underline{June}};
+    \node[tokstyle, fill=c1!35, right=0.6mm of t4.base east, anchor=base west] (t5)  {\underline{14}};
+    \node[tokstyle, fill=c2!35, right=0.6mm of t5.base east, anchor=base west] (t6)  {\underline{1946}};
+    \node[tokstyle, fill=c3!35, right=0.6mm of t6.base east, anchor=base west] (t7)  {\underline{is}};
+    \node[tokstyle, fill=c4!35, right=0.6mm of t7.base east, anchor=base west] (t8)  {a};
+    \node[tokstyle, fill=c4!35, right=0.6mm of t8.base east, anchor=base west] (t9)  {former};
+    % row 2
+    \node[tokstyle, fill=c0!35] (t10) at (0.00, 2.65) {\underline{U.S.}};
+    \node[tokstyle, fill=c1!35, right=0.6mm of t10.base east, anchor=base west] (t11) {\underline{president}};
+    \node[tokstyle, fill=c2!35, right=0.6mm of t11.base east, anchor=base west] (t12) {\underline{and}};
+    \node[tokstyle, fill=c3!35, right=0.6mm of t12.base east, anchor=base west] (t13) {\underline{businessman}};
+    \node[tokstyle, fill=c4!35, right=0.6mm of t13.base east, anchor=base west] (t14) {\underline{who}};
+    \node[tokstyle, fill=c0!35, right=0.6mm of t14.base east, anchor=base west] (t15) {\underline{served}};
+    % row 3
+    \node[tokstyle, fill=c1!35] (t16) at (0.00, 2.10) {\underline{as}};
+    \node[tokstyle, fill=c2!35, right=0.6mm of t16.base east, anchor=base west] (t17) {\underline{the}};
+    \node[tokstyle, fill=c3!35, right=0.6mm of t17.base east, anchor=base west] (t18) {\underline{45th}};
+    \node[tokstyle, fill=c4!35, right=0.6mm of t18.base east, anchor=base west] (t19) {\underline{president}};
+    \node[tokstyle, fill=c0!35, right=0.6mm of t19.base east, anchor=base west] (t20) {\underline{from}};
+    \node[tokstyle, fill=c1!35, right=0.6mm of t20.base east, anchor=base west] (t21) {\underline{2017}};
+    \node[tokstyle, fill=c2!35, right=0.6mm of t21.base east, anchor=base west] (t22) {\underline{to}};
+    \node[tokstyle, fill=c3!35, right=0.6mm of t22.base east, anchor=base west] (t23) {\underline{2021}\,\dots};
+
+    % inline state legend (below tokens)
+    \node[font=\tiny, color=black!70, anchor=base west]
+      at (0.0, 1.55) {state};
+    \node[swatch, fill=c0!55, anchor=base west] (lg0) at (0.75, 1.50) {};
+    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg0.east) {0};
+    \node[swatch, fill=c1!55, anchor=base west] (lg1) at (1.20, 1.50) {};
+    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg1.east) {1};
+    \node[swatch, fill=c2!55, anchor=base west] (lg2) at (1.65, 1.50) {};
+    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg2.east) {2};
+    \node[swatch, fill=c3!55, anchor=base west] (lg3) at (2.10, 1.50) {};
+    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg3.east) {3};
+    \node[swatch, fill=c4!55, anchor=base west] (lg4) at (2.55, 1.50) {};
+    \node[font=\tiny, anchor=base west, inner sep=1pt] at (lg4.east) {4};
+    \node[font=\tiny, color=black!70, anchor=base west]
+      at (3.05, 1.55) {\underline{token} = gated step};
+
+    % arrow tokens -> detector
+    \draw[arrowstyle] (3.35, 1.25) -- (3.35, 0.95);
+
+    % --- DETECTOR ------------------------------------------------------
+    \node[detbox] (det) at (3.35, 0.70)
+      {Auditor: re-derive $\sigma_\kappa$, count valid
+       $s\!\to\!s{+}1$};
+
+    % arrow detector -> verdict
+    \draw[arrowstyle] (3.35, 0.42) -- (3.35, 0.12);
+
+    % --- VERDICT -------------------------------------------------------
+    \node[rolelabel] at (-0.05, -0.20) {Verdict};
+    \node[verdictbox] (verd) at (0.0, -0.70)
+      {$\phi = 27/32 = 0.84$ (null $p_0{=}0.20$),\
+       \mbox{$z = 9.05 > z_{0.01}{=}2.326$}\,$\Rightarrow$\
+       \textbf{watermarked} \mbox{(no LM access).}};
+
   \end{tikzpicture}
-  \caption{\textbf{End-to-end ChainMark trace} for a wiki-domain
-    prompt on Llama-3.1-8B-Instruct ($S{=}5$, $\rho{=}0.5$, $33$
-    tokens shown). Subscripts under each token are its state
-    $\sigma_\kappa(t)$; \textbullet\ marks the gated steps where the
-    next token's state is forced. The auditor reproduces the state
-    sequence from the key $\kappa$ alone and computes
-    $\phi$, $z$ in $O(n)$ hash operations, with no language-model
-    access.}
+  \caption{\textbf{End-to-end ChainMark trace} on a wiki prompt
+    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$).
+    Each token tile is coloured by its state
+    $\sigma_\kappa(t) \in \{0,1,2,3,4\}$, so the clockwork cycle
+    reads off as a colour rotation
+    \textcolor{c0!85!black}{$\bullet$}\,$\to$\,\textcolor{c1!85!black}{$\bullet$}\,$\to$\,\textcolor{c2!85!black}{$\bullet$}\,$\to$\,\textcolor{c3!85!black}{$\bullet$}\,$\to$\,\textcolor{c4!85!black}{$\bullet$}.
+    Underlined tokens are the gated steps where ChainMark forced
+    $s_{i{+}1}{=}(s_i{+}1)\bmod 5$; un-underlined tokens are
+    free-sampled at $T{=}0.7$. The auditor reproduces the colour
+    sequence from $\kappa$ alone and reports $(\phi, z)$ in $O(n)$
+    hash operations.}
   \label{fig:experiment-flow}
 \end{figure}
 
@@ -162,7 +206,7 @@ on a $14$-token window, well above $z_{0.01}{=}2.326$.
     \caption{\textbf{Translation robustness.} Empirical decay ratio
       under NLLB-200 EN$\to$\{FR,DE,RU,ZH\}$\to$EN with the closed-form
       $(1-\delta_{\mathrm{eff}})^2$ diagonal
-      (\autoref{thm:robustness}); Llama/Qwen $n{=}100$, Mistral $n{=}75$.}
+      (\autoref{thm:robustness}); $n{=}100$ per (model, pivot).}
     \label{fig:translation-decay}
   \end{subfigure}\hfill
   \begin{subfigure}[t]{0.32\linewidth}
@@ -230,10 +274,10 @@ ablation of KGW with the gating policy held fixed against ChainMark.
   \includegraphics[width=\linewidth]{pictures/fig_headline_percell.pdf}
   \caption{\textbf{Per-(model, domain) head-to-head TPR (\%)} at
     $z_\alpha=2.326$ ($100$ prompts per cell, $n{=}200$ tokens).
-    Each row is one (model, domain) cell; left block is clean, right
-    block is ZH back-translation. ChainMark matches or leads every
-    clean cell and strictly leads every cell post-ZH-back-translation.
-    Bold = best per row within each attack block.}
+    Each row is one (model, domain) cell; left panel is clean, right
+    panel is ZH back-translation. MCL (ChainMark) matches or leads
+    every clean cell and strictly leads every cell post-ZH-back-translation.
+    Cells with TPR$<$50\% are annotated with their value.}
   \label{tab:headline-percell}
 \end{figure}
 

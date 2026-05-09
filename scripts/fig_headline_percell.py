@@ -35,7 +35,7 @@ MODELS = [
 ]
 DOMAINS = ["code", "factual", "wiki", "writing"]
 METHODS = ["mcl", "kgw", "sweet"]
-METHOD_LABELS = {"mcl": "ChainMark", "kgw": "KGW", "sweet": "SWEET"}
+METHOD_LABELS = {"mcl": "MCL", "kgw": "KGW", "sweet": "SWEET"}
 ATTACKS = [("z_clean", "Clean"), ("z_zh", "ZH back-translation")]
 Z_THRESHOLD = 2.326
 ANNOT_THRESHOLD = 50.0  # only annotate cells with TPR strictly below this
@@ -90,7 +90,6 @@ def render(M: np.ndarray, row_meta: list[tuple[str, str]]) -> None:
         "font.size": 8,
         "axes.labelsize": 8,
         "axes.titlesize": 8,
-        "legend.fontsize": 7,
         "xtick.labelsize": 7,
         "ytick.labelsize": 7,
         "pdf.fonttype": 42,
@@ -101,22 +100,21 @@ def render(M: np.ndarray, row_meta: list[tuple[str, str]]) -> None:
     n_rows = M.shape[0]  # 12
     n_methods = len(METHODS)  # 3
 
-    # Split the 12x6 matrix into two 12x3 panels.
     M_clean = M[:, :3]
     M_zh    = M[:, 3:]
 
-    # Sequential blues; vmin/vmax = 0..100. White at 0, deep navy at 100.
+    # Sequential blues; 0..100. White ≈ 0, deep navy ≈ 100.
     cmap = plt.get_cmap("Blues")
     vmin, vmax = 0.0, 100.0
 
-    fig = plt.figure(figsize=(3.25, 3.6))
+    fig = plt.figure(figsize=(3.2, 4.0))
     gs = fig.add_gridspec(
         nrows=2, ncols=2,
-        height_ratios=[1.0, 0.045],
+        height_ratios=[1.0, 0.035],
         width_ratios=[1.0, 1.0],
-        wspace=0.10, hspace=0.18,
-        left=0.235, right=0.985,
-        top=0.905, bottom=0.085,
+        wspace=0.12, hspace=0.20,
+        left=0.27, right=0.985,
+        top=0.94, bottom=0.085,
     )
     ax_clean = fig.add_subplot(gs[0, 0])
     ax_zh    = fig.add_subplot(gs[0, 1], sharey=ax_clean)
@@ -124,6 +122,7 @@ def render(M: np.ndarray, row_meta: list[tuple[str, str]]) -> None:
 
     method_xticklabels = [METHOD_LABELS[m] for m in METHODS]
 
+    im = None
     for ax, mat, panel_title in (
         (ax_clean, M_clean, "Clean"),
         (ax_zh,    M_zh,    "ZH back-translation"),
@@ -132,62 +131,62 @@ def render(M: np.ndarray, row_meta: list[tuple[str, str]]) -> None:
             mat, cmap=cmap, vmin=vmin, vmax=vmax,
             aspect="auto", interpolation="nearest",
         )
+        # Methods as a single row of x-tick labels under each panel.
         ax.set_xticks(np.arange(n_methods))
-        ax.set_xticklabels(method_xticklabels, fontsize=6.8)
+        ax.set_xticklabels(method_xticklabels, fontsize=7.0)
         ax.tick_params(axis="x", which="both", length=0, pad=2)
         ax.tick_params(axis="y", which="both", length=0)
-        # Hide all spines so heatmap reads as a clean color block.
         for spine in ax.spines.values():
             spine.set_visible(False)
-        ax.set_title(panel_title, fontsize=7.8, pad=3)
+        # Title-style panel labels at the top.
+        ax.set_title(panel_title, fontsize=8, pad=3)
 
-        # Thin white gridlines between cells.
+        # No interior gridlines on the heatmap; only the minor ticks.
         ax.set_xticks(np.arange(-0.5, n_methods, 1), minor=True)
         ax.set_yticks(np.arange(-0.5, n_rows, 1), minor=True)
-        ax.grid(which="minor", color="white", linewidth=0.6)
         ax.tick_params(which="minor", length=0)
 
-        # Sparse annotations: only where TPR < ANNOT_THRESHOLD (the failure
-        # cells); these are the cells that actually carry the story
-        # (baselines collapse under ZH while ChainMark stays high).
+        # Sparse annotations only where TPR < ANNOT_THRESHOLD.
         for i in range(mat.shape[0]):
             for j in range(mat.shape[1]):
                 v = mat[i, j]
                 if math.isnan(v):
                     continue
                 if v < ANNOT_THRESHOLD:
-                    # Dark text on light background (since v is small,
-                    # cell is light blue / white).
                     ax.text(
                         j, i, f"{int(round(v))}",
                         ha="center", va="center",
-                        fontsize=5.8, color="#222222", zorder=3,
+                        fontsize=5.6, color="#222222", zorder=3,
                     )
 
-        # Thin model-group separators after rows 4 and 8 (between models).
+        # Thin row separators between models (after rows 4 and 8).
         for k in (3.5, 7.5):
-            ax.axhline(y=k, color="#5a5a5a", linewidth=0.5, zorder=4)
+            ax.axhline(y=k, color="#cfcfcf", linewidth=0.4, zorder=4)
 
-        # Thin border around the whole heatmap so it doesn't bleed.
+        # Thin outer border so the panel reads as a contained block.
         ax.add_patch(plt.Rectangle(
             (-0.5, -0.5), n_methods, n_rows,
-            fill=False, edgecolor="#888888", linewidth=0.4, zorder=5,
+            fill=False, edgecolor="#9a9a9a", linewidth=0.35, zorder=5,
         ))
 
-    # Y-axis labels on left panel only: "Model / domain".
-    row_labels = [f"{m} / {d}" for (m, d) in row_meta]
+    # Compact two-line row labels: "<model>" newline "<domain>" would be too
+    # tall; instead use "<model> · <domain>" with a thin midpoint dot. Drop
+    # the "Instruct" suffix (already implied) — model names already trimmed.
+    row_labels = [f"{m} · {d}" for (m, d) in row_meta]
     ax_clean.set_yticks(np.arange(n_rows))
     ax_clean.set_yticklabels(row_labels, fontsize=6.6)
     plt.setp(ax_zh.get_yticklabels(), visible=False)
+    # Invert so first row appears at top (matplotlib default already does
+    # this with imshow; keep explicit for clarity if shape changes).
 
-    # Shared horizontal colorbar at the bottom.
+    # Shared horizontal colorbar at the bottom — concise label.
     cbar = fig.colorbar(
         im, cax=ax_cbar, orientation="horizontal",
         ticks=[0, 25, 50, 75, 100],
     )
     cbar.outline.set_linewidth(0.4)
     cbar.ax.tick_params(labelsize=6.5, length=2, width=0.4, pad=1.5)
-    cbar.set_label("TPR (%) at $z>2.326$", fontsize=7.2, labelpad=2)
+    cbar.set_label("TPR (%)", fontsize=7.2, labelpad=2)
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_PATH, format="pdf", bbox_inches="tight", pad_inches=0.02)

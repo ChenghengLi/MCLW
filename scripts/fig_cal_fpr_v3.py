@@ -123,27 +123,26 @@ def render(rows: list[dict]) -> None:
     fig, ax = plt.subplots(figsize=(3.2, 3.0))
 
     Ss = [r["S"] for r in rows]
+    fpr_pooled_analytic = [r["fpr_pooled_analytic"] for r in rows]
     fpr_recal = [r["fpr_recal"] for r in rows]
     hoeff = [r["hoeff"] for r in rows]
 
-    # ---- (a) Per-model analytic FPR lines ------------------------------
-    for m in MODELS:
-        ys = [r["per_model_analytic"][m] for r in rows]
-        ax.plot(
-            Ss, ys,
-            marker=MODEL_MARKERS[m], markersize=4.5,
-            linestyle="-", linewidth=1.2,
-            color=MODEL_COLORS[m],
-            label=f"{MODEL_LABELS[m]} (analytic $z_\\alpha$)",
-            zorder=4,
-        )
+    # ---- (a) Pooled empirical FPR at analytic threshold ----------------
+    ax.plot(
+        Ss, fpr_pooled_analytic,
+        marker="o", markersize=4.5,
+        linestyle="-", linewidth=1.2,
+        color="#e07b00",
+        label=r"Empirical FPR @ $z_\alpha$",
+        zorder=4,
+    )
 
     # ---- (b) Pooled recalibrated empirical-quantile FPR ----------------
     ax.plot(
         Ss, fpr_recal,
-        marker="x", markersize=5,
+        marker="s", markersize=4.5,
         linestyle="-", linewidth=1.4,
-        color="#444444",
+        color="#2ca02c",
         label=r"Recalibrated $z^\star=\hat F^{-1}(1-\alpha)$",
         zorder=5,
     )
@@ -152,7 +151,7 @@ def render(rows: list[dict]) -> None:
     ax.plot(
         Ss, hoeff,
         linestyle="--", linewidth=1.0,
-        color="#777777",
+        color="#1f4e9d",
         marker="",
         label="Hoeffding bound",
         zorder=3,
@@ -176,10 +175,8 @@ def render(rows: list[dict]) -> None:
     ax.set_xlim(min(S_VALUES) - 0.5, max(S_VALUES) + 0.5)
     ax.minorticks_off()
 
-    # y range driven by the largest per-model analytic value.
-    all_y = []
-    for r in rows:
-        all_y.extend(r["per_model_analytic"].values())
+    # y range driven by the pooled empirical analytic value.
+    all_y = list(fpr_pooled_analytic)
     all_y.extend(fpr_recal)
     all_y.extend(hoeff)
     all_y = [v for v in all_y if not math.isnan(v)]
@@ -234,18 +231,19 @@ def main() -> None:
         ]))
         hoeff = hoeffding_bound_perS(S, int(round(mean_n_pool)))
 
-        rows.append({
-            "S": S,
-            "per_model_analytic": per_model_analytic,
-            "fpr_recal": fpr_recal,
-            "hoeff": hoeff,
-        })
-
         L_arr, _ = per_model_arr["llama-3-1-8b-instruct"]
         M_arr, _ = per_model_arr["mistral-7b-instruct-v0-3"]
         Q_arr, _ = per_model_arr["qwen2-5-7b-instruct"]
         # Pooled-FPR equivalent for the old aggregate row (kept for sanity)
         fpr_pooled_analytic = empirical_fpr_at(pooled, Z_ALPHA)
+
+        rows.append({
+            "S": S,
+            "per_model_analytic": per_model_analytic,
+            "fpr_pooled_analytic": fpr_pooled_analytic,
+            "fpr_recal": fpr_recal,
+            "hoeff": hoeff,
+        })
         print(
             f"{S:>3}  {L_arr.size:>4} {M_arr.size:>4} {Q_arr.size:>4}  "
             f"{per_model_analytic['llama-3-1-8b-instruct']:>5.2f}% "
