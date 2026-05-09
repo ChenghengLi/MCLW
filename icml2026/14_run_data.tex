@@ -37,11 +37,15 @@
   \centering
   \caption{\textbf{Empirical-SD recalibration vs.\ failure modes,
     evaluated on $n=3000$ non-watermarked samples ($1000$ per
-    model).} Goal: empirical FPR $\le 1\%$ at the
-    $\alpha=1\%$ target while preserving TPR$=100\%$. Only the
-    empirical-SD recipe (Fix~1) reaches the target; the other four
-    are reported as failure modes. The iid-baseline row is the
-    closed-form $z_\alpha=2.326$ threshold without recalibration.}
+    model).} Goal: bring empirical FPR close to the $\alpha=1\%$
+    target while preserving TPR$=100\%$. Only the empirical-SD
+    recipe (Fix~1) brings FPR within $\sim 0.2$ pp of the target
+    ($1.17\%$); the other four sit at $2$--$5\%$ FPR or collapse
+    TPR. The iid-baseline row is the closed-form $z_\alpha=2.326$
+    threshold without recalibration. The $2.07\%$ baseline on this
+    $n=3000$ pooled corpus supersedes the $1.7$--$6.9\%$ per-$S$
+    cells in \autoref{tab:cal-sstar} (which use the smaller
+    Exp.~5 sub-design with $n\approx 300$ per cell).}
   \label{tab:fpr-recipes}
   \small
   \setlength{\tabcolsep}{4pt}
