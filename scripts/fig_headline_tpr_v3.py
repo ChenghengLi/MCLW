@@ -189,16 +189,18 @@ def render(aggregates: dict[str, dict]) -> None:
                     zorder=6 if is_mcl else 5,
                 )
 
-        # Numeric pooled-value label above each bar (compact, vertical)
+        # Numeric pooled-value label above each bar — small horizontal,
+        # placed at the bar tip with a 1-unit gap; falls inside the
+        # 0..108 axis cap so labels don't collide with adjacent groups.
         for bx, v in zip(bar_centers, pooled_vals):
             ax.text(
                 bx,
-                v + 2.2,
-                f"{v:.1f}",
+                v + 1.5,
+                f"{v:.0f}",
                 ha="center",
                 va="bottom",
-                fontsize=5.4,
-                rotation=90,
+                fontsize=5.6,
+                rotation=0,
                 fontweight=("bold" if is_mcl else "normal"),
                 color=("#0a1d4d" if is_mcl else "#444444"),
             )
