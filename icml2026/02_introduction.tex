@@ -8,8 +8,8 @@ substrate is unsettled. Existing watermarks have three structural
 problems for regulator-facing audit. \emph{(i)~LM-bound detection.}
 KGW~\citep{kirchenbauer2023watermark} and its entropy-gated variants
 SWEET~\citep{lee2023sweet} and EWD~\citep{lu2024ewd} require the
-generating LM (or a faithful proxy) at detection time --- to
-recompute the green-list bias or to weight tokens by entropy --- so
+generating LM (or a faithful proxy) at detection time, to
+recompute the green-list bias or to weight tokens by entropy, so
 a third-party auditor cannot verify a transcript from the key alone.
 \emph{(ii)~No closed-form calibration.} None of these schemes
 inverts a regulator-side specification (target FPR $\alpha$, text
@@ -35,7 +35,7 @@ generated positions, the language-model logits are masked to keep
 only tokens whose state is the legal successor, so the produced
 text walks the chain by construction. Detection re-derives every
 token's state from the key in $O(n)$ hash operations and counts how
-often consecutive tokens follow the cycle --- no LM access, no proxy
+often consecutive tokens follow the cycle, no LM access, no proxy
 weights, no learned components. The detector's null law inverts in
 closed form to a calibration map
 $S^\star(n_{\min}, \rho, \alpha)$ (\autoref{thm:detection},

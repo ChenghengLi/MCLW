@@ -311,7 +311,7 @@ universal robustness threshold; we isolate it as a lemma.
   baseline $1/S$ is $\Delta = \rho(S{-}1)/S$ pre-attack and $\Delta
   (1-\delta)^2$ post-attack.  The null SD is the same in both regimes
   (it is a property of the null distribution, which the attack does
-  not change --- and the post-attack \emph{alternative} variance is
+  not change, and the post-attack \emph{alternative} variance is
   bounded above by the null variance, only making the standardised
   margin a tighter lower bound on detection).  Hence
   $z_{\mathrm{post}}/z_{\mathrm{pre}} = \Delta_{\mathrm{post}} /
@@ -506,9 +506,9 @@ recall the definition for the appendix.
   let $g_i \in \{0,1\}$ denote the gate indicator at position $i$.
   Set $\pi_i = g_i + (1 - g_i)/S$, the marginal probability of
   $X_i = 1$ under the watermark alternative.  Treating $\{X_i\}$ as
-  conditionally independent given the keyed state sequence ---
+  conditionally independent given the keyed state sequence , 
   asymptotically valid under the random oracle on distinct tokens
-  --- the log-likelihood ratio
+ , the log-likelihood ratio
   \begin{equation}
     \Lambda
       \;=\; \sum_{i=1}^{n-1}\!
@@ -658,7 +658,7 @@ they are referenced from elsewhere in the paper.
   introduces previously-queried tokens (whose state is in
   $\sigma_\kappa(\mathcal{T}_{\mathrm{q}})$) can craft pairs that hit valid
   transitions deterministically, raising $\phi$ above
-  $\Sigma(\delta)$ --- which only helps detection.  The lower bound
+  $\Sigma(\delta)$, which only helps detection.  The lower bound
   $\Sigma(\delta) \geq \delta(2-\delta)/S$ is therefore strategy-free.
 \end{proof}
 

@@ -7,13 +7,13 @@ OECD Hiroshima Process). Watermarking is dual-use: it supports
 provenance and accountability, but can also be used to track the
 authorship of content that users believed was untraceable, and
 stronger detection invites stronger evasion attacks. False positives
-are a particular concern --- mislabelling human-written text as
-machine-generated has real reputational and legal cost --- which is
+are a particular concern, mislabelling human-written text as
+machine-generated has real reputational and legal cost, which is
 why we instrument the detector with a closed-form, regulator-facing
 target false-positive rate rather than an unspecified threshold. Our
 model-free detector reduces verification-side compute and allows
 third-party audit without any access to the generating LM, which we
 view as governance-positive. Any deployment should disclose its
-detection regime --- the target false-positive rate, the text-length
-floor, and the watermark fraction --- so that users understand the
+detection regime, the target false-positive rate, the text-length
+floor, and the watermark fraction, so that users understand the
 conditions under which their outputs are, and are not, marked.
