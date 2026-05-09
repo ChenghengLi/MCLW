@@ -71,7 +71,7 @@ positions, gated to $\rho = 0.5$ to match ChainMark's budget.
   \label{fig:exp-overview}
 \end{figure*}
 
-\subsection{Matched-budget head-to-head against KGW and SWEET}
+\subsection{Matched-budget head-to-head}
 \label{subsec:exp2-headline}
 
 A $3 \times 3 \times 4 \times 3$ factorial (3 methods $\times$ 3 models
@@ -97,15 +97,15 @@ holds the gating policy fixed against ChainMark.
     Bold = best per column.}
   \label{tab:headline-aggregate}
   \small
-  \setlength{\tabcolsep}{4pt}
-  \begin{tabular}{lccccc}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{lcccc}
     \toprule
-    Method & cells & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{random}}$ &
-            TPR$_{\mathrm{ZH}}$ & PPL ($\downarrow$) \\
+    Method & TPR$_{\mathrm{clean}}$ & TPR$_{\mathrm{rnd}}$ &
+            TPR$_{\mathrm{ZH}}$ & PPL$\downarrow$ \\
     \midrule
-    \textbf{ChainMark (ours)} & 12/12 & \textbf{100.0\%} & \textbf{\phantom{0}99.9\%} & \textbf{72.8\%} & 3.66 \\
-    KGW                 & 12/12 & \phantom{0}74.8\% & \phantom{0}55.1\%  & 19.4\%  & 1.93 \\
-    SWEET               & 12/12 & \phantom{0}71.8\% & \phantom{0}51.2\%  & 18.0\%  & \textbf{1.80} \\
+    \textbf{ChainMark} & \textbf{100.0} & \textbf{99.9} & \textbf{72.8} & 3.66 \\
+    KGW                & \phantom{0}74.8 & 55.1 & 19.4 & 1.93 \\
+    SWEET              & \phantom{0}71.8 & 51.2 & 18.0 & \textbf{1.80} \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -160,7 +160,7 @@ rather than tight. The claim is stronger than synthetic
 random-substitution can support, since NLLB-200 produces
 semantically coherent rewrites rather than i.i.d.\ token noise.
 
-\subsection{$k$-regular ChainMark at $k{=}2$}
+\subsection{$k$-regular at $k{=}2$}
 \label{subsec:exp4-kregular}
 
 Instantiating $k = 2$ (each state has two allowed successors) at
@@ -196,7 +196,7 @@ $k$.
   \end{tabular}
 \end{table}
 
-\subsection{Calibration anchor (state-count sweep)}
+\subsection{Calibration anchor}
 \label{subsec:exp5-calibration}
 
 We sweep $S \in \{2, 3, 5, 7, 11\}$ across the three models with
