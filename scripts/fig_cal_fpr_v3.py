@@ -113,7 +113,7 @@ def render(rows: list[dict]) -> None:
         "axes.spines.right": False,
     })
 
-    fig, ax = plt.subplots(figsize=(3.4, 2.6))
+    fig, ax = plt.subplots(figsize=(3.4, 3.0))
 
     Ss = [r["S"] for r in rows]
     fpr_emp = [r["fpr_analytic"] for r in rows]
@@ -180,13 +180,15 @@ def render(rows: list[dict]) -> None:
     ax.yaxis.grid(True, linestyle=":", linewidth=0.5, color="#bbbbbb", zorder=0)
     ax.set_axisbelow(True)
 
-    # Legend OUTSIDE the plot, top-right anchor
+    # Legend OUTSIDE the plot, BELOW the axes
     ax.legend(
-        loc="upper left",
-        bbox_to_anchor=(1.02, 1.0),
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.18),
+        ncol=2,
         frameon=False,
         handlelength=1.8,
         handletextpad=0.5,
+        columnspacing=1.2,
         borderaxespad=0.0,
     )
 

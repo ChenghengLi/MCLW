@@ -102,7 +102,7 @@ def collect_points():
 # Plot
 # ---------------------------------------------------------------------------
 def make_plot(points, out_path: Path):
-    fig, ax = plt.subplots(figsize=(3.0, 3.0))
+    fig, ax = plt.subplots(figsize=(3.2, 3.0))
 
     # Theory diagonal y = (1 - x)^2
     xs = np.linspace(0, 1, 400)
@@ -155,7 +155,7 @@ def make_plot(points, out_path: Path):
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
-    # ----- Single combined legend, outside on the right --------------------
+    # ----- Single combined legend, outside BELOW the axes ------------------
     pivot_handles = [
         plt.Line2D([0], [0], marker="o", linestyle="",
                    markerfacecolor=meta["color"],
@@ -178,15 +178,17 @@ def make_plot(points, out_path: Path):
 
     ax.legend(
         handles=pivot_handles + model_handles + [theory_handle],
-        loc="upper left", bbox_to_anchor=(1.02, 1.0),
-        ncol=1, frameon=False,
-        handletextpad=0.4, borderaxespad=0.0,
+        loc="upper center", bbox_to_anchor=(0.5, -0.18),
+        ncol=4, frameon=False,
+        handlelength=1.1,
+        handletextpad=0.4, columnspacing=1.0,
+        borderaxespad=0.0,
         fontsize=7,
     )
 
     fig.tight_layout(pad=0.3)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_path, format="pdf", bbox_inches="tight")
+    fig.savefig(out_path, format="pdf", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
 
 
