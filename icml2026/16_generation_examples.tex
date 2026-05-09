@@ -1,0 +1,70 @@
+% 16_generation_examples.tex -- appendix: prompt + setup examples
+\section{Prompt and Generation Examples}
+\label{app:examples}
+
+This appendix shows representative prompts from each of the four
+content domains used in \autoref{sec:experiments}, together with the
+exact ChainMark configuration and post-attack pipeline that produced
+the headline numbers in \autoref{tab:headline-aggregate} and
+\autoref{tab:headline-percell}. All three models receive the same
+prompt verbatim with no system prompt prepended; decoding parameters
+($T{=}0.7$, top-$p{=}1$, $n{=}200$ tokens, deterministic
+prompt-order seed) are also held fixed across models and methods.
+
+\paragraph{Prompt examples per domain.}
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Code} (HumanEval problem stems, $164$ problems
+    available; we use the first $100$):
+    \begin{quote}\small\ttfamily
+    from typing import List\\
+    def has\_close\_elements(numbers: List[float], threshold: float) -> bool:\\
+    \quad """Check if in given list of numbers, are any two numbers closer to each other than given threshold."""
+    \end{quote}
+  \item \textbf{Factual} (short closed-form knowledge prompts):
+    \begin{quote}\small\ttfamily
+    The capital of France is
+    \end{quote}
+  \item \textbf{Wiki} (open-ended ``Explain $X$\ldots'' prompts over
+    a curated $176$-entry concept list):
+    \begin{quote}\small\ttfamily
+    Explain Donald Trump in a comprehensive way.
+    \end{quote}
+  \item \textbf{Writing} (creative-completion prompts):
+    \begin{quote}\small\ttfamily
+    Write a short story that begins: The colony ship arrived three centuries late, and someone was already waiting.
+    \end{quote}
+\end{itemize}
+
+\paragraph{ChainMark generation configuration (used in
+\autoref{tab:headline-aggregate}).}
+At each generation step on the prompt above, the model produces a
+distribution over its native vocabulary; ChainMark then masks logits
+at gated positions (gate density $\rho{=}0.5$, high-entropy gate
+$G_{H_{\mathrm{high}}}$) to keep only token IDs whose state
+$\sigma_\kappa(t) = \mathrm{SHA\text{-}256}(\kappa\,\Vert\,t) \bmod
+S$ equals $(s+1) \bmod S$, where $s$ is the previous token's state.
+At ungated positions the model samples at $T{=}0.7$ from the original
+distribution. The secret key $\kappa$ is fixed for the full
+campaign; in deployment a regulator-side audit re-derives the same
+state sequence from the same key with the model's tokenizer.
+
+\paragraph{Attack-pipeline example.} Given the watermarked text $x$
+(say, $200$ tokens of a wiki-domain answer), the three attack
+conditions in \autoref{tab:headline-aggregate} apply respectively:
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Clean.} Detect on $x$ as-is.
+  \item \textbf{Random substitution at $\delta_{\mathrm{eff}}{=}0.20$.}
+    Replace a uniformly random $20\%$ of tokens with a uniformly
+    sampled vocabulary token, then detect on the corrupted text.
+  \item \textbf{ZH back-translation.} Pass $x$ through
+    NLLB-200~\citep{nllbteam2022nllb}
+    English\,$\rightarrow$\,Chinese\,$\rightarrow$\,English; record the
+    empirical token-edit-distance $\delta_{\mathrm{eff}}$
+    ($\approx 0.81$ for ZH on average,
+    \autoref{tab:translation-pivots}); then detect on the
+    round-tripped text.
+\end{itemize}
+The detector runs the same $\sigma_\kappa$ and counts valid
+transitions; reports $\phi$, the standardised $z$, and a binary
+flag at $z>z_\alpha$ (\autoref{alg:detect-app},
+\autoref{fig:refimpl}).

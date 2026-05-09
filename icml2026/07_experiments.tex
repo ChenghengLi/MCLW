@@ -33,10 +33,14 @@ $S = 5$ states, target gate budget $\rho = 0.5$, the high-entropy gate
 $G_{H_{\mathrm{high}}}$, and clockwork ($k{=}1$) topology.
 
 \textbf{Baselines.} \emph{KGW}~\citep{kirchenbauer2023watermark} at
-$\gamma = 0.5$, logit bias $\delta_{\mathrm{KGW}} = 2$.
-\emph{SWEET}~\citep{lee2023sweet} retains the same $\gamma = 0.5$ and
-$\delta_{\mathrm{KGW}} = 2$ but watermarks only the high-entropy
-positions, gated to $\rho = 0.5$ to match ChainMark's budget.
+$\gamma = 0.5$, logit bias $\delta_{\mathrm{KGW}} = 2$ (the canonical
+operating point reported in the original paper at this $\gamma$).
+\emph{SWEET}~\citep{lee2023sweet} is reproduced as a matched-budget
+re-implementation: same $\gamma = 0.5$ and $\delta_{\mathrm{KGW}} = 2$
+but the green-list bias is applied only at the top-$\rho{=}0.5$
+fraction of positions by token-level entropy, so the budget aligns
+with ChainMark's $\rho$. Per-domain prompt-and-generation examples
+appear in \autoref{app:examples}.
 
 \begin{figure*}[t]
   \centering

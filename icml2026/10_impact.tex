@@ -3,17 +3,39 @@
 
 This paper develops watermarking infrastructure for LLM-generated
 content in service of AI governance regimes (EU AI Act Article~50,
-OECD Hiroshima Process). Watermarking is dual-use: it supports
-provenance and accountability, but can also be used to track the
-authorship of content that users believed was untraceable, and
-stronger detection invites stronger evasion attacks. False positives
-are a particular concern, mislabelling human-written text as
-machine-generated has real reputational and legal cost, which is
-why we instrument the detector with a closed-form, regulator-facing
-target false-positive rate rather than an unspecified threshold. Our
-model-free detector reduces verification-side compute and allows
-third-party audit without any access to the generating LM, which we
-view as governance-positive. Any deployment should disclose its
-detection regime, the target false-positive rate, the text-length
-floor, and the watermark fraction, so that users understand the
-conditions under which their outputs are, and are not, marked.
+OECD Hiroshima Process). The contribution is dual-use, and we
+flag four asymmetric harms.
+
+\textbf{Authorship tracking and chilling effects.} Stronger
+watermarking exposes writers who relied on undetectable LLM use.
+Marginalised users (ESL writers, students under inequitable AI
+policies, whistleblowers reformulating sensitive content) bear
+asymmetric harm relative to incumbent users.
+
+\textbf{End-user perplexity cost.} ChainMark imposes a $\approx
+2\times$ self-perplexity cost ($3.66$ vs the $1.80$--$1.93$ baseline
+range; \autoref{tab:headline-aggregate}). Deployers adopting
+ChainMark to satisfy a regulatory mark therefore impose a measurable
+quality cost on \emph{every} user whose generation is gated, not
+just on adversaries who would try to evade detection.
+
+\textbf{False positives.} Mislabelling human-written text as
+machine-generated has real reputational and legal cost. We
+instrument the detector with a closed-form, regulator-facing target
+false-positive rate $\alpha$ rather than an unspecified threshold;
+the discussed empirical-quantile recalibration (\autoref{sec:discussion},
+\autoref{app:fpr-recipes}) is the recipe a deployer should run
+before invoking detection on any production content.
+
+\textbf{Adaptive adversaries are out of scope.} Our security and
+robustness theorems cover an oracle-blind adversary; a regulator
+deploying ChainMark must not assume the watermark survives an
+attacker with detector-query access or with $\sigma_\kappa$ access
+(\autoref{sec:discussion}). The audit primitive is honest about
+non-adversarial mislabelling, not about adversarial spoofing or
+scrubbing under realistic API-query budgets.
+
+Any deployment should publish the detection regime ($\alpha$,
+$n_{\min}$, $\rho$, the recalibration recipe used) so users
+understand the conditions under which their outputs are, and are
+not, marked.
