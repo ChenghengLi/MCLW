@@ -42,7 +42,7 @@ state from the key alone and reports a $z$-score.
 
     % ASSISTANT bubble (watermarked output)
     \node[rolelabel] at (-0.05, 2.95) {LM (ChainMark)};
-    \node[asstbubble] (asst) at (0.0, 2.30) {%
+    \node[asstbubble] (asst) at (0.0, 1.90) {%
       \textbf{Donald}\,\textsubscript{$s_2$}\
       \textbf{Trump}\,\textsubscript{$s_3$}\
       (\textbf{born}\,\textsubscript{$s_4\,\bullet$}\
@@ -55,21 +55,42 @@ state from the key alone and reports a $z$-score.
       \textbf{U.S.}\,\textsubscript{$s_0\,\bullet$}\
       \textbf{president}\,\textsubscript{$s_1\,\bullet$}\
       \textbf{and}\,\textsubscript{$s_2\,\bullet$}\
-      \textbf{businessman}\,\textsubscript{$s_3\,\bullet$}\,\dots\\[1pt]
+      \textbf{businessman}\,\textsubscript{$s_3\,\bullet$}\
+      \textbf{who}\,\textsubscript{$s_4\,\bullet$}\
+      \textbf{served}\,\textsubscript{$s_0\,\bullet$}\
+      \textbf{as}\,\textsubscript{$s_1\,\bullet$}\
+      \textbf{the}\,\textsubscript{$s_2\,\bullet$}\
+      \textbf{45th}\,\textsubscript{$s_3\,\bullet$}\
+      \textbf{president}\,\textsubscript{$s_4\,\bullet$}\
+      \textbf{from}\,\textsubscript{$s_0\,\bullet$}\
+      \textbf{2017}\,\textsubscript{$s_1\,\bullet$}\
+      \textbf{to}\,\textsubscript{$s_2\,\bullet$}\
+      \textbf{2021}\,\textsubscript{$s_3\,\bullet$}\
+      \textbf{after}\,\textsubscript{$s_4$}\
+      \textbf{a}\,\textsubscript{$s_4$}\
+      \textbf{long}\,\textsubscript{$s_0\,\bullet$}\
+      \textbf{career}\,\textsubscript{$s_1\,\bullet$}\
+      \textbf{in}\,\textsubscript{$s_2\,\bullet$}\
+      \textbf{real}\,\textsubscript{$s_3\,\bullet$}\
+      \textbf{estate}\,\textsubscript{$s_4\,\bullet$}\
+      \textbf{and}\,\textsubscript{$s_0\,\bullet$}\
+      \textbf{television}\,\textsubscript{$s_1\,\bullet$}.\,\dots\\[1pt]
       {\tiny ($\bullet$ = gated step where ChainMark forced
       $s_{i+1}{=}(s_i{+}1)\!\bmod 5$; subscripts $=$
-      $\sigma_\kappa(t_i)$.)}};
+      $\sigma_\kappa(t_i)$. Ungated tokens (no $\bullet$) are
+      free-sampled at $T{=}0.7$ and may break the cycle.)}};
 
-    \draw[arrowstyle] (3.20, 1.90) -- (3.20, 1.45);
+    \draw[arrowstyle] (3.20, 0.95) -- (3.20, 0.45);
     \node[font=\tiny, color=black!60, anchor=west]
-      at (3.30, 1.68) {Model-free detector: re-run $\sigma_\kappa$,\
+      at (3.30, 0.70) {Model-free detector: re-run $\sigma_\kappa$,\
         count valid transitions};
 
     % DETECTOR verdict
-    \node[rolelabel] at (-0.05, 0.95) {Auditor};
-    \node[detbubble] (det) at (0.0, 0.20)
-      {\textbf{Verdict.} $\phi = 0.79\;\;(\text{vs }p_0=0.20)$,\
-       $z = 5.30 > z_{0.01}=2.326$, $p\text{-value} \approx 6\!\times\!10^{-8}$.\\
+    \node[rolelabel] at (-0.05, -0.05) {Auditor};
+    \node[detbubble] (det) at (0.0, -0.80)
+      {\textbf{Verdict on the 33-token window above:}
+       $\phi = 27/32 = 0.84\;\;(\text{vs }p_0=0.20)$,\
+       $z = 9.05 > z_{0.01}=2.326$, $p\text{-value} \ll 10^{-15}$.\\
        \textbf{watermarked} (no LM access required).};
   \end{tikzpicture}
   \caption{\textbf{End-to-end ChainMark trace} for a wiki-domain
