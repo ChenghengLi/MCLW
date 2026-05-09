@@ -155,13 +155,13 @@ def make_plot(points, out_path: Path):
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
-    # ----- Legends (two side-by-side, below the axes) ---------------------
+    # ----- Single combined legend, outside on the right --------------------
     pivot_handles = [
         plt.Line2D([0], [0], marker="o", linestyle="",
                    markerfacecolor=meta["color"],
                    markeredgecolor=meta["color"],
                    markersize=4.5, alpha=0.7,
-                   label=meta["label"])
+                   label=f"pivot: {meta['label']}")
         for meta in PIVOTS.values()
     ]
     model_handles = [
@@ -169,28 +169,19 @@ def make_plot(points, out_path: Path):
                    markerfacecolor="0.35",
                    markeredgecolor="0.35",
                    markersize=4.5, alpha=0.8,
-                   label=meta["label"])
+                   label=f"model: {meta['label']}")
         for meta in MODELS.values()
     ]
     theory_handle = plt.Line2D([0], [0], color="black", linestyle="--",
                                linewidth=1.0,
                                label=r"Theory: $(1-\delta_{\mathrm{eff}})^2$")
 
-    leg_pivot = ax.legend(
-        handles=pivot_handles, title="pivot",
-        loc="upper center", bbox_to_anchor=(0.22, -0.22),
-        ncol=4, frameon=False,
-        handletextpad=0.3, columnspacing=0.8,
-        title_fontsize=7, fontsize=7,
-    )
-    ax.add_artist(leg_pivot)
-
-    leg_model = ax.legend(
-        handles=model_handles + [theory_handle], title="model",
-        loc="upper center", bbox_to_anchor=(0.78, -0.22),
-        ncol=2, frameon=False,
-        handletextpad=0.3, columnspacing=0.8,
-        title_fontsize=7, fontsize=7,
+    ax.legend(
+        handles=pivot_handles + model_handles + [theory_handle],
+        loc="upper left", bbox_to_anchor=(1.02, 1.0),
+        ncol=1, frameon=False,
+        handletextpad=0.4, borderaxespad=0.0,
+        fontsize=7,
     )
 
     fig.tight_layout(pad=0.3)

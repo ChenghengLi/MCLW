@@ -25,14 +25,14 @@ choices.
 \subsection{Empirical SD recalibration closes the FPR gap}
 
 Recomputing the detection threshold from the empirical SD of $z$ on
-a non-watermarked corpus gives $z^* = \hat\mu + z_\alpha\,\hat\sigma$,
+a non-watermarked corpus gives $z^\star = \hat\mu + z_\alpha\,\hat\sigma$,
 which brings empirical FPR from $2.1\%$ to $1.2\%$ at $\alpha=1\%$
 while preserving TPR$=100\%$ (\autoref{app:fpr-recipes}). The
 plug-in is calibrated at $\alpha=1\%$ but the empirical $z$-null is
 leptokurtic (excess kurtosis $\approx 1.4$); for tighter $\alpha
 \leq 0.5\%$ or for the high-$S$ regime ($S \geq 7$, where the SD
 recipe is still $2$--$4\%$ off after recalibration) the
-empirical-quantile recipe $z^* = \hat F^{-1}(1{-}\alpha)$ is the
+empirical-quantile recipe $z^\star = \hat F^{-1}(1{-}\alpha)$ is the
 robust drop-in (and is what we use to draw the recalibrated curve in
 \autoref{fig:cal-fpr}). The apples-to-apples $1\%$-FPR head-to-head
 appears in \autoref{app:headline-recalibrated}; ChainMark also admits an

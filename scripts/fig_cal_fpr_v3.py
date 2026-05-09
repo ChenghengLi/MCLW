@@ -113,7 +113,7 @@ def render(rows: list[dict]) -> None:
         "axes.spines.right": False,
     })
 
-    fig, ax = plt.subplots(figsize=(3.0, 2.6))
+    fig, ax = plt.subplots(figsize=(3.4, 2.6))
 
     Ss = [r["S"] for r in rows]
     fpr_emp = [r["fpr_analytic"] for r in rows]
@@ -163,8 +163,10 @@ def render(rows: list[dict]) -> None:
     ax.set_xlabel(r"State count $S$")
     ax.set_ylabel("Empirical FPR (%)")
 
-    ax.set_xticks(Ss)
-    ax.set_xticklabels([str(S) for S in Ss])
+    ax.set_xticks(S_VALUES)
+    ax.set_xticklabels([str(S) for S in S_VALUES])
+    ax.set_xlim(min(S_VALUES) - 0.5, max(S_VALUES) + 0.5)
+    ax.minorticks_off()
 
     ymax = max(
         max(fpr_emp) if fpr_emp else 0.0,
@@ -178,10 +180,10 @@ def render(rows: list[dict]) -> None:
     ax.yaxis.grid(True, linestyle=":", linewidth=0.5, color="#bbbbbb", zorder=0)
     ax.set_axisbelow(True)
 
-    # Legend OUTSIDE the plot, to the right
+    # Legend OUTSIDE the plot, top-right anchor
     ax.legend(
-        loc="center left",
-        bbox_to_anchor=(1.02, 0.5),
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1.0),
         frameon=False,
         handlelength=1.8,
         handletextpad=0.5,
