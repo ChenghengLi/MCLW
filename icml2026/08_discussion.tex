@@ -21,9 +21,10 @@ specification toward a longer floor. When cross-lingual rewrite or random substi
 expected attack profile (\autoref{subsec:exp3-translation}), the
 universal robustness threshold $\delta^\star$ of
 \autoref{thm:robustness} bounds the worst case across all gating
-choices. The practical decision then collapses to a single axis:
-entropy gating (KGW/SWEET-style) versus the gate-free MCL
-specification. SWEET, which
+choices. The practical decision then collapses to a single axis: KGW's
+green-list bias under entropy gating versus MCL's hard-state-cycle
+constraint composed with the same high-entropy gate
+(\autoref{subsec:gates}). SWEET, which
 we read as a high-entropy gate following~\citet{lee2023sweet}, is a
 sensible choice when the underlying model produces sharply
 peaked distributions on most positions; MCL is the more direct

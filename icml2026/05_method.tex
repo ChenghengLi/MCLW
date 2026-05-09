@@ -6,13 +6,13 @@
 
 For each token id $v \in \mathcal{V}$ define
 \begin{equation}
-  \sigma(v) \;=\; \mathcal{H}(\kappa \,\Vert\, v) \bmod S,
+  \sigma_\kappa(v) \;=\; \mathcal{H}(\kappa \,\Vert\, v) \bmod S,
 \end{equation}
 which deterministically maps $\mathcal{V}$ onto $S$ equivalence
-classes $\mathcal{V}_s = \{v : \sigma(v) = s\}$, $s \in [S]$. Under
-the random-oracle model $\sigma$ is uniform and independent across
+classes $\mathcal{V}_s = \{v : \sigma_\kappa(v) = s\}$, $s \in [S]$. Under
+the random-oracle model $\sigma_\kappa$ is uniform and independent across
 distinct tokens, so $\mathbb{E}[|\mathcal{V}_s|] = V/S$; knowledge
-of $\sigma$ on queried tokens reveals nothing about unqueried ones
+of $\sigma_\kappa$ on queried tokens reveals nothing about unqueried ones
 (\autoref{thm:security}).
 
 \subsection{Transition topology}
@@ -34,7 +34,7 @@ baseline to $2/S$ (\autoref{sec:experiments}).
 
 \subsection{Generation}
 
-At step $i$ with current state $s_i = \sigma(t_i)$, MCL forms the
+At step $i$ with current state $s_i = \sigma_\kappa(t_i)$, MCL forms the
 legal token set $\mathcal{V}_{s_i}^\star =
 \bigcup_{s' \in \Sigma_k(s_i)} \mathcal{V}_{s'}$, masks the LM
 logits outside $\mathcal{V}_{s_i}^\star$ to $-\infty$, and picks
@@ -49,7 +49,7 @@ plus an $O(V)$ logit mask (precomputed once per state).
     \STATE {\bfseries Input:} prompt $p$, key $\kappa$, states $S$,
       successor $\Sigma_k$, gate $g(\cdot)$, max tokens $N$
     \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(p)$;
-      $s \leftarrow \sigma(\mathbf{t}_{-1})$
+      $s \leftarrow \sigma_\kappa(\mathbf{t}_{-1})$
     \FOR{$i = 1$ {\bfseries to} $N$}
       \STATE $p_i \leftarrow \mathrm{softmax}(\mathcal{M}(\mathbf{t}))$
       \STATE $\mathcal{V}^\star \leftarrow
@@ -60,7 +60,7 @@ plus an $O(V)$ logit mask (precomputed once per state).
         \STATE $t_i \leftarrow \arg\max_t p_i(t)$
       \ENDIF
       \STATE $\mathbf{t} \leftarrow \mathbf{t} \,\Vert\, t_i$;
-        $s \leftarrow \sigma(t_i)$
+        $s \leftarrow \sigma_\kappa(t_i)$
       \IF{$t_i = \texttt{EOS}$} \STATE {\bfseries break} \ENDIF
     \ENDFOR
     \STATE \textbf{return} $\mathrm{Decode}(\mathbf{t})$
@@ -97,12 +97,12 @@ pointwise by $\Delta_i$.
 \subsection{Detection}
 
 The verifier tokenises the candidate text, re-derives states by
-re-applying $\sigma$, and computes the fraction of legal transitions
+re-applying $\sigma_\kappa$, and computes the fraction of legal transitions
 \begin{equation}
   \label{def:phi}
   \phi(\mathbf{t})
     \;=\; \frac{1}{n-1} \sum_{i=1}^{n-1}
-      \mathbb{1}\!\left[\sigma(t_{i+1}) \in \Sigma_k(\sigma(t_i))\right].
+      \mathbb{1}\!\left[\sigma_\kappa(t_{i+1}) \in \Sigma_k(\sigma_\kappa(t_i))\right].
 \end{equation}
 With $p_0 = k/S$, the random-oracle null gives $\mathbb{E}[\phi] =
 p_0$ with pairwise-zero covariance for any $k$-regular $\Sigma_k$
@@ -125,7 +125,7 @@ robustness under per-token modification rate $\delta$
     \STATE $\mathbf{t} \leftarrow \mathrm{Tokenize}(x)$;
       $c \leftarrow 0$
     \FOR{$i = 1$ {\bfseries to} $n-1$}
-      \IF{$\sigma(t_{i+1}) \in \Sigma_k(\sigma(t_i))$}
+      \IF{$\sigma_\kappa(t_{i+1}) \in \Sigma_k(\sigma_\kappa(t_i))$}
         \STATE $c \leftarrow c + 1$
       \ENDIF
     \ENDFOR

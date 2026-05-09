@@ -574,9 +574,9 @@ they are referenced from elsewhere in the paper.
 
 \begin{theorem}[Self-healing against oracle-blind adversaries]
   \label{thm:healing}
-  Let $\mathcal{T}_k \subseteq \mathcal{V}$ be the set of tokens
+  Let $\mathcal{T}_{\mathrm{q}} \subseteq \mathcal{V}$ be the set of tokens
   the adversary has queried with the correct key.  For any token
-  $t' \notin \mathcal{T}_k$ that the adversary introduces,
+  $t' \notin \mathcal{T}_{\mathrm{q}}$ that the adversary introduces,
   $\sigma_\kappa(t')$ is uniform on $\mathcal{S}$ by the random-oracle
   property, so each modified position contributes an indicator
   distributed as $\mathrm{Bernoulli}(1/S)$ to the validity count,
@@ -596,7 +596,7 @@ they are referenced from elsewhere in the paper.
   $1/S$ by the same column- and row-regularity argument as in
   \autoref{thm:robustness}.  Strategies in which the adversary
   introduces previously-queried tokens (whose state is in
-  $\sigma_\kappa(\mathcal{T}_k)$) can craft pairs that hit valid
+  $\sigma_\kappa(\mathcal{T}_{\mathrm{q}})$) can craft pairs that hit valid
   transitions deterministically, raising $\phi$ above
   $\Sigma(\delta)$ --- which only helps detection.  The lower bound
   $\Sigma(\delta) \geq \delta(2-\delta)/S$ is therefore strategy-free.
@@ -605,7 +605,7 @@ they are referenced from elsewhere in the paper.
 % PROOF REVIEW NOTE: The original self-healing proof claimed
 % strategy independence without distinguishing the case where the
 % adversary's introduced tokens happen to lie in
-% $\sigma_\kappa(\mathcal{T}_k)$.  We have made the lower-bound
+% $\sigma_\kappa(\mathcal{T}_{\mathrm{q}})$.  We have made the lower-bound
 % direction explicit (the adversary can only \emph{help} detection
 % above the random-substitution floor) and stated the equality
 % condition (every introduced token is unqueried).
