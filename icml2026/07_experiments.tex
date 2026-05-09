@@ -20,6 +20,9 @@ state from the key alone and reports a $z$-score.
   \definecolor{c2}{HTML}{E8C12F}
   \definecolor{c3}{HTML}{4FAE5C}
   \definecolor{c4}{HTML}{4A8FD3}
+  % Accent colours: deep blue for ChainMark mechanics, red for the auditor.
+  \definecolor{cmblue}{HTML}{1F6AD1}
+  \definecolor{auditred}{HTML}{B22222}
   % Compact token macro: \tk{state}{text} = a coloured rounded tile;
   % \tg{state}{text} = the same but underlined to mark a gated step.
   % These emit small inline TikZ nodes that wrap with surrounding text,
@@ -29,56 +32,104 @@ state from the key alone and reports a $z$-score.
       inner xsep=1.5pt, inner ysep=0.8pt, font=\scriptsize,%
       fill=#1!35] (X) {#2};}
   \newcommand{\tg}[2]{\tikz[baseline=(X.base)]\node[%
-      rounded corners=1pt, draw=black!25, line width=0.2pt,%
+      rounded corners=1pt, draw=black!35, line width=0.3pt,%
       inner xsep=1.5pt, inner ysep=0.8pt, font=\scriptsize,%
-      fill=#1!35] (X) {\underline{#2}};}
+      fill=#1!45] (X) {\underline{#2}};}
+  % Tiny inline arrow between gated tokens to emphasise the chain walk.
+  % Wrap math in a hbox and follow by an explicit \allowbreak so the
+  % joined chain still wraps inside the column.
+  \newcommand{\tarr}{\hspace{0.5pt}\textcolor{cmblue}{\scriptsize\ensuremath{\rightharpoonup}}\hspace{0.5pt}\allowbreak}
   \begin{minipage}{\columnwidth}
     \scriptsize
     \setlength{\fboxsep}{4pt}%
 
-    % ---- 1. USER PROMPT -----------------------------------------------
-    {\small\bfseries 1.\,User prompt}\par
-    \vspace{1pt}%
-    \noindent\colorbox{black!4}{%
+    % ---- 0. STATE-RING LEGEND ----------------------------------------
+    \noindent\colorbox{black!3}{%
       \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
-        \texttt{Explain photosynthesis in a comprehensive way.}
+        \centering
+        \begin{tikzpicture}[x=1pt,y=1pt,baseline=(current bounding box.center)]
+          % Five state nodes on a tight ring, ~88pt wide total.
+          \def\R{14}
+          \foreach \i/\col/\lab in
+            {0/c0/{$s_0$},1/c1/{$s_1$},2/c2/{$s_2$},3/c3/{$s_3$},4/c4/{$s_4$}}{%
+            \node[circle, draw=black!40, line width=0.3pt, fill=\col!55,
+                  inner sep=0pt, minimum size=11pt, font=\tiny]
+                  (S\i) at ({90-\i*72}:\R) {\lab};
+          }
+          % Clockwise arrows s_i -> s_{(i+1) mod 5}.
+          \foreach \i/\j in {0/1,1/2,2/3,3/4,4/0}{%
+            \draw[-{Latex[length=2pt,width=2pt]}, cmblue, line width=0.4pt]
+              (S\i) to[bend right=15] (S\j);
+          }
+        \end{tikzpicture}\hspace{6pt}%
+        \raisebox{14pt}{\begin{tabular}{@{}l@{}}%
+          \scriptsize\textbf{State legend}\\[-1pt]
+          \tk{c0}{\,$s_0$\,}\,\tk{c1}{\,$s_1$\,}\,\tk{c2}{\,$s_2$\,}\,\tk{c3}{\,$s_3$\,}\,\tk{c4}{\,$s_4$\,}\\[-1pt]
+          \scriptsize clockwork: $s\!\to\!(s{+}1)\!\bmod 5$%
+        \end{tabular}}%
       \end{minipage}}\par
-    \vspace{2pt}\centerline{$\downarrow$}\vspace{1pt}%
+    \vspace{3pt}%
+
+    % ---- 1. USER PROMPT -----------------------------------------------
+    {\small\bfseries 1.\,User prompt}\;\textcolor{black!55}{\itshape regulator-provided test input}\par
+    \vspace{1pt}%
+    {\setlength{\fboxrule}{0.6pt}%
+    \noindent\fcolorbox{black!25}{black!4}{%
+      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}
+        \texttt{Explain photosynthesis in a comprehensive way.}
+      \end{minipage}}}\par
+    \vspace{2pt}\centerline{\textcolor{cmblue}{\small$\Downarrow$ \scriptsize logit-mask gate $G_{H_{\mathrm{high}}}$}}\vspace{1pt}%
 
     % ---- 2. OUTPUT TOKENS ---------------------------------------------
-    {\small\bfseries 2.\,Watermarked output (tile colour $=$ state $\sigma_\kappa$)}\par
+    {\small\bfseries 2.\,Watermarked output}\\
+    {\textcolor{black!55}{\itshape tile colour $=\sigma_\kappa(t)$; \underline{underline}\,$=$\,gated step forcing $(s{+}1)\bmod 5$, joined by \textcolor{cmblue}{$\rightharpoonup$}}}\par
     \vspace{1pt}%
-    \noindent\colorbox{green!5}{%
-      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
+    \setlength{\fboxrule}{0.8pt}%
+    \noindent\fcolorbox{cmblue!50}{cmblue!4}{%
+      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}
         \raggedright
-        \tk{c2}{Photosynthesis} \tk{c3}{is} \tg{c4}{the}
-        \tg{c0}{process} \tg{c1}{by} \tg{c2}{which}
-        \tg{c3}{plants} \tk{c4}{convert} \tg{c0}{sunlight}
-        \tg{c1}{into} \tg{c2}{chemical} \tg{c3}{energy}
-        \tg{c4}{\dots}
+        \tk{c2}{Photosynthesis} \tk{c3}{is}
+        \tg{c4}{the}\tarr\tg{c0}{process} \tg{c1}{by}\tarr\tg{c2}{which}
+        \tg{c3}{plants} \tk{c4}{convert}
+        \tg{c0}{sunlight}\tarr\tg{c1}{into} \tg{c2}{chemical}\tarr\tg{c3}{energy}
+        \tg{c4}{and} \tk{c0}{releases} \tk{c1}{oxygen}\,\textcolor{black!50}{\dots}
       \end{minipage}}\par
-    \vspace{2pt}\centerline{$\downarrow$}\vspace{1pt}%
+    \vspace{2pt}\centerline{\textcolor{auditred}{\small$\Downarrow$ \scriptsize key-only re-derivation $\sigma_\kappa$, count valid pairs}}\vspace{1pt}%
 
     % ---- 3. VERDICT ---------------------------------------------------
-    {\small\bfseries 3.\,Auditor verdict}\par
+    {\small\bfseries 3.\,Auditor verdict}\;\textcolor{black!55}{\itshape no LM access; $\phi=$ valid$/$total transitions}\par
     \vspace{1pt}%
-    \noindent\colorbox{orange!8}{%
-      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
-        $\phi = 11/13 = 0.85$,\;
+    {\setlength{\fboxrule}{0.8pt}%
+    \noindent\fcolorbox{auditred!55}{auditred!5}{%
+      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep-2\fboxrule\relax}
+        % Inline 11/13 valid bar: 11 green ticks + 2 grey ticks.
+        \textbf{transitions}\;%
+        \tikz[baseline=-1pt]{%
+          \foreach \i in {1,...,11}{%
+            \fill[c3!75] ({(\i-1)*4pt},0) rectangle ++(3pt,5pt);}
+          \foreach \i in {12,13}{%
+            \fill[black!25] ({(\i-1)*4pt},0) rectangle ++(3pt,5pt);}
+          \draw[black!40, line width=0.2pt]
+            (0,0) rectangle ({13*4pt-1pt},5pt);
+        }\;%
+        $\phi = \tfrac{11}{13} = 0.85$,\;
         $z = 5.30 > z_{0.01}{=}2.326$\;$\Rightarrow$\;
-        \textbf{watermarked} (no LM access).
-      \end{minipage}}%
+        \textcolor{auditred}{\textbf{WATERMARKED}}.
+      \end{minipage}}}%
   \end{minipage}
   \caption{\textbf{End-to-end ChainMark trace} on a wiki prompt
-    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$, $13$-token excerpt).
-    Each token tile is coloured by its state
-    $\sigma_\kappa(t) \in \{0,1,2,3,4\}$, so the clockwork cycle reads
-    off as a colour rotation
-    \textcolor{c0!85!black}{$\bullet$}\,$\to$\,\textcolor{c1!85!black}{$\bullet$}\,$\to$\,\textcolor{c2!85!black}{$\bullet$}\,$\to$\,\textcolor{c3!85!black}{$\bullet$}\,$\to$\,\textcolor{c4!85!black}{$\bullet$}. Underlined tokens are the gated steps where ChainMark
-    forced $s_{i{+}1}{=}(s_i{+}1)\bmod 5$; un-underlined tokens are
-    free-sampled at $T{=}0.7$. The auditor reproduces the colour
-    sequence from $\kappa$ alone and reports $(\phi, z)$ in $O(n)$
-    hash operations.}
+    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$, $\sim\!16$-token
+    excerpt). The state ring at top fixes the colour code
+    $s_0\!\to\!s_1\!\to\!\cdots\!\to\!s_4\!\to\!s_0$; every output tile
+    inherits its colour from $\sigma_\kappa(t)\in\{0,1,2,3,4\}$.
+    \underline{Underlined} tokens are gated steps where ChainMark
+    masked logits to enforce $s_{i{+}1}{=}(s_i{+}1)\bmod 5$ and the
+    \textcolor{cmblue}{$\rightharpoonup$} arrows trace the forced
+    clockwork walk; un-underlined tokens are free-sampled at
+    $T{=}0.7$. The auditor in panel 3 re-derives the entire colour
+    sequence from $\kappa$ alone, counts $11/13$ valid transitions
+    (green bar), and emits $(\phi, z)$ in $O(n)$ hash operations,
+    no LM forward pass.}
   \label{fig:experiment-flow}
 \end{figure}
 
