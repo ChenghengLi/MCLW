@@ -264,9 +264,7 @@ translation and paraphrase attacks.
     state count (\autoref{thm:detection},
     \autoref{app:proofs}), and a universal robustness threshold
     that is invariant to $(S, \rho, n)$ under the midpoint decision
-    convention (\autoref{thm:robustness}), strengthened against
-    every oracle-blind adversary by self-healing
-    (\autoref{thm:healing}).
+    convention (\autoref{thm:robustness}).
   \item \textbf{$k$-regular generalisation.} Both the detection law
     and the robustness threshold extend verbatim to any $k$-regular
     doubly-stochastic transition topology
@@ -274,9 +272,10 @@ translation and paraphrase attacks.
   \item \textbf{Empirical comparison and gate analysis.} We evaluate
     MCL head-to-head against KGW and SWEET across multiple
     instruction-tuned language models and four text domains under
-    translation and paraphrase attacks (\autoref{sec:experiments}),
-    and show that low-entropy gating is Pareto-dominated and that
-    detection is gate-invariant at practical budgets
+    translation and random-substitution attacks
+    (\autoref{sec:experiments}), and show that MCL retains
+    substantially more detection signal than the baselines under
+    matched-budget attacks
     (\autoref{subsec:exp2-headline}, \autoref{subsec:exp5-calibration}).
   \item \textbf{Empirical anchor of the calibration formula.} An
     independent state-count sweep matches the closed-form

@@ -132,12 +132,11 @@ domain, and prompt set.
 
 \autoref{fig:headline-tpr} and \autoref{tab:headline-aggregate}
 collapse the design over the (model, domain) axis; the per-cell
-breakdown is deferred to \autoref{tab:headline-percell} for
-inspection of model- and domain-specific behaviour. We expect MCL
-to be competitive with KGW on clean text and to retain a larger
-fraction of its clean signal under post-hoc edit and paraphrase
-attacks --- the matched-budget post-attack survival regime targeted
-by our design. SWEET serves as an entropy-gating ablation of KGW
+breakdown is in \autoref{tab:headline-percell}. MCL achieves perfect
+clean detection (100\% TPR) and retains 73\% TPR after ZH
+back-translation, where KGW and SWEET drop to roughly 19\%. This is
+the matched-budget post-attack survival regime that our scheme
+targets by design. SWEET serves as an entropy-gating ablation of KGW
 that holds gating policy fixed against MCL.
 
 \begin{table*}[t]
@@ -330,19 +329,19 @@ of the theory: \autoref{thm:detection} (calibration; Exp.~5),
 \autoref{thm:robustness} (post-attack decay; Exp.~3), and
 \autoref{thm:k-regular} (topology generalisation; Exp.~4), with
 Exp.~2 supplying the head-to-head comparison against KGW and SWEET
-on the matched gating-budget axis. We expect, and the data in
+on the matched gating-budget axis. The data in
 \autoref{fig:headline-tpr},
 \autoref{fig:translation-decay},
 \autoref{fig:cal-fpr},
 \autoref{tab:headline-aggregate},
 \autoref{tab:headline-percell},
 \autoref{tab:kregular}, and
-\autoref{tab:cal-sstar}
-will collectively support: (i) MCL is competitive with KGW on clean
-text and improves under realistic paraphrase and translation
-attacks; (ii) post-attack $z$ decays as $(1-\delta_{\mathrm{eff}})^2$
-across pivots, models, and domains; (iii) $p_0 = k/S$ holds
-empirically for $k{=}2$; and (iv) the analytic FPR bound is
-actionable, with observed $S^\star$ tracking the closed form across
-models. Implications and limitations are discussed in
-\autoref{sec:discussion}.
+\autoref{tab:cal-sstar} support four claims: (i) MCL achieves
+perfect clean detection (100\% TPR) and dominates KGW/SWEET under
+random-substitution and translation attacks (73\% vs 19\% TPR
+post-back-translation); (ii) the post-attack $z$ ratio is consistent
+with the $(1-\delta_{\mathrm{eff}})^2$ scaling across pivots, models,
+and domains; (iii) the random baseline $p_0 = k/S$ holds empirically
+at $k{=}2$; and (iv) the analytic FPR bound is qualitatively
+actionable, with observed $S^\star$ tracking the closed form modulo
+a 20--30\% empirical-threshold inflation (\autoref{sec:discussion}).

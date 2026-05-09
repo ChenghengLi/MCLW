@@ -57,6 +57,16 @@ every $k$-regular topology; we validate $k=1$ (clockwork) and $k=2$
 (soft-cycle) empirically. $k=3$ and beyond are deferred to the
 extended version of this paper.
 
+\paragraph{Incomplete SWEET coverage.}
+\autoref{tab:headline-aggregate}'s SWEET aggregate is computed over
+$9$ of $12$ (model, domain) cells; three Qwen-2.5-7B SWEET cells
+(factual, wiki, writing) failed to complete in the cluster window
+and are omitted. The qualitative ordering MCL $\gg$ KGW $\geq$ SWEET
+holds in every complete cell (\autoref{tab:headline-percell}), but
+the SWEET aggregate in \autoref{tab:headline-aggregate} should be
+read as a 9-cell mean rather than a balanced 12-cell mean. A full
+re-run is in progress for the extended version.
+
 \paragraph{Translation-only robustness scope.} Our robustness
 evaluation covers \emph{clean}, \emph{random-substitution at
 $\delta_{\mathrm{eff}}=0.20$}, and \emph{NLLB-200 EN$\to$ZH$\to$EN
