@@ -92,14 +92,39 @@ domain, and prompt set.
 
 \begin{figure*}[t]
   \centering
-  \includegraphics[width=0.95\linewidth]{pictures/fig_headline_tpr.pdf}
-  \caption{\textbf{Head-to-head TPR comparison across attacks.}
-    MCL ($S{=}5$, $\rho{=}0.5$, $G_{H_{\mathrm{high}}}$, $k{=}1$)
-    vs KGW ($\gamma{=}0.5, \delta_{\mathrm{KGW}}{=}2$) vs SWEET (same KGW params,
-    high-entropy gating at $\rho{=}0.5$). Aggregated over
-    Llama-3.1-8B, Qwen-2.5-7B, Mistral-7B-v0.3 and four domains
-    (code / factual / wiki / writing).}
-  \label{fig:headline-tpr}
+  \begin{subfigure}[t]{0.32\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{pictures/fig_headline_tpr.pdf}
+    \caption{\textbf{Head-to-head TPR.}
+      MCL vs KGW ($\gamma{=}0.5, \delta_{\mathrm{KGW}}{=}2$) vs
+      SWEET (high-entropy gating at $\rho{=}0.5$), aggregated over
+      3 LLMs $\times$ 4 domains.}
+    \label{fig:headline-tpr}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{pictures/fig_translation_decay.pdf}
+    \caption{\textbf{Translation robustness.} Empirical decay ratio
+      under NLLB-200 EN$\to$\{FR,DE,RU,ZH\}$\to$EN with closed-form
+      $(1-\delta_{\mathrm{eff}})^2$ diagonal
+      (\autoref{thm:robustness}); Llama/Qwen $n=100$, Mistral $n=75$
+      (no code).}
+    \label{fig:translation-decay}
+  \end{subfigure}\hfill
+  \begin{subfigure}[t]{0.32\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{pictures/fig_cal_fpr.pdf}
+    \caption{\textbf{Calibration anchor.} Empirical FPR vs state
+      count $S$ on non-watermarked completions, with the closed-form
+      Hoeffding upper bound (\autoref{thm:detection}); threshold
+      fixed at $z_\alpha$ for $\alpha{=}0.01$.}
+    \label{fig:cal-fpr}
+  \end{subfigure}
+  \caption{\textbf{Headline experimental results.} \textbf{(a)}~Exp.~2
+    head-to-head TPR. \textbf{(b)}~Exp.~3 translation-decay curve.
+    \textbf{(c)}~Exp.~5 calibration FPR anchor. Per-pivot translation
+    breakdown in \autoref{app:translation-pivots}.}
+  \label{fig:exp-overview}
 \end{figure*}
 
 \begin{table}[t]
@@ -195,21 +220,7 @@ Bernoulli noise. We plot the observed ratio against the
 predicted $(1-\delta_{\mathrm{eff}})^2$ on a single set of axes,
 overlaying the slope-1 identity.
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=\linewidth]{pictures/fig_translation_decay.pdf}
-  \caption{\textbf{Translation robustness curve.} Empirical
-    detection-decay ratio under NLLB-200 EN$\to$\{FR, DE, RU,
-    ZH\}$\to$EN pivots, with $\delta_{\mathrm{eff}}$ measured per
-    generation. The closed-form $(1-\delta_{\mathrm{eff}})^2$
-    prediction from \autoref{thm:robustness} is the diagonal.
-    Llama and Qwen contribute $n=100$ per pivot ($4$ domains $\times
-    25$ prompts); Mistral contributes $n=75$ ($3$ domains: factual,
-    wiki, writing; the code domain did not complete in the cluster
-    window). Per-pivot TPR breakdown in
-    \autoref{app:translation-pivots}.}
-  \label{fig:translation-decay}
-\end{figure*}
+% [Translation-decay figure consolidated into fig:exp-overview at top of section.]
 
 The observed ratios sit at or above the
 $(1-\delta_{\mathrm{eff}})^2$ diagonal across pivots, models, and
@@ -286,16 +297,7 @@ form derived in \autoref{app:proofs}; the matching Gaussian-tail
 calibration of \autoref{thm:detection} is what we use throughout
 the body for $z_\alpha$.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\linewidth]{pictures/fig_cal_fpr.pdf}
-  \caption{\textbf{Calibration anchor.} Empirical FPR on
-    non-watermarked completions as a function of state count $S$,
-    with the closed-form Hoeffding upper bound from
-    \autoref{thm:detection}. Threshold fixed at $z_\alpha$ for
-    $\alpha = 0.01$.}
-  \label{fig:cal-fpr}
-\end{figure}
+% [Cal-FPR figure consolidated into fig:exp-overview at top of section.]
 
 \begin{table}[t]
   \centering
@@ -337,26 +339,6 @@ gap with the empirical-SD threshold recalibration discussed in
 \autoref{sec:discussion} and \autoref{app:fpr-recipes}. The
 closed-form derivation lives in \autoref{app:proofs}.
 
-\subsection{Results Summary}
-\label{subsec:results-summary}
-
-The four sub-experiments together cover the three predictive axes
-of the theory: \autoref{thm:detection} (calibration; Exp.~5),
-\autoref{thm:robustness} (post-attack decay; Exp.~3), and
-\autoref{thm:k-regular} (topology generalisation; Exp.~4), with
-Exp.~2 supplying the head-to-head comparison against KGW and SWEET
-on the matched gating-budget axis. The four sub-experiments support four claims.
-(i) MCL achieves perfect clean detection ($100\%$ TPR) and
-dominates KGW/SWEET under random-substitution and translation
-attacks ($73\%$ vs $19\%$ TPR post-back-translation;
-\autoref{fig:headline-tpr}, \autoref{tab:headline-aggregate},
-\autoref{tab:headline-percell}).
-(ii) The post-attack $z$ ratio sits at or above the
-$(1-\delta_{\mathrm{eff}})^2$ diagonal across pivots, models, and
-domains (\autoref{fig:translation-decay}).
-(iii) The random baseline $p_0 = k/S$ holds empirically at $k{=}2$
-(\autoref{tab:kregular}).
-(iv) The analytic FPR bound gives the right $S^\star$ ordering with
-an empirical-SD recalibration handoff for strict $1\%$-FPR
-deployment (\autoref{fig:cal-fpr}, \autoref{tab:cal-sstar},
-\autoref{sec:discussion}, \autoref{app:fpr-recipes}).
+% [Results Summary subsection removed: claims are already made in
+% each experiment's section; the consolidated fig:exp-overview at
+% top of §07 visually summarises the same headline results.]
