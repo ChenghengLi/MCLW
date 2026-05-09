@@ -14,7 +14,7 @@ state from the key alone and reports a $z$-score.
 \begin{figure}[t]
   \centering
   % Palette shared with fig:teaser; defined here at figure scope so the
-  % caption (outside tikzpicture) can also reference c0..c4.
+  % caption (outside the minipage) can also reference c0..c4.
   \definecolor{c0}{HTML}{E15A5A}
   \definecolor{c1}{HTML}{F0A030}
   \definecolor{c2}{HTML}{E8C12F}
@@ -22,7 +22,8 @@ state from the key alone and reports a $z$-score.
   \definecolor{c4}{HTML}{4A8FD3}
   % Compact token macro: \tk{state}{text} = a coloured rounded tile;
   % \tg{state}{text} = the same but underlined to mark a gated step.
-  % All tiles share a fixed inner-ysep so rows align to a clean baseline.
+  % These emit small inline TikZ nodes that wrap with surrounding text,
+  % so the natural LaTeX paragraph fill respects \columnwidth.
   \newcommand{\tk}[2]{\tikz[baseline=(X.base)]\node[%
       rounded corners=1pt, draw=black!25, line width=0.2pt,%
       inner xsep=1.5pt, inner ysep=0.8pt, font=\scriptsize,%
@@ -31,73 +32,45 @@ state from the key alone and reports a $z$-score.
       rounded corners=1pt, draw=black!25, line width=0.2pt,%
       inner xsep=1.5pt, inner ysep=0.8pt, font=\scriptsize,%
       fill=#1!35] (X) {\underline{#2}};}
-  % Tighten token spacing inside the output paragraph.
-  \begin{tikzpicture}[
-    node distance=1.6mm and 0pt,
-    seclabel/.style={font=\small\bfseries, color=black!75,
-                     anchor=west, inner sep=0pt},
-    panel/.style={rounded corners=2pt, draw=black!40, line width=0.4pt,
-                  inner sep=4pt, font=\scriptsize, align=left,
-                  text width=\linewidth-12pt},
-    userpanel/.style={panel, fill=black!4},
-    outpanel/.style={panel, fill=green!5},
-    verdpanel/.style={panel, fill=orange!8},
-    flowarrow/.style={font=\scriptsize, color=black!55, inner sep=1pt},
-    swatch/.style={rounded corners=0.5pt, draw=black!25, line width=0.2pt,
-                   minimum width=2.4mm, minimum height=2.4mm, inner sep=0pt},
-  ]
+  \begin{minipage}{\columnwidth}
+    \scriptsize
+    \setlength{\fboxsep}{4pt}%
 
-    % ---- 1. USER PROMPT -------------------------------------------------
-    \node[seclabel] (lab1) {1.\,User prompt};
-    \node[userpanel, below=0.8mm of lab1.south west, anchor=north west]
-         (user)
-         {\texttt{Explain photosynthesis in a comprehensive way.}};
+    % ---- 1. USER PROMPT -----------------------------------------------
+    {\small\bfseries 1.\,User prompt}\par
+    \vspace{1pt}%
+    \noindent\colorbox{black!4}{%
+      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
+        \texttt{Explain photosynthesis in a comprehensive way.}
+      \end{minipage}}\par
+    \vspace{2pt}\centerline{$\downarrow$}\vspace{1pt}%
 
-    % connector down
-    \node[flowarrow, below=0.2mm of user.south] (arr1)
-         {$\downarrow$\ \emph{LM + ChainMark gate ($S{=}5$, $\rho{=}0.5$)}};
+    % ---- 2. OUTPUT TOKENS ---------------------------------------------
+    {\small\bfseries 2.\,Watermarked output (tile colour $=$ state $\sigma_\kappa$)}\par
+    \vspace{1pt}%
+    \noindent\colorbox{green!5}{%
+      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
+        \raggedright
+        \tk{c2}{Photosynthesis} \tk{c3}{is} \tg{c4}{the}
+        \tg{c0}{process} \tg{c1}{by} \tg{c2}{which}
+        \tg{c3}{plants} \tk{c4}{convert} \tg{c0}{sunlight}
+        \tg{c1}{into} \tg{c2}{chemical} \tg{c3}{energy}
+        \tg{c4}{\dots}
+      \end{minipage}}\par
+    \vspace{2pt}\centerline{$\downarrow$}\vspace{1pt}%
 
-    % ---- 2. OUTPUT TOKENS ----------------------------------------------
-    \node[seclabel, below=0.2mm of arr1.south, anchor=north west]
-         (lab2) {2.\,Watermarked output (tile colour $=$ state $\sigma_\kappa$)};
-
-    % Compact 18-token excerpt that wraps cleanly into 2 rows at column
-    % width without overflow. Picked so the auditor verdict box still
-    % fits on the page below the panel.
-    \node[outpanel, below=0.8mm of lab2.south west, anchor=north west]
-         (output) {%
-      \tk{c2}{Photosynthesis}\,\tk{c3}{is}\,\tg{c4}{the}\,\tg{c0}{process}\,%
-      \tg{c1}{by}\,\tg{c2}{which}\,\tg{c3}{plants}\,\tk{c4}{convert}\,%
-      \tg{c0}{sunlight}\,\tg{c1}{into}\,\tg{c2}{chemical}\,%
-      \tg{c3}{energy}\,\tg{c4}{stored}\,\tg{c0}{in}\,\tg{c1}{glucose}\,%
-      \tg{c2}{within}\,\tg{c3}{chloroplasts}\,\tg{c4}{\dots}%
-      \par\vspace{2pt}%
-      \scriptsize\color{black!70}%
-      \tikz[baseline=-0.6ex]\node[swatch, fill=c0!55]{};\,0\;%
-      \tikz[baseline=-0.6ex]\node[swatch, fill=c1!55]{};\,1\;%
-      \tikz[baseline=-0.6ex]\node[swatch, fill=c2!55]{};\,2\;%
-      \tikz[baseline=-0.6ex]\node[swatch, fill=c3!55]{};\,3\;%
-      \tikz[baseline=-0.6ex]\node[swatch, fill=c4!55]{};\,4\hfill%
-      \underline{token}\,$=$\,gated%
-    };
-
-    % connector down
-    \node[flowarrow, below=0.2mm of output.south] (arr2)
-         {$\downarrow$\ \emph{auditor re-derives $\sigma_\kappa$, counts valid $s{\to}s{+}1$}};
-
-    % ---- 3. VERDICT -----------------------------------------------------
-    \node[seclabel, below=0.2mm of arr2.south, anchor=north west] (lab3)
-         {3.\,Auditor verdict};
-    \node[verdpanel, below=0.8mm of lab3.south west, anchor=north west]
-         (verd) {%
-      $\phi = 15/17 = 0.88$\;(null $p_0{=}0.20$),\;
-      $z = 7.04 \gg z_{0.01}=2.326$\;$\Rightarrow$\;
-      \textbf{watermarked} (no LM access).%
-    };
-
-  \end{tikzpicture}
+    % ---- 3. VERDICT ---------------------------------------------------
+    {\small\bfseries 3.\,Auditor verdict}\par
+    \vspace{1pt}%
+    \noindent\colorbox{orange!8}{%
+      \begin{minipage}{\dimexpr\columnwidth-2\fboxsep\relax}
+        $\phi = 11/13 = 0.85$,\;
+        $z = 5.30 > z_{0.01}{=}2.326$\;$\Rightarrow$\;
+        \textbf{watermarked} (no LM access).
+      \end{minipage}}%
+  \end{minipage}
   \caption{\textbf{End-to-end ChainMark trace} on a wiki prompt
-    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$, $17$-token excerpt).
+    (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$, $13$-token excerpt).
     Each token tile is coloured by its state
     $\sigma_\kappa(t) \in \{0,1,2,3,4\}$, so the clockwork cycle reads
     off as a colour rotation
@@ -143,14 +116,10 @@ re-implementation: same $\gamma = 0.5$ and $\delta_{\mathrm{KGW}} = 2$
 but the green-list bias is applied only at the top-$\rho{=}0.5$
 fraction of positions by token-level entropy, so the budget aligns
 with ChainMark's $\rho$. Per-domain prompt-and-generation examples (with a token-level
-gating walkthrough) appear in \autoref{app:examples}. As an
-illustration, on the wiki prompt \texttt{Explain Donald Trump in a
-comprehensive way.} (Llama-3.1-8B-Instruct, $S{=}5$, $\rho{=}0.5$),
-the first $14$ generated tokens visit states
-$2,3,4,0,1,2,3,4,4,4,0,1,2,3$ (one per token under
-$\sigma_\kappa$), of which $11$ pairs follow the clockwork cycle
-$s\!\to\!(s{+}1)\bmod 5$, giving $\phi{=}0.79$ and $z{\approx}5.3$
-on a $14$-token window, well above $z_{0.01}{=}2.326$.
+gating walkthrough) appear in \autoref{app:examples}; the
+end-to-end trace in \autoref{fig:experiment-flow} above gives one
+illustration on the wiki prompt
+\texttt{Explain photosynthesis in a comprehensive way.}.
 
 \begin{figure*}[t]
   \centering
