@@ -36,10 +36,11 @@ $\kappa$ is fixed across every run.
 regimes: \emph{code} (HumanEval problem stems), \emph{factual}
 (short closed-form knowledge prompts), \emph{wiki} (open-ended
 ``Explain $X$\ldots'' prompts over a curated concept list), and
-\emph{writing} (creative-completion prompts). Headline experiments
-use 100 prompts per domain; calibration and translation experiments
-use a 25-prompt subsample per domain to keep the design balanced
-under the larger Cartesian product.
+\emph{writing} (creative-completion prompts). Headline experiments (Exp.~2) use 100 prompts per domain;
+translation and calibration experiments (Exp.~3, Exp.~5) use a
+25-prompt subsample per domain to keep the design balanced under
+the larger Cartesian product; the $k$-regular sanity check (Exp.~4)
+uses 100 prompts on the wiki domain only.
 
 \textbf{Generation.} Temperature $T = 0.7$, top-$p = 1$, token
 budget $n = 200$ at every cell. Prompt order is determined by a
@@ -176,9 +177,10 @@ that holds gating policy fixed against MCL.
 Exp.~3 tests the closed-form $(1-\delta)^2$ scaling of
 \autoref{thm:robustness} on real machine-translation attacks.
 Each MCL-watermarked output (3 models $\times$ 4 domains $\times$
-25 prompts $\times$ $n{=}200$ tokens) is round-tripped through
-NLLB-200~\citep{nllbteam2022nllb} on four pivot languages: French,
-German, Russian, and Chinese. The empirical effective edit
+25 prompts $\times$ $n{=}200$ tokens; Mistral$\times$code did not
+complete in the cluster window, see \autoref{tab:translation-pivots})
+is round-tripped through NLLB-200~\citep{nllbteam2022nllb} on four
+pivot languages: French, German, Russian, and Chinese. The empirical effective edit
 distance $\delta_{\mathrm{eff}}$ is computed from the token-edit
 distance between the watermarked output and its post-pivot
 counterpart, giving each generation a continuous $\delta$ value
