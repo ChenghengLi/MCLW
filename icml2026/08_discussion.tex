@@ -147,9 +147,11 @@ the operational claim relative to ``model-free in plain text.''
 \paragraph{Robustness theorem assumes uniform substitution.}
 \autoref{thm:robustness} characterises the post-attack
 $z$-statistic under i.i.d.\ uniform token substitution at rate
-$\delta$. NLLB back-translation and DIPPER paraphrase are not
-uniform substitutions: they preserve some grammatical structure and
-preferentially replace high-frequency / high-entropy tokens. Our
+$\delta$. NLLB back-translation is not uniform substitution
+(grammar-preserving paraphrase such as DIPPER, deferred to the
+extended version, is even further from the i.i.d.\ ideal): such
+attacks preserve some grammatical structure and preferentially
+replace high-frequency / high-entropy tokens. Our
 empirical decay curves (\autoref{fig:translation-decay}) sit
 \emph{above} the $(1-\delta_{\mathrm{eff}})^2$ slope-1 prediction,
 i.e., MCL retains more signal than the worst-case bound would
@@ -161,8 +163,9 @@ rather than a tight prediction.
 The robustness analysis underlying \autoref{thm:robustness} models
 the attack as i.i.d.\ uniform substitution at rate $\delta$, and
 predicts post-attack $z$-scores that scale as
-$(1-\delta_{\mathrm{eff}})^2$. Translation and paraphrase attacks
-are not i.i.d.\ uniform substitution: they preserve syntax,
+$(1-\delta_{\mathrm{eff}})^2$. Translation attacks (and the
+deferred paraphrase extension) are not i.i.d.\ uniform substitution:
+they preserve syntax,
 correlate substitutions across positions, and leak word identity
 through morphology. The empirical fit in
 \autoref{subsec:exp3-translation} is therefore best read as a

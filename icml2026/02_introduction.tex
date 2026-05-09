@@ -40,9 +40,11 @@ key can verify provenance from a string of plain text. Second, the
 detector's null-and-alternative law inverts in closed form to a
 calibration map (\autoref{thm:detection}, derived in
 \autoref{app:proofs}). A regulator who fixes a target false-positive
-rate $\alpha$ and a text-length floor $n_{\min}$ reads off the
-minimum admissible state count; a deployer may spend more budget for
-margin but cannot evade the regulator's specification.
+rate $\alpha$, a text-length floor $n_{\min}$, and a watermark
+budget $\rho$ reads off the minimum admissible state count
+$S^\star(n_{\min}, \rho, \alpha)$; a deployer may spend more budget
+than the floor for additional margin but cannot evade the
+regulator's specification.
 \autoref{fig:mcl_teaser} summarises the construction; the formal
 treatment is in \autoref{sec:method} and \autoref{sec:theory}.
 
