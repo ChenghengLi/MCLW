@@ -80,7 +80,7 @@ treatment is in \autoref{sec:method} and \autoref{sec:theory}.
     \node[paneltitle] at (1.80, 4.95) {\large A.~Clockwork chain};
     \node[font=\footnotesize, color=black!75, anchor=base]
       at (1.80, 4.30)
-      {$\sigma_\kappa(t) = \mathrm{SHA\text{-}256}(k\,\Vert\,t)\bmod S$};
+      {$\sigma_\kappa(t) = \mathrm{SHA\text{-}256}(\kappa\,\Vert\,t)\bmod S$};
 
     \begin{scope}[shift={(1.80, 2.30)}]
       \foreach \i [evaluate=\i as \stt using {90 - \i*72},
@@ -233,7 +233,7 @@ treatment is in \autoref{sec:method} and \autoref{sec:theory}.
     partition $\mathcal V_{s+1}$, and the next token is the masked
     $\arg\max$.
     \textbf{(C)}~Detection re-derives every token's state from the
-    key $k$ in $O(n)$ hash operations: a watermarked sequence walks
+    key $\kappa$ in $O(n)$ hash operations: a watermarked sequence walks
     the chain by construction (top, validity rate $\phi=1$), whereas
     unwatermarked text visits states uniformly and is valid only at
     rate $1/S$ in expectation (bottom).}
@@ -244,13 +244,13 @@ treatment is in \autoref{sec:method} and \autoref{sec:theory}.
 A second design choice — \emph{which} of the $n$ positions to
 watermark — is left as a parameter we call the gate. Existing
 schemes implicitly fix this choice: SWEET and EWD watermark only
-low-entropy positions, on the intuition that high-entropy positions
-contribute the bulk of detection statistic. Whether that intuition
+high-entropy positions, on the intuition that those positions
+contribute the bulk of the detection statistic. Whether that intuition
 survives once detection is decoupled from the language model is an
 empirical question, which we resolve in \autoref{sec:experiments}
 through a matched-budget head-to-head against KGW and SWEET on
 multiple instruction-tuned LLMs and four text domains, including
-translation and paraphrase attacks.
+translation and random-substitution attacks.
 
 \paragraph{Contributions.}
 \begin{enumerate}[nosep, leftmargin=*]

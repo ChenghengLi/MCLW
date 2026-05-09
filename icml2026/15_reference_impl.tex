@@ -4,7 +4,7 @@
 
 The following 24-line Python listing is a self-contained,
 dependency-minimal reference implementation of
-Algorithm~\ref{alg:detect} for clockwork MCL. It takes a list of integer
+\autoref{alg:detect} for clockwork MCL. It takes a list of integer
 token IDs, a bytes key, a state count $S$, and a significance
 threshold $\alpha$; it returns the fingerprint score $\phi$, the
 $z$-score, the one-sided $p$-value, and a binary detection flag.
@@ -12,7 +12,7 @@ $z$-score, the one-sided $p$-value, and a binary detection flag.
 The listing is sufficient to independently verify any MCL-watermarked
 text given only the secret key, with no language-model access and no
 learned components. Extensions to arbitrary $k$-regular topologies
-(cf.~Proposition~\ref{prop:kregular}) require replacing the successor check
+(cf.~\autoref{prop:kregular}) require replacing the successor check
 \texttt{states[i+1] == (states[i]+1) \% S} with a lookup
 \texttt{T[states[i]][states[i+1]] > 0} and setting \texttt{p0 =
 (T > 0).mean()}; no other modification is needed.
@@ -70,7 +70,7 @@ logit-bias watermark families.
 
 \paragraph{Key management.} The scheme's security reduces to the
 confidentiality of \texttt{key} plus the random-oracle idealisation
-of SHA-256 (Theorem~\ref{thm:security}). In practice an auditor and a
+of SHA-256 (\autoref{thm:security}). In practice an auditor and a
 deployer can share the key through any standard key-management
 substrate (e.g., HKDF-derived per-deployment keys, committed to an
 external ledger so that the commitment precedes generation). Rotating

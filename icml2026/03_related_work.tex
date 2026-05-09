@@ -39,11 +39,11 @@ watermarking signal to \emph{high-entropy} positions, but at
 different layers. SWEET applies a binary gate at generation time
 (restricting where the green-list bias is added); EWD weights
 positions by entropy at detection time, approximating the
-log-likelihood ratio of Theorem~\ref{thm:hdd}. MCL is
+log-likelihood ratio of \autoref{thm:hdd}. MCL is
 gate-agnostic in its mathematical specification: high-entropy,
 low-entropy, and surprisal-gap gates are all admissible. We treat
 the gate as a design parameter and compare the three at matched
-budget (\S\ref{sec:experiments}); low-entropy gating turns out to
+budget (\autoref{sec:experiments}); low-entropy gating turns out to
 be strictly Pareto-dominated, while high-entropy and surprisal-gap
 gates are statistically equivalent on quality and detection
 probability at $\rho \geq 0.5$. The operational dial is therefore
@@ -58,4 +58,4 @@ framework. These instruments leave the detection regime
 (FPR, quality floor, robustness) implicit. MCL's contribution, beyond
 the watermarking scheme itself, is that it surfaces these parameters
 analytically, producing a policy-to-configuration map auditable by
-third parties (\S\ref{sec:discussion}).
+third parties (\autoref{sec:discussion}).

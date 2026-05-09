@@ -41,7 +41,7 @@
     inverse-frequency-weighted statistic) both hit the target while
     preserving 100\% TPR. Fix~3 ($k$-skip) collapses TPR because the
     watermark only constrains adjacent transitions.}
-  \label{tab:fpr-recipe}
+  \label{tab:fpr-recipes}
   \small
   \setlength{\tabcolsep}{4pt}
   \begin{tabular}{lll}
@@ -113,21 +113,21 @@
 The following experiments are deferred to the extended version of
 this paper:
 \begin{itemize}
-  \item \textbf{TODO: DIPPER paraphrase attack.} Grammar-preserving
+  \item \textbf{DIPPER paraphrase attack.} Grammar-preserving
     paraphrase via DIPPER~\citep{krishna2023paraphrasing} on at least
     one (model, domain) cell.
-  \item \textbf{TODO: $k$-regular validation at $k\geq 3$.}
+  \item \textbf{$k$-regular validation at $k\geq 3$.}
     \autoref{thm:k-regular} predicts $p_0 = k/S$ for any
     $k$-regular topology; we validate $k\in\{1,2\}$ only.
-  \item \textbf{TODO: External-LM PPL or MAUVE quality metric.}
+  \item \textbf{External-LM PPL or MAUVE quality metric.}
     Self-PPL is conservative but circular; an external judge LM or
     MAUVE would give a model-independent quality reading.
-  \item \textbf{TODO: Base (non-instruction-tuned) and $\geq 10$B
+  \item \textbf{Base (non-instruction-tuned) and $\geq 10$B
     LLMs.} Our fleet covers only instruction-tuned 7--8B models.
-  \item \textbf{TODO: $\rho$-sweep on the new fleet.} The current
+  \item \textbf{$\rho$-sweep on the new fleet.} The current
     headline runs use $\rho=0.5$ only; the previous gate-invariance
     ablation was on a smaller setup.
-  \item \textbf{TODO: Adversary with detector-oracle access.}
+  \item \textbf{Adversary with detector-oracle access.}
     \autoref{thm:security} excludes adversaries who can query the
     detector; characterising query complexity is open.
 \end{itemize}

@@ -1,6 +1,4 @@
 % 07_experiments.tex
-\providecommand{\todoplot}[1]{\fbox{\textbf{TODO plot}: #1}}
-\providecommand{\todotable}[1]{\fbox{\textbf{TODO table}: #1}}
 
 \section{Experiments}
 \label{sec:experiments}
@@ -30,7 +28,7 @@ checkpoints in the 7--8B parameter range:
 \texttt{meta-llama/Llama-3.1-8B-Instruct},
 \texttt{Qwen/Qwen-2.5-7B-Instruct}, and
 \texttt{mistralai/Mistral-7B-Instruct-v0.3}. The same secret key
-$k$ is fixed across every run.
+$\kappa$ is fixed across every run.
 
 \textbf{Domains.} Four prompt domains stress different entropy
 regimes: \emph{code} (HumanEval problem stems), \emph{factual}
@@ -198,7 +196,8 @@ overlaying the slope-1 identity.
     detection-decay ratio under NLLB-200 EN$\to$\{FR, DE, RU,
     ZH\}$\to$EN pivots, with $\delta_{\mathrm{eff}}$ measured per
     generation. The closed-form $(1-\delta_{\mathrm{eff}})^2$
-    prediction from \autoref{thm:robustness} is the diagonal.}
+    prediction from \autoref{thm:robustness} is the diagonal.
+    Per-pivot TPR breakdown in \autoref{app:translation-pivots}.}
   \label{fig:translation-decay}
 \end{figure*}
 

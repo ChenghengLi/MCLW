@@ -18,8 +18,8 @@ outputs $S^\star$ rises sharply with stricter $\alpha$, so deployers
 targeting tight false-positive rates on short passages should
 either tolerate the higher state count or shift the
 specification toward a longer floor. When the expected attack
-profile is dominated by paraphrase or cross-lingual rewrite
-(\autoref{subsec:exp3-translation}), the universal robustness
+profile is dominated by cross-lingual rewrite or random
+substitution (\autoref{subsec:exp3-translation}), the universal robustness
 threshold $\delta^\star$ of \autoref{thm:robustness} bounds the
 worst case across all gating choices, so the practical decision
 collapses to whether the deployer wants entropy gating
@@ -56,6 +56,18 @@ models above 10B. Trends across these three are consistent
 every $k$-regular topology; we validate $k=1$ (clockwork) and $k=2$
 (soft-cycle) empirically. $k=3$ and beyond are deferred to the
 extended version of this paper.
+
+\paragraph{Calibration-recipe alternatives.} Two operational
+recipes that close the FPR gap empirically (Fix~1: empirical
+threshold recalibration; Fix~5: HDD-lite, model-free
+inverse-frequency-weighted statistic) are tabulated in
+\autoref{app:fpr-recipes}; the apples-to-apples 1\%-FPR
+recalibrated head-to-head appears in
+\autoref{app:headline-recalibrated}. Beyond a positive 1\% FPR
+target, MCL also admits an empirical FPR$=0\%$ regime via threshold
+lifting (\autoref{app:fpr-zero}); KGW and SWEET cannot achieve this
+regime because their watermarked and non-watermarked $z$
+distributions overlap.
 
 \paragraph{Incomplete SWEET coverage.}
 \autoref{tab:headline-aggregate}'s SWEET aggregate is computed over
