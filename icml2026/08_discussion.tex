@@ -28,13 +28,20 @@ Recomputing the detection threshold from the empirical SD of $z$ on
 a non-watermarked corpus gives $z^* = \hat\mu + z_\alpha\,\hat\sigma$,
 which brings empirical FPR from $2.1\%$ to $1.2\%$ at $\alpha=1\%$
 while preserving TPR$=100\%$ (\autoref{app:fpr-recipes}). The
-apples-to-apples $1\%$-FPR head-to-head appears in
-\autoref{app:headline-recalibrated}; MCL also admits an empirical
-FPR$=0\%$ regime via threshold lifting (\autoref{app:fpr-zero}),
-which KGW and SWEET cannot achieve since their watermarked and
-non-watermarked $z$ distributions overlap. Failure modes we tried
-but did not adopt (Newey--West HAC, $k$-skip, stopword filtering,
-HDD-lite) are tabulated in \autoref{app:fpr-recipes}.
+plug-in is calibrated at $\alpha=1\%$ but the empirical $z$-null is
+leptokurtic (excess kurtosis $\approx 1.4$); for tighter $\alpha
+\leq 0.5\%$ or for the high-$S$ regime ($S \geq 7$, where the SD
+recipe is still $2$--$4\%$ off after recalibration) the
+empirical-quantile recipe $z^* = \hat F^{-1}(1{-}\alpha)$ is the
+robust drop-in (and is what we use to draw the recalibrated curve in
+\autoref{fig:cal-fpr}). The apples-to-apples $1\%$-FPR head-to-head
+appears in \autoref{app:headline-recalibrated}; MCL also admits an
+empirical FPR$=0\%$ regime via threshold lifting
+(\autoref{app:fpr-zero}), which KGW and SWEET cannot achieve since
+their watermarked and non-watermarked $z$ distributions overlap.
+Failure modes we tried but did not adopt (Newey--West HAC, $k$-skip,
+stopword filtering, HDD-lite) are tabulated in
+\autoref{app:fpr-recipes}.
 
 \subsection{Limitations}
 
@@ -44,9 +51,12 @@ at $T{=}0.7$, top-$p{=}1$, $n{=}200$ with one deterministic
 prompt-order seed (no replicate-seed CIs). The fleet covers three
 open-weight instruction-tuned 7--8B models; base, smaller, and
 $\geq 10$B models are deferred. We validate $k$-regular MCL at
-$k\in\{1,2\}$; $k\geq 3$ is deferred. The translation evaluation
-covers $11/12$ (model, domain) cells (Mistral$\times$code did not
-complete in the cluster window; see
+$k\in\{1,2\}$; $k\geq 3$ is deferred. The robustness suite is translation-only: we do
+\emph{not} run grammar-preserving paraphrase (e.g.\ DIPPER), so the
+strongest robustness claim is against translation and uniform
+substitution, not against adversarial paraphrasing. The translation
+evaluation itself covers $11/12$ (model, domain) cells
+(Mistral$\times$code did not complete in the cluster window; see
 \autoref{tab:translation-pivots}), and the SWEET row of the
 empirically recalibrated head-to-head
 (\autoref{tab:headline-recalibrated}) is omitted since the SWEET

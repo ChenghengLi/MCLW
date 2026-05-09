@@ -207,7 +207,15 @@ universal robustness threshold; we isolate it as a lemma.
   $\hat\sigma$ (a calibration-side assumption that holds far better
   than the i.i.d.\ random-oracle null assumed by
   \autoref{thm:detection}), then declaring $H_1$ when $z > z^\star$
-  has FPR $\to \alpha$ as $M\to\infty$.
+  has FPR $\to \alpha$ as $M\to\infty$. When the $z$-null is
+  measurably non-Gaussian (e.g.\ heavy-tailed at large $S$), the
+  Gaussian plug-in $z^\star$ is replaced by the
+  \emph{empirical-quantile} drop-in
+  $z^\star_{\mathrm{emp}} = \hat F^{-1}(1{-}\alpha)$, where
+  $\hat F$ is the empirical CDF of $\{z_i\}$; this delivers the
+  target FPR at any $\alpha$ by Glivenko--Cantelli regardless of
+  null shape (at the cost of $\sqrt{1/M}$ Monte-Carlo noise in the
+  threshold).
 \end{proposition}
 
 \begin{proof}
